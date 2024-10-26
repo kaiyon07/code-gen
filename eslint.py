@@ -23,7 +23,7 @@ class EslintProcessor:
         self.options = dict(DEFAULT_OPTIONS)
         self.options['config'] = config_path
 
-    def evaluate(self, code: str) -> str:
+    def evaluate(self, code: str):
         cmd = [COMMAND] + [f"--{key} {value}" for key, value in self.options.items()]
 
         result = subprocess.run(" ".join(cmd), shell=True, capture_output=True, text=True, input=code)
