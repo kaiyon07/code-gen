@@ -1,0 +1,15 @@
+You are given the following JavaScript function:
+```
+{function}
+```
+
+Write at least 10 tests for this function in JSON format. Do not include any comments in your JSON. This is the format you should follow. Note that you do not have to include expected outputs, only inputs:
+```
+{
+  "functionName": "string",
+  "testInputs": [
+    [/* parameters for test 1*/],
+	[/* parameters for test 2*/],
+  ]
+}
+```
