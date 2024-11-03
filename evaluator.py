@@ -77,6 +77,10 @@ def evaluate(original_code, output, run_code=True):
 
     result = subprocess.run(["npm", "start"], cwd="./js", capture_output=True, text=True)
 
-    result_parsed = json.loads(result.stdout[result.stdout.find("{"):])
+    result_parsed = {}
+    try:
+        result_parsed = json.loads(result.stdout[result.stdout.find("{"):])
+    except:
+        result_parsed['pyError'] = "No parseable output from JavaScript evaluation.. crashed?"
 
     return static_analysis_result | result_parsed
