@@ -113,7 +113,6 @@ function test() {
     let numRefactoredCorrect = 0;
     originalResults.forEach(
         (exp, i) => {
-            console.log(`${exp} ${refactoredResults[i]} ${optimizedResults[i]}`);
             if (_.isEqual(exp, refactoredResults[i]))
                 numRefactoredCorrect++;
 

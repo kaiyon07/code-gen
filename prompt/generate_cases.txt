@@ -9,7 +9,7 @@ Write at least 10 tests for this function in JSON format. Do not include any com
   "functionName": "string",
   "testInputs": [
     [/* parameters for test 1*/],
-	[/* parameters for test 2*/],
+    [/* parameters for test 2*/]
   ]
 }
 ```
