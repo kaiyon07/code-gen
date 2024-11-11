@@ -3,7 +3,13 @@ import google.generativeai as genai
 from config import MAX_TOKENS_ANSWER, GEMINI_KEY
 import typing_extensions as typing
 
-genai.configure(api_key=GEMINI_KEY)
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+api_key = os.getenv("GEMINI_KEY")
+
+genai.configure(api_key=api_key)
 
 
 #Note works with both flash and pro
