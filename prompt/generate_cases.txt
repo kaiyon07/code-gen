@@ -3,7 +3,9 @@ You are given the following JavaScript function:
 {function}
 ```
 
-Write at least 10 tests for this function in JSON format. Do not include any comments in your JSON. This is the format you should follow. Note that you do not have to include expected outputs, only inputs:
+Write at least 10 tests for this function in JSON format. Do not include any comments in your JSON. If the parameters have functions in them, make sure to follow the JavaScript format and also cover those functions in quotation marks. 
+For example, a function that checks whether a number is even or not should be like "function(value, index) { return value % 2 === 0; }" and not "(element) => element > 2".
+This is the format you should follow. Note that you do not have to include expected outputs, only inputs:
 ```
 {
   "functionName": "string",
