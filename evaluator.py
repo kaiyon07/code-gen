@@ -1,6 +1,6 @@
 from eslint import EslintProcessor
 from google_closure_compiler import GoogleClosureCompiler
-# from gemini_api import gemini_response
+from gemini_api import gemini_response
 import subprocess
 import re
 import json
@@ -80,18 +80,19 @@ def evaluate(original_code, output, run_code=True):
     with open("./prompt/generate_cases.txt", "r") as file:
         test_cases_prompt = file.read().replace("{function}", original_code)
 
-    # test_case_string = extract_code_from_markdown(gemini_response(test_cases_prompt, 'gemini-1.5-pro'))
+    test_cases_string = extract_code_from_markdown(gemini_response(test_cases_prompt, 'gemini-1.5-pro'))
     # TEMP CODE TO SET test_case_string
     # TODO remove the next `with` block and uncomment the code above to generate by chatgpt
-    with open("./js/inputs.json", "r") as file:
-        test_cases_string = file.read()
+    
+    #with open("./js/inputs.json", "r") as file:
+    #    test_cases_string = file.read()
 
     # Write the LLM-generated JSON containing test inputs into a JSON file
     with open("./js/inputs.json", "w") as file:
         file.write(test_cases_string)
 
     test_cases_parsed = json.loads(test_cases_string)
-
+    
     # Optimize the code using Google Closure Compiler (for performance comparison)
     optimized_code = optimize_code(google_closure_compiler, original_code, test_cases_parsed['functionName'])
 

@@ -10,3 +10,7 @@ JavaScript:
 Python:
 * `OpenAI`
 * `google.generativeai`
+
+Evaluation Setup:
+* `cd js`
+* `npm install`

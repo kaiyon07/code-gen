@@ -10,12 +10,12 @@ function test() {
     {
         // #put ORIGINAL
 
-        let testInputs = JSON.parse(JSON.stringify(inputs.testInputs));
+        let tests1 = JSON.parse(JSON.stringify(inputs.tests));
         let t0 = performance.now();
-        testInputs.forEach(
+        tests1.forEach(
             (input) => {
                 try {
-                    originalResults.push(eval(`${inputs.functionName}(...input)`))
+                    originalResults.push(eval(input))
                 }
                 catch (e) {
                     originalResults.push(typeof e)
@@ -26,12 +26,12 @@ function test() {
         runtimeOriginal = t1 - t0;
 
         // Check for exceptions
-        let testInputs2 = JSON.parse(JSON.stringify(inputs.testInputs));
+        let tests2 = JSON.parse(JSON.stringify(inputs.tests));
         let numErrors = 0;
-        testInputs2.forEach(
+        tests2.forEach(
             (input) => {
                 try {
-                    eval(`${inputs.functionName}(...input)`)
+                    eval(input)
                 }
                 catch (e) {
                     numErrors++;
@@ -39,7 +39,7 @@ function test() {
             }
         );
 
-        if (numErrors === inputs.testInputs.length)
+        if (numErrors === inputs.tests.length)
         {
             console.log(JSON.stringify({
                 evaluationError: "Original code does not run properly, all tests return error"
@@ -57,12 +57,12 @@ function test() {
     {
         // #put OPTIMIZED
 
-        let testInputs = JSON.parse(JSON.stringify(inputs.testInputs));
+        let tests = JSON.parse(JSON.stringify(inputs.tests));
         let t0 = performance.now();
-        testInputs.forEach(
+        tests.forEach(
             (input) => {
                 try {
-                    optimizedResults.push(eval(`${inputs.functionName}(...input)`))
+                    optimizedResults.push(eval(input))
                 }
                 catch (e) {
                     optimizedResults.push(typeof e)
@@ -77,12 +77,12 @@ function test() {
     {
         // #put REFACTORED
 
-        let testInputs = JSON.parse(JSON.stringify(inputs.testInputs));
+        let tests = JSON.parse(JSON.stringify(inputs.tests));
         let t0 = performance.now();
-        testInputs.forEach(
+        tests.forEach(
             (input) => {
                 try {
-                    refactoredResults.push(eval(`${inputs.functionName}(...input)`))
+                    refactoredResults.push(eval(input))
                 }
                 catch (e) {
                     refactoredResults.push(typeof e)

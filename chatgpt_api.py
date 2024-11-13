@@ -3,7 +3,14 @@ from config import OPENAI_KEY
 import time
 import os
 import json
-client = OpenAI(api_key=OPENAI_KEY)
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+api_key = os.getenv("OPENAI_KEY")
+
+client = OpenAI(api_key=api_key)
 
 class ChatGPT(object):
     def __init__(self, MODEL):
