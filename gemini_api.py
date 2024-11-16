@@ -2,12 +2,12 @@ import os
 import google.generativeai as genai
 from config import MAX_TOKENS_ANSWER, GEMINI_KEY
 import typing_extensions as typing
-
+                       
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-api_key = os.getenv("GEMINI_KEY")
+api_key = "AIzaSyCCX4QRat4pczNgXoNWcMogNEjtuNPcbjQ"
 
 genai.configure(api_key=api_key)
 
