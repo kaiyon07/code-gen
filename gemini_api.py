@@ -1,8 +1,7 @@
 import os
 import google.generativeai as genai
-from config import MAX_TOKENS_ANSWER, GEMINI_KEY
-import typing_extensions as typing
-                       
+from config import GEMINI_KEY
+import typing_extensions as typing            
 from dotenv import load_dotenv
 import os
 
@@ -14,7 +13,7 @@ genai.configure(api_key=api_key)
 
 #Note works with both flash and pro
 
-def gemini_response(prompt, model_name):
+def gemini_response(prompt, model_name, MAX_TOKENS_ANSWER=1000):
     model = genai.GenerativeModel(
     model_name,
     generation_config={
@@ -34,7 +33,7 @@ class Recipe(typing.TypedDict):
 
 #Note works with only pro1.5
 
-def gemini_json_response(prompt,json_out,model_name):
+def gemini_json_response(prompt,json_out,model_name, MAX_TOKENS_ANSWER=1000):
     model = genai.GenerativeModel(
     model_name,
     generation_config={
