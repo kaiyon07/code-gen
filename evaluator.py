@@ -40,15 +40,17 @@ def evaluate(original_code, output, run_code=True):
     :param run_code: bool, if False, only run static analysis, if True, run performance and correctness tests
     :return: a Dict of the following format
     {
-        'eslint_delta': int, change in number of ESLint-found issues
-        'closure_delta': int, change in number of Google Closure Compiler Warnings
+        'eslint_count_original': int, number of ESLint-found issues in original code
+        'eslint_count_refactored': int, number of ESLint-found issues in the refactored code
+        'closure_count_original': int, number of Google Closure Compiler Warnings in original code
+        'closure_count_refactored': int, number of Google Closure Compiler Warnings in refactored code
         'closure_optimized_code': str, the code which Google Closure Compiler transpiled
-        'runtimeOriginal': runtime of original_code against tests
-        'runtimeOptimized': runtime of Google Closure Compiler transpiled code against tests
-        'runtimeRefactored': runtime of refactored (output) code against tests
-        'numOptimizedCorrect': number of tests Google Closure Compiler transpiled code works on
-        'numRefactoredCorrect': number of tests refactored (output) code works on
-        'total': total number of tests
+        'runtimeOriginal': float, runtime of original_code against tests
+        'runtimeOptimized': float, runtime of Google Closure Compiler transpiled code against tests
+        'runtimeRefactored': float, runtime of refactored (output) code against tests
+        'numOptimizedCorrect': int, number of tests Google Closure Compiler transpiled code works on
+        'numRefactoredCorrect': int, number of tests refactored (output) code works on
+        'total': int, total number of tests
     }
     """
     # Part 1: Static analysis
@@ -60,16 +62,14 @@ def evaluate(original_code, output, run_code=True):
     eslint_original = eslint.evaluate(original_code)[0]['messages']
     eslint_output = eslint.evaluate(output_code)[0]['messages']
 
-    eslint_delta = len(eslint_output) - len(eslint_original)
-
     closure_original = google_closure_compiler.evaluate(original_code)
     closure_output = google_closure_compiler.evaluate(output_code)
 
-    closure_delta = len(closure_output) - len(closure_original)
-
     static_analysis_result = {
-        'eslint_delta': eslint_delta,  # number of reduced issues with the refactored code with eslint
-        'closure_delta': closure_delta,  # number of reduced issues with the refactored code with closure
+        'eslint_count_original': len(eslint_original),
+        'eslint_count_refactored': len(eslint_output),
+        'closure_count_original': len(closure_original),
+        'closure_count_refactored': len(closure_output),
     }
 
     if not run_code:
