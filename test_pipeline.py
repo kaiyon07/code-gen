@@ -2,11 +2,11 @@ import os
 import json
 import time
 from tqdm import tqdm  # Import tqdm for the progress bar
-from evaluator import evaluate
-from eslint import EslintProcessor
-from google_closure_compiler import GoogleClosureCompiler
-from chatgpt_api import ChatGPT  # Import ChatGPT
-from gemini_api import gemini_response  # Import Gemini API
+from linter_code.evaluator import evaluate
+from linter_code.eslint import EslintProcessor
+from linter_code.google_closure_compiler import GoogleClosureCompiler
+from api_requests.chatgpt_api import ChatGPT  # Import ChatGPT
+from api_requests.gemini_api import gemini_response  # Import Gemini API
 
 # Define the main dataset folder and output files for each model
 dataset_folder = './our_dataset'

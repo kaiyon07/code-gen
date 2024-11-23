@@ -1,6 +1,6 @@
 import os
 import google.generativeai as genai
-from config import GEMINI_KEY
+from api_requests.config import GEMINI_KEY
 import typing_extensions as typing            
 from dotenv import load_dotenv
 import os

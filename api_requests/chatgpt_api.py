@@ -1,5 +1,5 @@
 from openai import OpenAI
-from config import OPENAI_KEY
+from api_requests.config import OPENAI_KEY
 import time
 import os
 import json
