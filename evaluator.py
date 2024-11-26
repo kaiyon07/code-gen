@@ -114,10 +114,6 @@ def evaluate(original_code, output, run_code=True):
         test_cases_string = extract_code_from_markdown(gemini_response(test_cases_prompt, 'gemini-1.5-pro'))
         write_test_case_cache(original_code, test_cases_string)
 
-    # Write the LLM-generated JSON containing test inputs into a JSON file
-    with open("./js/inputs.json", "w") as file:
-        file.write(test_cases_string)
-
     # Try to parse LLM-generated JSON - it may be cut off
     test_cases_parsed = None
     for json_completion in ["", "\\\")\"]}", "\"]}", "]}", "}"]:
@@ -126,10 +122,15 @@ def evaluate(original_code, output, run_code=True):
         except json.JSONDecodeError:
             pass
         else:
+            test_cases_string += json_completion
             break
 
     if not test_cases_parsed:
         return static_analysis_result
+
+    # Write the LLM-generated JSON containing test inputs into a JSON file
+    with open("./js/inputs.json", "w") as file:
+        file.write(test_cases_string)
 
     static_analysis_result['test_cases'] = test_cases_string
     
@@ -151,7 +152,11 @@ def evaluate(original_code, output, run_code=True):
         file.write(js_execute_file)
 
     # Run the hardcoded JavaScript source using Node (output is a JSON printed to stdout)
-    result = subprocess.run(["npm", "start"], cwd="./js", capture_output=True, text=True)
+    try:
+        result = subprocess.run(["npm", "start"], cwd="./js", capture_output=True, text=True, timeout=60)
+    except subprocess.TimeoutExpired:
+        subprocess.run(["pkill", "-9", "node"])
+        return static_analysis_result | {'pyError': 'node.js timeout'}
 
     # Parse the results of execution and combine with the results from static analysis
     result_parsed = {}

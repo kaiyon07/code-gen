@@ -1,11 +1,6 @@
 import _ from 'lodash';
 import inputs from './inputs.json' assert { type: 'json' };
 
-/* Maximum Execution Time: 2 minutes */
-setTimeout(() => {
-    process.exit(0);
-}, 1000 * 60 * 2);
-
 function test() {
     let originalResults = Array();
     let optimizedResults = Array();
@@ -144,5 +139,3 @@ catch (e) {
         evaluationError: e
     }));
 }
-
-process.exit(0);
