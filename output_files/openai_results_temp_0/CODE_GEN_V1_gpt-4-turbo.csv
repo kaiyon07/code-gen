@@ -1,0 +1,2242 @@
+,gt_code,level,refactor_code,rationale
+0,"var createHelloWorld = function() { 
+    return function() {
+        return ""Hello World"";
+    }
+}",Easy,"/**
+ * @return {Function}
+ */
+const createHelloWorld = () => {
+    return () => ""Hello World"";
+};
+
+/**
+ * Example usage:
+ * const f = createHelloWorld();
+ * console.log(f()); // ""Hello World""
+ */","The function 'createHelloWorld' is defined using an arrow function, adhering to ES6+ syntax for cleaner and more concise code. It returns another arrow function that simply returns the string ""Hello World"". This inner function ignores any arguments passed to it, fulfilling the requirement to always return ""Hello World"". No error handling is implemented because the function's behavior is straightforward and does not involve any operations that typically require error handling, such as I/O operations or data processing. The code is organized for readability, with clear example usage commented for demonstration."
+1,"var createCounter = function(init) {
+  let presentCount = init;
+
+  function increment() {
+    return ++presentCount;
+  }
+
+  function decrement() {
+      return --presentCount;
+  }
+
+  function reset() {
+      return (presentCount = init);
+  }
+
+  return { increment, decrement, reset };
+};",Easy,"/**
+ * @param {integer} init
+ * @return { increment: Function, decrement: Function, reset: Function }
+ */
+var createCounter = function(init) {
+    if (typeof init !== 'number' || isNaN(init)) {
+        throw new Error('Initial value must be a valid number.');
+    }
+
+    let currentValue = init;
+
+    return {
+        increment: () => ++currentValue,
+        decrement: () => --currentValue,
+        reset: () => currentValue = init
+    };
+};","The function createCounter is designed to encapsulate a counter functionality with an initial value specified by the parameter 'init'. It validates the input to ensure it's a number, enhancing robustness. The function uses a closure to maintain the state of 'currentValue', which is modified by the returned methods. Each method (increment, decrement, reset) directly manipulates 'currentValue' and returns the updated value. This approach ensures that the counter's state is private and only modifiable through the provided methods. The use of arrow functions provides a concise syntax and binds 'this' lexically, which is suitable here since there's no use of 'this' in the functions."
+2,"var map = function(arr, fn) {
+    const transformedArr = [];
+    arr.forEach((element, index) => {
+      transformedArr[index] = fn(element, index);
+    });
+    return transformedArr;
+  };",Easy,"/**
+ * @param {number[]} arr
+ * @param {Function} fn
+ * @return {number[]}
+ */
+var map = function(arr, fn) {
+    if (!Array.isArray(arr)) throw new TypeError('First argument must be an array.');
+    if (typeof fn !== 'function') throw new TypeError('Second argument must be a function.');
+
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+        result.push(fn(arr[i], i));
+    }
+    return result;
+};","The provided JavaScript function 'map' takes two parameters: an array 'arr' and a function 'fn'. It first checks if the inputs are of the correct types, throwing a TypeError if not. This ensures robust error handling. The function then initializes an empty array 'result'. It iterates over 'arr', applying the function 'fn' to each element along with its index, and stores the result in 'result'. This approach avoids using Array.map to meet the requirement, and uses ES6 features like 'let' for block-scoped variables and arrow functions for clarity and conciseness."
+3,"var filter = function(arr, fn) {
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (fn(arr[i], i)) {
+      result.push(arr[i]);
+    }
+  }
+  return result;
+};",Easy,"/**
+ * @param {number[]} arr
+ * @param {Function} fn
+ * @return {number[]}
+ */
+var filter = function(arr, fn) {
+    if (!Array.isArray(arr)) throw new TypeError('Expected an array');
+    if (typeof fn !== 'function') throw new TypeError('Expected a function');
+
+    const filteredArr = [];
+    for (let i = 0; i < arr.length; i++) {
+        if (fn(arr[i], i)) {
+            filteredArr.push(arr[i]);
+        }
+    }
+    return filteredArr;
+};","The provided JavaScript function 'filter' takes an array 'arr' and a function 'fn' as parameters. It first checks if 'arr' is indeed an array and if 'fn' is a function, throwing a TypeError if either condition fails. This ensures the function operates with correct input types. The function then initializes an empty array 'filteredArr' to store elements that pass the 'fn' test. It iterates over 'arr', applying 'fn' to each element and its index. If 'fn' returns a truthy value, the element is added to 'filteredArr'. This approach avoids using Array.filter to meet the requirement of not using built-in methods, and uses ES6 features like 'let' for block-scoped variable declaration."
+4,"/**
+ * @param {number[]} nums
+ * @param {Function} fn
+ * @param {number} init
+ * @return {number}
+ */
+var reduce = function(nums, fn, init) {
+  let val = init;
+  for (let i = 0; i < nums.length; i++) {
+    val = fn(val, nums[i]);
+  }
+  return val;
+};",Easy,"/**
+ * @param {number[]} nums
+ * @param {Function} fn
+ * @param {number} init
+ * @return {number}
+ */
+var reduce = function(nums, fn, init) {
+    if (!Array.isArray(nums)) throw new TypeError('nums must be an array');
+    if (typeof fn !== 'function') throw new TypeError('fn must be a function');
+    if (typeof init !== 'number') throw new TypeError('init must be a number');
+
+    let result = init;
+    for (let i = 0; i < nums.length; i++) {
+        result = fn(result, nums[i]);
+    }
+    return result;
+};","The provided JavaScript function 'reduce' takes three parameters: an array 'nums', a reducer function 'fn', and an initial value 'init'. It iterates over the array, applying the reducer function to each element sequentially, starting with the initial value. The function uses a for loop to process each element of the array, updating the result with the return value of the reducer function. Error handling is implemented to ensure that the inputs are of the correct type, throwing a TypeError if they are not. This ensures robustness and prevents runtime errors due to incorrect input types. The use of ES6 syntax, such as 'let' for variable declaration, adheres to modern JavaScript standards."
+5,"/**
+ * @param {Function} fn
+ * @param {number} t
+ * @return {Function}
+ */
+var timeLimit = function(fn, t) {
+  return async function(...args) {
+    return new Promise((delayresolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(timeoutId);
+        reject(""Time Limit Exceeded"");
+      }, t);
+
+      fn(...args)
+        .then((result) => {
+          clearTimeout(timeoutId);
+          delayresolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+  };
+};
+
+/**
+ * const limited = timeLimit((t) => new Promise(res => setTimeout(res, t)), 100);
+ * limited(150).catch(console.log) // ""Time Limit Exceeded"" at t=100ms
+ */",Medium,"/**
+ * @param {Function} fn
+ * @param {number} t
+ * @return {Function}
+ */
+var timeLimit = function(fn, t) {
+    return async function(...args) {
+        let timeout;
+        try {
+            const timeoutPromise = new Promise((_, reject) => {
+                timeout = setTimeout(() => reject('Time Limit Exceeded'), t);
+            });
+            const result = await Promise.race([fn(...args), timeoutPromise]);
+            clearTimeout(timeout);
+            return result;
+        } catch (error) {
+            clearTimeout(timeout);
+            throw error;
+        }
+    };
+};","The provided JavaScript code defines a function 'timeLimit' that takes another function 'fn' and a time limit 't' in milliseconds. It returns a new function that, when called, executes 'fn' with any provided arguments asynchronously. The function uses 'Promise.race' to race the function 'fn' against a timeout promise that rejects after 't' milliseconds. If 'fn' resolves before the timeout, the result is returned and the timeout is cleared. If the timeout occurs first, it rejects with 'Time Limit Exceeded', and the timeout is also cleared in the catch block to handle any errors cleanly. This ensures that the function either successfully returns the result of 'fn' or rejects if the time limit is exceeded, adhering to the problem requirements."
+6,"const TimeLimitedCache = function() {
+    this.cache = new Map();  // Using Map so we don't need a size variable
+};
+
+TimeLimitedCache.prototype.set = function(key, value, duration) {
+    let found = this.cache.has(key);
+    if (found) clearTimeout(this.cache.get(key).ref);  // Cancel previous timeout
+    this.cache.set(key, {
+        value,  // Equivalent to `value: value`
+        ref: setTimeout(() => this.cache.delete(key), duration)
+    });
+    return found;
+};
+
+TimeLimitedCache.prototype.get = function(key) {
+    return this.cache.has(key) ? this.cache.get(key).value : -1;
+};
+
+TimeLimitedCache.prototype.count = function() {
+    return this.cache.size;
+};",Medium,"class TimeLimitedCache {
+    constructor() {
+        this.cache = new Map();
+    }
+
+    set(key, value, duration) {
+        if (!Number.isInteger(key) || !Number.isInteger(value) || !Number.isInteger(duration)) {
+            throw new Error('Key, value, and duration must be integers');
+        }
+        const exists = this.cache.has(key) && Date.now() < this.cache.get(key).expiry;
+        const expiry = Date.now() + duration;
+        this.cache.set(key, { value, expiry });
+        return exists;
+    }
+
+    get(key) {
+        if (this.cache.has(key)) {
+            const item = this.cache.get(key);
+            if (Date.now() < item.expiry) {
+                return item.value;
+            }
+        }
+        return -1;
+    }
+
+    count() {
+        let count = 0;
+        this.cache.forEach((value, key) => {
+            if (Date.now() < value.expiry) {
+                count++;
+            }
+        });
+        return count;
+    }
+}","The provided JavaScript code defines a class 'TimeLimitedCache' that manages key-value pairs with expiration times. The 'set' method updates or adds a key-value pair with a specified duration, returning true if the key already existed and was not expired. The 'get' method retrieves the value for a key if it hasn't expired, otherwise returns -1. The 'count' method counts the number of unexpired keys. Modern JavaScript features like 'class' syntax and 'Map' are used for better performance and readability. Error handling ensures that inputs are integers, preventing unexpected behavior."
+7,"var debounce = function(fn, t) {
+    let id;
+        return function (...args) {
+                clearTimeout(id);
+                id = setTimeout(() => fn(...args), t);
+        }
+};",Medium,"/**
+ * @param {Function} fn
+ * @param {number} t milliseconds
+ * @return {Function}
+ */
+var debounce = function(fn, t) {
+    let timeoutId = null;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            fn.apply(this, args);
+        }, t);
+    };
+};","The provided JavaScript code defines a debounce function that delays the execution of a given function 'fn' by 't' milliseconds, and cancels previous calls if the function is invoked again within that time frame. A variable 'timeoutId' is used to keep track of the timeout. Each time the returned function is called, any existing timeout is cleared (using 'clearTimeout'), and a new timeout is set (using 'setTimeout'). This ensures that 'fn' is only called after 't' milliseconds have passed without any further calls. The use of 'apply' allows the function to be called with the correct context and arguments."
+8,"var promiseAll = async function(functions) {
+    return new Promise((resolve, reject) => {
+        let results = [];
+        functions.forEach(fn => {
+            fn()
+            .then(val => results.push(val))
+            .catch(reason => reject(reason));
+        });
+        resolve(results);
+    })};
+
+var promiseAll = async function(functions) {
+    return new Promise((resolve,reject)=>{
+        if(functions.length === 0) {
+            resolve([]);
+            return;
+        }
+        const arr=new Array(functions.length);
+        arr.fill(null);
+        let count=0
+        functions.forEach(async(fn,i)=>{
+            try{
+                arr[i]=await fn()
+                count++
+            
+                if(count===functions.length){
+                    resolve(arr);
+                }
+            }
+            catch(e){
+                reject(e);
+            }
+        
+        });
+    });
+};",Medium,"/**
+ * @param {Array<Function>} functions
+ * @return {Promise<any>}
+ */
+var promiseAll = function(functions) {
+    return new Promise((resolve, reject) => {
+        let results = [];
+        let completed = 0;
+        if (functions.length === 0) {
+            resolve(results);
+        }
+        functions.forEach((func, index) => {
+            func()
+                .then(result => {
+                    results[index] = result;
+                    completed++;
+                    if (completed === functions.length) {
+                        resolve(results);
+                    }
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    });
+};","The provided JavaScript code defines a function 'promiseAll' that takes an array of asynchronous functions and returns a promise. This promise resolves with an array of results from the asynchronous functions if all functions resolve successfully, or it rejects with the reason of the first rejection. The implementation manually tracks the completion of each asynchronous function using a counter 'completed' and an array 'results' to store the results in the order of the original functions. Each function is called, and its result is placed in the correct position in the 'results' array based on its index. If a function rejects, the promise immediately rejects with the error. This approach ensures that the functions are executed in parallel and does not rely on 'Promise.all', fulfilling the task requirements."
+9,"class EventEmitter {
+  constructor() {
+    this.events = new Map();
+  }
+
+  subscribe(event, cb) {
+    if (!this.events.has(event)) {
+      this.events.set(event, []);
+    }
+
+    const listeners = this.events.get(event);
+    listeners.push(cb);
+
+    return {
+      unsubscribe: () => {
+        const index = listeners.indexOf(cb);
+        if (index !== -1) {
+          listeners.splice(index, 1);
+        }
+      }
+    };
+  }
+
+  emit(event, args = []) {
+    if (!this.events.has(event)) {
+      return [];
+    }
+
+    const listeners = this.events.get(event);
+    const results = [];
+
+    for (const listener of listeners) {
+      results.push(listener(...args));
+    }
+
+    return results;
+  }
+}",Medium,"class EventEmitter {
+    constructor() {
+        this.events = {};
+    }
+
+    subscribe(eventName, callback) {
+        if (!this.events[eventName]) {
+            this.events[eventName] = [];
+        }
+        this.events[eventName].push(callback);
+
+        return {
+            unsubscribe: () => {
+                const index = this.events[eventName].indexOf(callback);
+                if (index > -1) {
+                    this.events[eventName].splice(index, 1);
+                }
+            }
+        };
+    }
+
+    emit(eventName, args = []) {
+        if (!this.events[eventName]) {
+            return [];
+        }
+        return this.events[eventName].map(callback => callback(...args));
+    }
+}","The EventEmitter class is designed to manage event subscriptions and emissions. It uses an object `events` to store arrays of callback functions keyed by event names. The `subscribe` method adds a callback to the appropriate event array and returns an object with an `unsubscribe` method, allowing removal of the callback. The `emit` method checks if the event has callbacks; if not, it returns an empty array. If there are callbacks, it maps over them, passing any provided arguments, and returns an array of results. This implementation uses ES6 features like arrow functions and the spread operator for clarity and conciseness."
+10,"class Calculator {
+  constructor(value) {
+    this.result = value;
+  }
+  add(value) {
+    this.result += value;
+    return this;
+  }
+
+  subtract(value) {
+    this.result -= value;
+    return this;
+  }
+
+  multiply(value) {
+    this.result *= value;
+    return this;
+  }
+
+  divide(value) {
+    if (value === 0) {
+      throw new Error('Division by zero is not allowed');
+    }
+    this.result /= value;
+    return this;
+  }
+
+  power(value) {
+    this.result = Math.pow(this.result, value);
+    return this;
+  }
+
+  getResult() {
+    return this.result;
+  }
+}",Medium,"class Calculator {
+    constructor(value) {
+        this.result = value;
+    }
+
+    add(value) {
+        this.result += value;
+        return this;
+    }
+
+    subtract(value) {
+        this.result -= value;
+        return this;
+    }
+
+    multiply(value) {
+        this.result *= value;
+        return this;
+    }
+
+    divide(value) {
+        if (value === 0) {
+            throw new Error('Division by zero is not allowed');
+        }
+        this.result /= value;
+        return this;
+    }
+
+    power(value) {
+        this.result = Math.pow(this.result, value);
+        return this;
+    }
+
+    getResult() {
+        return this.result;
+    }
+}",The provided JavaScript code defines a Calculator class that supports basic arithmetic operations and method chaining. The constructor initializes the result with a given value. Each arithmetic method performs an operation on the result and returns the Calculator instance to allow chaining. The divide method includes error handling for division by zero. The power method uses Math.pow for exponentiation. The getResult method simply returns the current result. This design adheres to ES6+ syntax and best practices for readability and functionality.
+11,"/**
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+
+class ListNode {
+  constructor(val, next) {
+    this.val = (val === undefined ? 0 : val);
+    this.next = (next === undefined ? null : next);
+  }
+}
+
+function arrayToList(array) {
+    if (array.length === 0) return null;
+
+    let head = new ListNode(array[0]);
+    let current = head;
+
+    for (let i = 1; i < array.length; i++) {
+        current.next = new ListNode(array[i]);
+        current = current.next;
+    }
+
+    return head;
+}
+
+var mergeKLists = function (lists) {
+    let nums = []
+
+    for (let i = 0; i < lists.length; i++) {
+        let current = lists[i]
+        while (current !== null) {
+            nums.push(current.val)
+            current = current.next
+        }
+    }
+
+    return arrayToList(nums.sort((a, b) => a - b))
+};",Medium,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+var mergeKLists = function(lists) {
+    if (!lists.length) return null;
+
+    const mergeTwoLists = (l1, l2) => {
+        const dummy = new ListNode(0);
+        let current = dummy;
+
+        while (l1 && l2) {
+            if (l1.val < l2.val) {
+                current.next = l1;
+                l1 = l1.next;
+            } else {
+                current.next = l2;
+                l2 = l2.next;
+            }
+            current = current.next;
+        }
+
+        current.next = l1 || l2;
+        return dummy.next;
+    };
+
+    while (lists.length > 1) {
+        let mergedList = [];
+        for (let i = 0; i < lists.length; i += 2) {
+            let l1 = lists[i];
+            let l2 = i + 1 < lists.length ? lists[i + 1] : null;
+            mergedList.push(mergeTwoLists(l1, l2));
+        }
+        lists = mergedList;
+    }
+
+    return lists[0];
+};","The provided JavaScript function 'mergeKLists' merges k sorted linked lists into a single sorted linked list. It uses a helper function 'mergeTwoLists' to merge two lists at a time. This approach reduces the problem size by half in each iteration, leading to a logarithmic number of iterations (similar to the merge step in merge sort). The function handles edge cases, such as an empty input array, by returning null. The use of ES6 features like 'let' for block-scoped variables and the concise function syntax enhances readability and follows modern JavaScript practices."
+12,"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {string}
+ */
+var mergeAlternately = function(word1, word2) {
+ let result = '';
+  for (let i = 0; i < Math.max(word1.length, word2.length); i++) {
+    if (i < word1.length) result += word1[i];
+    if (i < word2.length) result += word2[i];
+  }
+  return result;
+};",Easy,"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {string}
+ */
+var mergeAlternately = function(word1, word2) {
+    let mergedString = '';
+    const maxLength = Math.max(word1.length, word2.length);
+
+    for (let i = 0; i < maxLength; i++) {
+        if (i < word1.length) {
+            mergedString += word1[i];
+        }
+        if (i < word2.length) {
+            mergedString += word2[i];
+        }
+    }
+
+    return mergedString;
+};","The function 'mergeAlternately' takes two strings, 'word1' and 'word2', and merges them in an alternating fashion. A 'for' loop iterates up to the length of the longer string. Inside the loop, characters from each string are appended to 'mergedString' if the current index is within the bounds of the respective string. This ensures that if one string is longer, its extra characters are added after the shorter string's characters are exhausted. The function returns the merged string. This approach is efficient, with a time complexity of O(n) where n is the length of the longer string, and it uses ES6 features like 'let' for block-scoped variables."
+13,"var gcdOfStrings = function (str1, str2) {
+    // handle the base case
+    if (str1 + str2 !== str2 + str1) return '';
+    let a = str1.length
+    let b = str2.length
+
+    // loop (divide) until you find the 
+    // highest common factor (length of string) 
+    // like we did in maths
+    while (b) {
+        let temp = b
+        b = a % b
+        a = temp
+    }
+    return str1.substring(0, a)
+};",Easy,"/**
+ * @param {string} str1
+ * @param {string} str2
+ * @return {string}
+ */
+var gcdOfStrings = function(str1, str2) {
+    if (str1 + str2 !== str2 + str1) {
+        return '';
+    }
+    const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+    return str1.substring(0, gcd(str1.length, str2.length));
+};","The function gcdOfStrings checks if the concatenation of str1 and str2 is the same as str2 and str1. If not, it returns an empty string, indicating no common divisor string exists. If they are the same, it uses a helper function gcd to find the greatest common divisor of the lengths of str1 and str2. This gcd value is then used to extract the substring from str1, which is the largest string that divides both str1 and str2. The gcd function is implemented using recursion, following the Euclidean algorithm for computing the greatest common divisor."
+14,"var reverseWords = function(s) {
+    let words = s.split(' ');
+    let res = [];
+
+    for (let i = words.length - 1; i >= 0; i--) {
+        if (words[i]) {
+            res.push(words[i]);
+        }
+    }
+
+    return res.join(' ');
+};",Medium,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var reverseWords = function(s) {
+    if (typeof s !== 'string') {
+        throw new TypeError('Input must be a string.');
+    }
+    return s.trim().split(/\s+/).reverse().join(' ');
+};","The function 'reverseWords' takes a string 's' as input and returns a new string with the words in reverse order. First, it checks if the input is a string to handle type errors. It uses the 'trim' method to remove any leading or trailing spaces. The 'split' method with a regular expression '\s+' is used to split the string into words, handling multiple spaces between words. The 'reverse' method reverses the array of words, and 'join' concatenates them into a single string with a space. This approach ensures the function is robust, handles various edge cases, and adheres to modern JavaScript practices."
+15,"var productExceptSelf = function(nums) {
+    const output = Array(nums.length).fill(1);
+
+    let left = 1;
+    for (let i = 0; i < nums.length; i++) {
+        output[i] *= left;
+        left *= nums[i];
+    }
+
+    let right = 1;
+    for (let i = nums.length - 1; i >= 0; i--) {
+        output[i] *= right;
+        right *= nums[i];
+    }
+
+    return output;    
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var productExceptSelf = function(nums) {
+    if (!Array.isArray(nums) || nums.length === 0) {
+        throw new Error('Invalid input: Input must be a non-empty array.');
+    }
+
+    const length = nums.length;
+    const answer = new Array(length).fill(1);
+
+    let left = 1;
+    for (let i = 0; i < length; i++) {
+        answer[i] = left;
+        left *= nums[i];
+    }
+
+    let right = 1;
+    for (let i = length - 1; i >= 0; i--) {
+        answer[i] *= right;
+        right *= nums[i];
+    }
+
+    return answer;
+};","The provided JavaScript function 'productExceptSelf' calculates the product of all elements in an array except the current element without using division, adhering to the O(n) time complexity requirement. The function first checks if the input is a valid non-empty array. It then initializes an answer array with 1s. Two passes through the input array are made: one from left to right to accumulate the product of elements before the current index, and another from right to left to accumulate the product of elements after the current index. This approach ensures that each element of the answer array is the product of all other elements in the input array. The use of ES6 features like 'let' for block-scoped variables and 'const' for constants enhances readability and follows modern JavaScript practices."
+16,"/**
+ * @param {character[]} chars
+ * @return {number}
+ */
+var compress = function(chars) {
+    let write = 0;
+    let read = 0;
+
+    while (read < chars.length) {
+        let char = chars[read];
+        let count = 0;
+
+        // Count the number of consecutive characters
+        while (read < chars.length && chars[read] === char) {
+            count++;
+            read++;
+        }
+        chars[write] = char;
+        write++;
+        if (count > 1) {
+            for (let digit of String(count)) {
+                chars[write] = digit;
+                write++;
+            }
+        }
+    }
+
+    return write;
+};",Medium,"/**
+ * @param {character[]} chars
+ * @return {number}
+ */
+var compress = function(chars) {
+    if (!Array.isArray(chars)) {
+        throw new TypeError('Input must be an array of characters.');
+    }
+
+    let index = 0;
+    let i = 0;
+
+    while (i < chars.length) {
+        let j = i;
+
+        while (j < chars.length && chars[j] === chars[i]) {
+            j++;
+        }
+
+        const count = j - i;
+        chars[index++] = chars[i];
+
+        if (count > 1) {
+            const countStr = count.toString();
+            for (let k = 0; k < countStr.length; k++) {
+                chars[index++] = countStr[k];
+            }
+        }
+
+        i = j;
+    }
+
+    chars.length = index; // Adjust the length of the array
+    return index;
+};","The provided JavaScript function 'compress' takes an array of characters and compresses it in-place according to the specified rules. The function first checks if the input is a valid array. It uses two pointers, 'i' for the current character and 'j' to find the end of the current group of identical characters. It calculates the count of repeated characters and stores the character and its count (if greater than 1) back into the array. The count is converted to a string to handle counts of 10 or more correctly. The function modifies the length of the original array to reflect the new size after compression and returns this new length. This approach ensures that the space complexity remains constant, as no additional significant space is used beyond basic variables."
+17,"/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var longestOnes = function(nums, k) {
+    let left = 0
+    let max_length = 0
+    let zero_count = 0
+    for (let right = 0; right < nums.length; right++) {
+        if(nums[right] == 0){
+            zero_count += 1
+        }
+        while(zero_count > k) {
+            if(nums[left] == 0) {
+                zero_count -= 1
+            }
+            left++
+        }
+        // Calculate the length of the current valid window 
+        // and update max_length
+        max_length = Math.max(max_length, right- left + 1)
+    }
+    return max_length
+};",Medium,"/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var longestOnes = function(nums, k) {
+    if (!Array.isArray(nums) || typeof k !== 'number') {
+        throw new Error('Invalid input types');
+    }
+
+    let maxConsecutiveOnes = 0;
+    let zeroCount = 0;
+    let left = 0;
+
+    for (let right = 0; right < nums.length; right++) {
+        if (nums[right] === 0) {
+            zeroCount++;
+        }
+
+        while (zeroCount > k) {
+            if (nums[left] === 0) {
+                zeroCount--;
+            }
+            left++;
+        }
+
+        maxConsecutiveOnes = Math.max(maxConsecutiveOnes, right - left + 1);
+    }
+
+    return maxConsecutiveOnes;
+};","The provided JavaScript function, longestOnes, uses a sliding window technique to solve the problem of finding the maximum number of consecutive 1's in a binary array after flipping at most k 0's. The function starts by validating the input types to ensure nums is an array and k is a number. It initializes variables to track the maximum length of consecutive 1's, the count of 0's within the current window, and the left boundary of the window. As the right boundary of the window expands (right index), it checks if the current element is 0 and increments the zeroCount if true. If zeroCount exceeds k, it adjusts the left boundary until the condition is met again, ensuring at most k 0's can be flipped. The maximum length of the window with valid conditions is continuously updated and finally returned. This approach ensures the function is robust, handles edge cases, and operates efficiently with a time complexity of O(n)."
+18,"/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[][]}
+ */
+var findDifference = function(nums1, nums2) {
+    let set1 = new Set(nums1);
+    let set2 = new Set(nums2);
+    let uniqueToNums1 = Array.from(set1).filter(x => !set2.has(x));
+    let uniqueToNums2 = Array.from(set2).filter(x => !set1.has(x));
+
+    return [uniqueToNums1, uniqueToNums2];
+};",Medium,"/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[][]}
+ */
+var findDifference = function(nums1, nums2) {
+    if (!Array.isArray(nums1) || !Array.isArray(nums2)) {
+        throw new Error('Invalid input: Both parameters should be arrays.');
+    }
+
+    const set1 = new Set(nums1);
+    const set2 = new Set(nums2);
+    const result1 = [];
+    const result2 = [];
+
+    set1.forEach(num => {
+        if (!set2.has(num)) {
+            result1.push(num);
+        }
+    });
+
+    set2.forEach(num => {
+        if (!set1.has(num)) {
+            result2.push(num);
+        }
+    });
+
+    return [Array.from(new Set(result1)), Array.from(new Set(result2))];
+};","The provided JavaScript function 'findDifference' takes two arrays, nums1 and nums2, and returns a 2D array containing distinct elements from each array that are not present in the other. The function uses ES6 features like arrow functions and the Set object for efficient lookups and ensuring uniqueness. Error handling is implemented to ensure both inputs are arrays. The use of forEach loops over sets allows for direct checking of element presence, ensuring the solution is clear and efficient. The final result arrays are converted from sets to arrays to ensure no duplicates and to match the expected output format."
+19,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var removeStars = function(s) {
+let i = 0;
+    let stk = [];
+     while(i<s.length){
+         if(s.charAt(i)===""*""){
+            if(stk.length>0){
+                stk.pop();
+            }
+         }
+         else {
+             stk.push(s.charAt(i))
+         }
+         i++;
+     }
+    return stk.join("""");
+};",Medium,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var removeStars = function(s) {
+    let stack = [];
+    for (let char of s) {
+        if (char === '*') {
+            stack.pop();
+        } else {
+            stack.push(char);
+        }
+    }
+    return stack.join('');
+};","The provided JavaScript function 'removeStars' uses a stack to manage the characters of the string 's'. As we iterate through each character, if it's a star ('*'), the last character (non-star) is removed from the stack using 'pop'. If it's not a star, the character is added to the stack using 'push'. This approach efficiently handles the removal of characters as specified, ensuring that only the closest non-star character to the left of each star is removed. The final string is constructed by joining all characters left in the stack. This method is both time-efficient (O(n) complexity) and space-efficient, adhering to modern JavaScript (ES6+) standards and best practices for code readability and organization."
+20,"var predictPartyVictory = function(senate) {
+    senate = senate.split('');
+    while(senate.length) {
+        var first = senate.shift();
+        var len = senate.length;
+
+        for(var i=0; i<len; i++) {
+            if(first != senate[i]) {
+                senate.splice(i, 1);
+                senate.push(first);
+                break;
+            }
+        }
+        if(i == len) {
+            return first == 'D' ? 'Dire' : 'Radiant';
+        }
+    }
+};",Medium,"/**
+ * @param {string} senate
+ * @return {string}
+ */
+var predictPartyVictory = function(senate) {
+    let radiant = 0, dire = 0;
+    let radiantBan = 0, direBan = 0;
+    const queue = [];
+
+    for (let char of senate) {
+        if (char === 'R') {
+            radiant++;
+            queue.push('R');
+        } else if (char === 'D') {
+            dire++;
+            queue.push('D');
+        }
+    }
+
+    while (radiant > 0 && dire > 0) {
+        let senator = queue.shift();
+        if (senator === 'R') {
+            if (radiantBan > 0) {
+                radiantBan--;
+                radiant--;
+            } else {
+                direBan++;
+                queue.push('R');
+            }
+        } else if (senator === 'D') {
+            if (direBan > 0) {
+                direBan--;
+                dire--;
+            } else {
+                radiantBan++;
+                queue.push('D');
+            }
+        }
+    }
+
+    return radiant > dire ? 'Radiant' : 'Dire';
+};","The solution uses a queue to simulate the round-based voting process. Each senator is processed in order, and based on their party, they either ban an opponent or get banned if there are bans left for their party. The counters for each party's senators and bans are maintained throughout. The loop continues until one party has no more senators left, at which point the other party wins. This approach ensures that the best strategy for each senator is followed, simulating a smart play scenario. The use of a queue helps in maintaining the order of processing, and the counters help in deciding the outcome efficiently."
+21,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteMiddle = function(head) {
+    if(head === null)return null;
+    prev = new ListNode(0);
+    prev.next = head;
+    slow = prev;
+    fast = head;
+    while(fast != null && fast.next != null){
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    slow.next = slow.next.next;
+    return prev.next;
+};",Medium,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteMiddle = function(head) {
+    if (!head || !head.next) return null;
+    let slow = head, fast = head, prev = null;
+    while (fast && fast.next) {
+        prev = slow;
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    prev.next = slow.next;
+    return head;
+};","The provided JavaScript function 'deleteMiddle' deletes the middle node from a singly-linked list. It uses the two-pointer technique (slow and fast pointers) to find the middle node. The slow pointer moves one step at a time, while the fast pointer moves two steps, ensuring that when the fast pointer reaches the end, the slow pointer is at the middle. If the list has only one or two nodes, it directly returns null, as removing the middle from a single-node list results in an empty list. The function handles edge cases and maintains readability and organization by using clear variable names and concise logic."
+22,"function lowestCommonAncestor(root, p, q) {
+  if (!root || root === p || root === q) return root;
+  var resL = lowestCommonAncestor(root.left, p, q);
+  var resR = lowestCommonAncestor(root.right, p, q);
+  return (resL && resR) ? root : (resL || resR);
+}",Medium,"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {TreeNode}
+ */
+const lowestCommonAncestor = (root, p, q) => {
+    if (!root) return null;
+    if (root === p || root === q) return root;
+
+    const left = lowestCommonAncestor(root.left, p, q);
+    const right = lowestCommonAncestor(root.right, p, q);
+
+    if (left && right) return root;
+    return left ? left : right;
+};","The provided JavaScript function, lowestCommonAncestor, uses recursion to traverse the binary tree and find the lowest common ancestor of two nodes, p and q. The function checks if the current node is null, which is a base case for recursion, or if it matches either of the target nodes (p or q). If the current node matches, it returns itself as a potential ancestor. The function then recursively searches the left and right subtrees. If both calls return non-null values, it means both p and q are found in different branches, so the current node is their LCA. If only one side returns a non-null, that result is propagated upwards as it indicates the presence of at least one target node in that subtree. This approach ensures that the function efficiently finds the LCA with a time complexity of O(n) and a space complexity of O(h), where h is the height of the tree, due to recursive stack space."
+23,"var findCircleNum = function (isConnected) {
+
+    let provinces = 0;
+    let visited = new Array(isConnected.length).fill(false);
+
+    for (let i = 0; i < isConnected.length; i++) {
+        if (!visited[i]) {
+            provinces++;
+            dfs(isConnected, visited, i);
+        }
+    }
+    return provinces;
+};
+
+function dfs(isConnected, visited, i) {
+
+    visited[i] = true;
+    
+    for (let j = 0; j < isConnected.length; j++) {
+        if (isConnected[i][j] === 1 && !visited[j]) {
+            dfs(isConnected, visited, j);
+        }
+    }
+}",Medium,"/**
+ * @param {number[][]} isConnected
+ * @return {number}
+ */
+var findCircleNum = function(isConnected) {
+    if (!Array.isArray(isConnected) || !isConnected.length) {
+        throw new Error('Invalid input: isConnected must be a non-empty array.');
+    }
+
+    const n = isConnected.length;
+    let provinceCount = 0;
+    const visited = new Set();
+
+    function dfs(city) {
+        for (let i = 0; i < n; i++) {
+            if (isConnected[city][i] === 1 && !visited.has(i)) {
+                visited.add(i);
+                dfs(i);
+            }
+        }
+    }
+
+    for (let i = 0; i < n; i++) {
+        if (!visited.has(i)) {
+            visited.add(i);
+            dfs(i);
+            provinceCount++;
+        }
+    }
+
+    return provinceCount;
+};","The provided JavaScript function 'findCircleNum' uses Depth-First Search (DFS) to explore the 'isConnected' matrix and count the number of provinces. Each city is visited once, and a recursive DFS is initiated for each unvisited city that is directly connected to the current city. This approach ensures that all cities in a province are marked as visited before moving to the next unvisited city, effectively counting each province once. Error handling is implemented to ensure the input is a valid non-empty array. The use of ES6 features like 'let', 'const', and arrow functions enhances readability and compliance with modern JavaScript standards."
+24,"var findPeakElement = function(nums) {
+    var start = 0, end = nums.length - 1;
+    while (start < end) {
+        var mid = Math.floor((start + end) / 2);
+        if (mid === 0) {
+            return nums[0] >= nums[1] ? 0 : 1;
+        }
+        if (mid === end) {
+            return nums[end - 1] >= nums[end - 2] ? end - 1 : end - 2;
+        }
+
+        if (nums[mid] > nums[mid + 1] && nums[mid] > nums[mid - 1]) {
+            return mid;
+        }
+        if (nums[mid] < nums[mid - 1]) {
+            end = mid - 1;
+        } else {
+            start = mid + 1;
+        }
+    }
+    return start;
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var findPeakElement = function(nums) {
+    if (!Array.isArray(nums) || nums.length === 0) {
+        throw new Error('Invalid input: nums must be a non-empty array.');
+    }
+
+    let left = 0;
+    let right = nums.length - 1;
+
+    while (left < right) {
+        const mid = Math.floor((left + right) / 2);
+        if (nums[mid] > nums[mid + 1]) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return left;
+};","The provided JavaScript function 'findPeakElement' uses a binary search approach to find a peak element in a logarithmic time complexity, O(log n). The function first checks if the input is a valid non-empty array. It then initializes two pointers, 'left' and 'right', to the start and end of the array, respectively. The while loop continues until these pointers meet. Inside the loop, it calculates the middle index and compares the middle element with its next neighbor. If the middle element is greater, it narrows the search to the left half by adjusting the 'right' pointer; otherwise, it narrows it to the right half by adjusting the 'left' pointer. This approach ensures that at least one peak is found, as the function narrows down to the peak element. The function is designed to handle edge cases and errors, adhering to modern JavaScript (ES6+) standards and best practices for readability and code organization."
+25,"var twoSum = function(nums, target) {
+    
+    let numToIndexMap = {};
+
+    
+    for (let i = 0; i < nums.length; i++) {
+        
+        let diff = target - nums[i];
+
+        
+        if (numToIndexMap.hasOwnProperty(diff)) {
+            
+            return [i, numToIndexMap[diff]];
+        }
+
+        
+        numToIndexMap[nums[i]] = i;
+    }
+
+    
+    return null;
+};",Easy,"/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    const map = new Map();
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement)) {
+            return [map.get(complement), i];
+        }
+        map.set(nums[i], i);
+    }
+    throw new Error('No two sum solution');
+};","The provided JavaScript function 'twoSum' uses a hash map to store the indices of the elements as they are iterated over. This allows for constant time complexity O(1) look-up to check if the complement (target - current element) exists in the map. If it does, the function immediately returns the indices of the two numbers that add up to the target. If no such pair is found after iterating through the array, an error is thrown to handle the case where no solution exists. This approach ensures efficient and readable code, adhering to modern JavaScript (ES6+) standards."
+26,"var isAnagram = function(s, t) {
+    if (s.length !== t.length) {
+        return false;
+    }
+    
+    var freq = new Array(26).fill(0);
+    for (var i = 0; i < s.length; i++) {
+        freq[s.charCodeAt(i) - 'a'.charCodeAt(0)]++;
+        freq[t.charCodeAt(i) - 'a'.charCodeAt(0)]--;
+    }
+    
+    for (var i = 0; i < freq.length; i++) {
+        if (freq[i] !== 0) {
+            return false;
+        }
+    }
+    
+    return true;
+};",Easy,"/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isAnagram = function(s, t) {
+    if (s.length !== t.length) return false;
+    const charCount = {};
+    for (let char of s) {
+        charCount[char] = (charCount[char] || 0) + 1;
+    }
+    for (let char of t) {
+        if (!charCount[char]) return false;
+        charCount[char]--;
+    }
+    return true;
+};","The function 'isAnagram' checks if two strings, s and t, are anagrams of each other. It first checks if the strings are of the same length, returning false if they are not, as anagrams must have the same characters with the same frequencies. It uses a hash map (object in JavaScript) to count occurrences of each character in the first string. It then decrements these counts for each character in the second string. If a character in the second string doesn't exist in the map or its count goes below zero, it returns false, indicating that t is not an anagram of s. If all characters match, it returns true. This approach is efficient and clear, using ES6 features like 'let' for block-scoped variables."
+27,"var romanToInt = function(s) {
+    let res = 0;
+    const roman = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    };
+
+    for (let i = 0; i < s.length - 1; i++) {
+        if (roman[s[i]] < roman[s[i + 1]]) {
+            res -= roman[s[i]];
+        } else {
+            res += roman[s[i]];
+        }
+    }
+
+    return res + roman[s[s.length - 1]];    
+};",Easy,"/**
+ * @param {string} s
+ * @return {number}
+ */
+var romanToInt = function(s) {
+    const romanMap = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    };
+
+    let total = 0;
+    for (let i = 0; i < s.length; i++) {
+        const current = romanMap[s[i]];
+        const next = romanMap[s[i + 1]];
+
+        if (next && current < next) {
+            total -= current;
+        } else {
+            total += current;
+        }
+    }
+
+    return total;
+};","The function 'romanToInt' converts a Roman numeral string to an integer. It uses a map object 'romanMap' to associate Roman numeral characters with their respective integer values. The function iterates through the string, checking each character and its successor. If the current character's value is less than the next character's value, it subtracts the current value from the total (handling the subtraction cases like IV or IX). Otherwise, it adds the current value to the total. This approach efficiently handles the conversion in a single pass through the string, ensuring O(n) complexity where n is the length of the string. Error handling isn't explicitly required here as the function assumes valid Roman numeral input."
+28,"var isPalindrome = function(x) {
+    if (x < 0) {
+        return false;
+    }
+
+    let reverse = 0;
+    let xcopy = x;
+
+    while (x > 0) {
+        reverse = (reverse * 10) + (x % 10);
+        x = Math.floor(x / 10);
+    }
+
+    return reverse === xcopy;    
+};",Easy,"/**
+ * @param {number} x
+ * @return {boolean}
+ */
+var isPalindrome = function(x) {
+    try {
+        if (typeof x !== 'number') throw new TypeError('Input must be a number.');
+        if (!Number.isInteger(x)) throw new TypeError('Input must be an integer.');
+
+        const str = x.toString();
+        let left = 0;
+        let right = str.length - 1;
+
+        while (left < right) {
+            if (str[left] !== str[right]) return false;
+            left++;
+            right--;
+        }
+        return true;
+    } catch (error) {
+        console.error(error.message);
+        return false;
+    }
+};","The provided JavaScript function 'isPalindrome' checks if a given integer 'x' is a palindrome. It first ensures the input is a number and an integer, throwing a TypeError if not. The function converts the number to a string to easily compare characters from the beginning and end, moving towards the center. If any characters don't match, it returns false. If all characters match, it returns true. Error handling is implemented to catch and log exceptions, ensuring the function doesn't fail silently and provides useful error messages."
+29,"/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var fizzBuzz = function(n) {
+    var ans = [];
+
+    for (var i = 1; i <= n; i++) {
+        if (i % 3 === 0 && i % 5 === 0) {
+            ans.push(""FizzBuzz"");
+        } else if (i % 3 === 0) {
+            ans.push(""Fizz"");
+        } else if (i % 5 === 0) {
+            ans.push(""Buzz"");
+        } else {
+            ans.push(i.toString());
+        }
+    }
+
+    return ans;
+};",Easy,"/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var fizzBuzz = function(n) {
+    if (typeof n !== 'number' || n < 1) {
+        throw new Error('Input must be a positive integer.');
+    }
+    const result = [];
+    for (let i = 1; i <= n; i++) {
+        let output = '';
+        if (i % 3 === 0) output += 'Fizz';
+        if (i % 5 === 0) output += 'Buzz';
+        result.push(output || `${i}`);
+    }
+    return result;
+};","The provided JavaScript function, fizzBuzz, takes a positive integer n and returns an array of strings according to the FizzBuzz problem. The function first checks if the input n is a valid positive integer, throwing an error if not. It then initializes an empty array to store the results. A for loop iterates from 1 to n, constructing the appropriate string for each index i based on its divisibility by 3 and 5. If divisible by 3, 'Fizz' is appended to the output string, and if divisible by 5, 'Buzz' is appended. If neither condition is met, the index i itself is added as a string. This approach ensures clarity and efficiency, adhering to ES6+ syntax and best practices for error handling and code readability."
+30,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    const hash = {};
+    let res = 0;
+    let majority = 0;
+
+    for (let n of nums) {
+        hash[n] = 1 + (hash[n] || 0);
+        if (hash[n] > majority) {
+            res = n;
+            majority = hash[n];
+        }
+    }
+
+    return res;    
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    if (!Array.isArray(nums) || nums.length === 0) {
+        throw new Error('Invalid input: nums must be a non-empty array.');
+    }
+
+    const countMap = new Map();
+    const majorityCount = Math.floor(nums.length / 2);
+
+    for (let num of nums) {
+        countMap.set(num, (countMap.get(num) || 0) + 1);
+        if (countMap.get(num) > majorityCount) {
+            return num;
+        }
+    }
+
+    throw new Error('No majority element found.');
+};","The provided JavaScript function, majorityElement, uses a Map to count occurrences of each element in the input array. It checks if the input is valid and throws an error if not. The function iterates over the array, updating the count for each element. If an element's count exceeds half the array's length, it immediately returns that element as the majority. This approach ensures that the function efficiently finds the majority element without needing to traverse the entire array multiple times. The use of ES6 features like 'let' for block-scoped variables and 'Map' for efficient counting enhances readability and performance."
+31,"
+var firstUniqChar = function(s) {
+    let mp = {};
+
+    for (let a of s) {
+        mp[a] = (mp[a] || 0) + 1;
+    }
+
+    for (let i = 0; i < s.length; i++) {
+        if (mp[s[i]] === 1) {
+            return i;
+        }
+    }
+
+    return -1;
+};",Easy,"/**
+ * @param {string} s
+ * @return {number}
+ */
+var firstUniqChar = function(s) {
+    if (typeof s !== 'string') {
+        throw new Error('Input must be a string.');
+    }
+
+    const charCount = {};
+    for (let char of s) {
+        charCount[char] = (charCount[char] || 0) + 1;
+    }
+
+    for (let i = 0; i < s.length; i++) {
+        if (charCount[s[i]] === 1) {
+            return i;
+        }
+    }
+    return -1;
+};","The function firstUniqChar is designed to find the index of the first non-repeating character in a given string. It starts by checking if the input is a string, throwing an error if not, to ensure type safety. A hashmap (charCount) is used to store the frequency of each character in the string, which is populated in a single pass through the string. Another loop then checks each character in the original order to find the first character with a count of one, returning its index. If no such character exists, it returns -1. This approach ensures a time complexity of O(n), where n is the length of the string, by making only two passes over the string."
+32,"function binarySearch(nums, target) {
+  let left = 0;
+  let right = nums.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    
+    if (nums[mid] === target) {
+      return mid;
+    } else if (nums[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  
+  return -1;
+}",Easy,"/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var search = function(nums, target) {
+    let left = 0;
+    let right = nums.length - 1;
+    while (left <= right) {
+        let mid = Math.floor((left + right) / 2);
+        if (nums[mid] === target) {
+            return mid;
+        } else if (nums[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    return -1;
+};","The provided JavaScript function implements a binary search algorithm, which is suitable for searching in a sorted array with a time complexity of O(log n). The function takes a sorted array 'nums' and a 'target' value to find within the array. It uses two pointers, 'left' and 'right', to maintain the current search bounds. The middle index 'mid' is calculated, and the value at 'mid' is compared to 'target'. If the value matches, the index is returned. If the target is greater, the search continues in the right half; if less, in the left half. If the loop exits without finding the target, -1 is returned, indicating the target is not in the array. This approach is efficient and adheres to modern JavaScript ES6+ syntax, ensuring clarity and conciseness."
+33,"var moveZeroes = function(nums) {
+    let left = 0;
+
+    for (let right = 0; right < nums.length; right++) {
+        if (nums[right] !== 0) {
+            [nums[right], nums[left]] = [nums[left], nums[right]];
+            left++;
+        }
+    }
+
+    return nums;    
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var moveZeroes = function(nums) {
+    let lastNonZeroFoundAt = 0;
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] !== 0) {
+            nums[lastNonZeroFoundAt++] = nums[i];
+        }
+    }
+    for (let i = lastNonZeroFoundAt; i < nums.length; i++) {
+        nums[i] = 0;
+    }
+};","The provided JavaScript function 'moveZeroes' modifies an array in-place to move all zeros to the end while maintaining the order of non-zero elements. The function uses two pointers: one to track the position of the last non-zero element found ('lastNonZeroFoundAt') and another to iterate through the array ('i'). As it iterates, when a non-zero is found, it is placed at the position of the last non-zero element found, and the pointer is incremented. After processing all elements, the remaining positions in the array are filled with zeros. This approach ensures that the operation is done in-place with a time complexity of O(n) and without using extra space for another array, adhering to the problem's constraints and requirements for modern JavaScript syntax and best practices."
+34,"/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(input) {
+    var start = 0
+    var end = input.length - 1
+    while (start < end) {
+        var s = input.charCodeAt(start)
+        var e = input.charCodeAt(end)
+    
+        if (!isLetter(s)) {
+            start++
+            continue
+        }
+        if (!isLetter(e)) {
+            end--
+            continue
+        }
+    
+        if (toLowerCase(s) !== toLowerCase(e)) {
+            return false 
+        } 
+        start++
+        end--
+  }
+  return true
+};
+
+var isLetter = function(code) {
+    if (((code >= 48) && (code <= 57))  // numbers
+    || ((code >= 65) && (code <= 90))  // uppercase
+    || ((code >= 97) && (code <= 122))) {  // lowercase
+        return true
+    }
+    else {
+        return false
+    }
+}
+
+var toLowerCase = function(code) {
+    if (code >= 65 && code <= 90) {
+        return code + 32    
+    }
+    else {
+        return code
+    }
+}",Easy,"/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+    if (typeof s !== 'string') {
+        throw new TypeError('Input must be a string');
+    }
+
+    const cleaned = s.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    let left = 0;
+    let right = cleaned.length - 1;
+
+    while (left < right) {
+        if (cleaned[left] !== cleaned[right]) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+
+    return true;
+};","The function isPalindrome checks if a given string is a palindrome after normalizing it. It first ensures the input is a string to prevent runtime errors with non-string inputs. The normalization process involves removing all non-alphanumeric characters using a regular expression and converting all characters to lowercase. This cleaned version of the string is then checked for the palindrome property by comparing characters from the beginning and the end moving towards the center. If any pair of characters doesn't match, it returns false. If all pairs match, it returns true. This approach is efficient as it only traverses half of the string in the worst case."
+35,"var isPowerOfThree = function(n) {
+    if (n === 0) return false;
+    if (n === 1) return true;
+    
+    if (!(n%3)) return isPowerOfThree(n/3);
+    
+    return false;
+};",Easy,"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isPowerOfThree = function(n) {
+    if (typeof n !== 'number' || !Number.isFinite(n)) {
+        throw new TypeError('Input must be a finite number');
+    }
+    if (n < 1) {
+        return false;
+    }
+    while (n % 3 === 0) {
+        n /= 3;
+    }
+    return n === 1;
+};","The function isPowerOfThree checks if a given number n is a power of three. It starts by validating the input to ensure it's a finite number, throwing a TypeError if not. The function returns false immediately if n is less than 1, as powers of three are positive. It then uses a loop to divide n by 3 as long as n is divisible by 3 without a remainder. If the loop exits with n equal to 1, n is a power of three, and the function returns true; otherwise, it returns false. This approach efficiently checks the condition without recursion or additional libraries."
+36,"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var findDisappearedNumbers = function(nums) {
+    let obj={}
+    for(let n of nums){
+        obj[n]=1
+    }
+    let arr=[]
+    for(let i=1;i<=nums.length;i++){
+        if(!obj[i]) arr.push(i)
+    }
+    return arr
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var findDisappearedNumbers = function(nums) {
+    if (!Array.isArray(nums)) {
+        throw new TypeError('Input must be an array.');
+    }
+
+    const n = nums.length;
+    const numberPresence = new Array(n + 1).fill(false);
+
+    nums.forEach(num => {
+        if (num >= 1 && num <= n) {
+            numberPresence[num] = true;
+        }
+    });
+
+    const result = [];
+    for (let i = 1; i <= n; i++) {
+        if (!numberPresence[i]) {
+            result.push(i);
+        }
+    }
+
+    return result;
+};","The provided JavaScript function, findDisappearedNumbers, takes an array of integers and returns an array of integers that are missing from the sequence [1, n]. The function first checks if the input is an array, throwing a TypeError if not. It uses a boolean array, numberPresence, initialized to false, to track the presence of numbers in the input array. As it iterates over the input, it marks the corresponding indices in numberPresence as true for valid numbers. Finally, it constructs the result array by adding indices (representing numbers) that remain false in numberPresence. This approach ensures that the function is both efficient and easy to understand, adhering to modern JavaScript (ES6+) standards and best practices."
+37,"/**
+ * @param {number[]} cost
+ * @return {number}
+ */
+var minCostClimbingStairs = function(cost) {
+    cost.push(0);
+
+    for (let i = cost.length - 4; i >= 0; i--) {
+        cost[i] += Math.min(cost[i + 1], cost[i + 2]);
+    }
+
+    return Math.min(cost[0], cost[1]);    
+};",Easy,"/**
+ * @param {number[]} cost
+ * @return {number}
+ */
+var minCostClimbingStairs = function(cost) {
+    if (!Array.isArray(cost) || cost.some(c => typeof c !== 'number')) {
+        throw new TypeError('Input must be an array of numbers.');
+    }
+
+    const n = cost.length;
+    if (n === 0) return 0;
+    if (n === 1) return cost[0];
+
+    let dp = [cost[0], cost[1]];
+
+    for (let i = 2; i < n; i++) {
+        dp[i] = cost[i] + Math.min(dp[i - 1], dp[i - 2]);
+    }
+
+    return Math.min(dp[n - 1], dp[n - 2]);
+};","The provided JavaScript function, minCostClimbingStairs, calculates the minimum cost to reach the top of a staircase given an array of step costs. It uses dynamic programming to solve the problem efficiently. The function first checks if the input is a valid array of numbers to handle errors. It initializes a dp array where dp[i] represents the minimum cost to reach step i. The function iterates through the cost array, updating the dp array based on the minimum cost of the previous two steps. Finally, it returns the minimum of the last two values in the dp array, representing the minimum cost to reach the top from either of the last two steps. This approach ensures that the function is both efficient and handles potential input errors."
+38,"/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    let res = """";
+    let x=0, y=0, rem=0;
+    while(a!="""" || b!="""") {
+        if(a!="""") {
+            x = parseInt(a.slice(-1));
+            a = a.slice(0,-1);
+        }
+        if(b!="""") {
+            y = parseInt(b.slice(-1));
+            b = b.slice(0,-1);
+        }
+        if(x+y+rem == 2) {
+            rem=1;
+            res = ""0"" + res;
+        }
+        else if(x+y+rem == 3) {
+            rem=1;
+            res = ""1"" + res;
+        }
+        else {
+            res = (x+y+rem).toString() + res;
+            rem=0;
+        }
+        x=0;
+        y=0;
+    }
+    if(rem==1) res = ""1"" + res;
+    return res;
+
+};",Easy,"/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    // Check if inputs are valid binary strings
+    if (!/^[01]+$/.test(a) || !/^[01]+$/.test(b)) {
+        throw new Error('Invalid input: Both a and b must be binary strings.');
+    }
+
+    let result = '';
+    let carry = 0;
+    let i = a.length - 1;
+    let j = b.length - 1;
+
+    while (i >= 0 || j >= 0 || carry !== 0) {
+        const digitA = i >= 0 ? parseInt(a[i], 10) : 0;
+        const digitB = j >= 0 ? parseInt(b[j], 10) : 0;
+
+        let sum = digitA + digitB + carry;
+        result = (sum % 2) + result;
+        carry = Math.floor(sum / 2);
+
+        i--;
+        j--;
+    }
+
+    return result;
+};","The provided JavaScript function 'addBinary' takes two binary strings 'a' and 'b' as input and returns their sum as a binary string. The function first validates the inputs using a regular expression to ensure they are binary strings. It initializes variables for the result string, carry, and indices for both strings. The function then iterates from the end of both strings towards the beginning, adding corresponding digits along with any carry from the previous addition. The sum is calculated, and the result string is updated with the new digit. The carry is updated for the next iteration. The loop continues until all digits and the carry have been processed. This approach ensures that the function handles different lengths of binary strings and maintains clarity and readability in line with modern JavaScript (ES6+) practices."
+39,"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+    const seen = new Set();
+    
+    while (n !== 1 && !seen.has(n)) {
+        seen.add(n);
+        let sum = 0;
+        
+        let numStr = n.toString();
+        for (let i = 0; i < numStr.length; i++) {
+            let digit = Number(numStr[i]);
+            sum += digit * digit;
+        }
+        
+        n = sum;  
+    }
+    return n === 1;
+};",Easy,"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+    const seen = new Set();
+    while (n !== 1 && !seen.has(n)) {
+        seen.add(n);
+        n = n.toString().split('').reduce((acc, digit) => acc + digit * digit, 0);
+    }
+    return n === 1;
+};","The provided JavaScript function 'isHappy' determines if a number is happy by following the described process. It uses a Set to track numbers that have been seen to detect loops. The number 'n' is converted to a string to split into digits, which are then squared and summed to form the next number in the sequence. This process repeats until 'n' becomes 1 (happy number) or a loop is detected (not a happy number). The use of ES6 features like 'const', arrow functions, and 'Set' ensures modern syntax and efficient handling of loops."
+40,"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function (root) {
+    if (!root) return 0
+    let leftSubHeight = maxDepth(root.left)
+    let rightSubHeight = maxDepth(root.right) 
+    return Math.max(leftSubHeight, rightSubHeight) + 1
+};",Easy,"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+const maxDepth = (root) => {
+    if (!root) return 0;
+    const leftDepth = maxDepth(root.left);
+    const rightDepth = maxDepth(root.right);
+    return Math.max(leftDepth, rightDepth) + 1;
+};","The provided JavaScript function, maxDepth, calculates the maximum depth of a binary tree using recursion. It checks if the root node is null, returning 0 for an empty tree. If not, it recursively finds the depth of the left and right subtrees, and returns the greater of the two depths plus one (to account for the root node itself). This approach leverages the simplicity and elegance of recursion to navigate through the tree structure, ensuring that each node is visited. The use of ES6 arrow functions enhances readability and conciseness. Error handling is inherently managed by checking the existence of the root node at each recursive call, preventing errors related to accessing properties of null."
+41,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function (headA, headB) {
+  
+    let nodeA = headA;
+    let nodeB = headB;
+    
+    
+    while (nodeA !== nodeB) {
+        
+        nodeA = !nodeA ? headB : nodeA.next;
+        
+        nodeB = !nodeB ? headA : nodeB.next;
+    }
+    
+    
+    return nodeA;
+};",Easy,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+const getIntersectionNode = (headA, headB) => {
+    if (!headA || !headB) return null;
+
+    let pointerA = headA;
+    let pointerB = headB;
+
+    while (pointerA !== pointerB) {
+        pointerA = pointerA ? pointerA.next : headB;
+        pointerB = pointerB ? pointerB.next : headA;
+    }
+
+    return pointerA;
+};","The provided JavaScript function 'getIntersectionNode' uses two pointers to traverse the linked lists. If the lists intersect, the pointers will meet at the intersection node after traversing the length of both lists. If they don't intersect, both pointers will eventually be null, indicating no intersection. This approach is efficient with a time complexity of O(m+n) and does not modify the original lists, adhering to the problem's constraints. The use of ternary operators ensures that once a pointer reaches the end of a list, it starts from the beginning of the other list, effectively handling different list lengths and finding the intersection point if it exists."
+42,"var minDistance = function(word1, word2) {
+    const cache = {}
+    function dp(i, j) {
+        if (cache[`${i}->${j}`] !== undefined) {
+            return cache[`${i}->${j}`]
+        }
+        if (i >= word1.length) {
+            return word2.length - j;
+        } 
+        if (j >= word2.length) {
+            return word1.length - i;
+        }
+        if (word1[i] === word2[j]) {
+            return dp(i+1, j+1);
+        }
+        let insert = 1 + dp(i, j+1);
+        let del = 1 + dp(i+1, j);
+        let repl = 1 + dp(i+1, j+1);
+        const res = Math.min(insert, del, repl);
+        cache[`${i}->${j}`] = res;
+        return res;
+    }
+    return dp(0, 0)
+};",Medium,"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {number}
+ */
+var minDistance = function(word1, word2) {
+    if (typeof word1 !== 'string' || typeof word2 !== 'string') {
+        throw new Error('Invalid input: Both parameters must be strings.');
+    }
+
+    const len1 = word1.length;
+    const len2 = word2.length;
+    const dp = Array.from({ length: len1 + 1 }, () => Array(len2 + 1).fill(0));
+
+    for (let i = 0; i <= len1; i++) {
+        dp[i][0] = i;
+    }
+    for (let j = 0; j <= len2; j++) {
+        dp[0][j] = j;
+    }
+
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            if (word1[i - 1] === word2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]) + 1;
+            }
+        }
+    }
+
+    return dp[len1][len2];
+};","The provided JavaScript function 'minDistance' calculates the minimum number of operations required to convert one string to another using dynamic programming. The function first checks if the inputs are strings to ensure type safety. It then initializes a 2D array 'dp' where dp[i][j] represents the minimum operations needed to convert the first i characters of 'word1' to the first j characters of 'word2'. The function fills the base cases where one of the strings is empty, requiring i or j operations (insertions or deletions). It then iterates through both strings, filling in the dp table based on whether characters match (no operation needed) or differ (insert, delete, or replace). The final value at dp[len1][len2] gives the minimum operations needed for the full transformation. This approach ensures optimal and efficient computation using the principles of dynamic programming."
+43,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var longestConsecutive = function(nums) {
+    if(!nums.length) return 0;
+    
+    let count = 1;
+    let largestSequence = 0;
+    
+    nums = new Set(nums);
+    nums = Array.from(nums);
+    nums.sort((a,b)=> a-b);
+   
+
+    for(let i=0 ; i<nums.length ; i++){
+        let diff = nums[i+1] - nums[i]; 
+        if(diff == 1){
+             count++;
+        }else{
+            if(count > largestSequence){
+                largestSequence = count;
+            }
+            count = 1;
+        }
+
+    }
+    return largestSequence;;
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var longestConsecutive = function(nums) {
+    if (!Array.isArray(nums)) {
+        throw new TypeError('Input must be an array of numbers.');
+    }
+
+    const numSet = new Set(nums);
+    let longestStreak = 0;
+
+    for (const num of numSet) {
+        if (!numSet.has(num - 1)) { // Check if it's the start of a sequence
+            let currentNum = num;
+            let currentStreak = 1;
+
+            while (numSet.has(currentNum + 1)) {
+                currentNum += 1;
+                currentStreak += 1;
+            }
+
+            longestStreak = Math.max(longestStreak, currentStreak);
+        }
+    }
+
+    return longestStreak;
+};","The provided JavaScript function 'longestConsecutive' solves the problem of finding the longest consecutive sequence in an unsorted array of integers. The function first checks if the input is a valid array. It then uses a Set to store the numbers, which allows for O(1) average time complexity for lookups. The main loop iterates through each number in the set, and for each number that does not have a preceding consecutive number in the set (indicating the start of a sequence), it counts the length of the consecutive sequence starting from that number. This approach ensures that each number is part of exactly one sequence check, keeping the overall time complexity to O(n). The use of modern JavaScript features like 'const', 'let', and 'Set', along with clear error handling and code organization, adheres to best practices for readability and efficiency."
+44,"var shortestPalindrome = function(s) {
+    let count = kmp(s.split('').reverse().join(''), s);
+    return s.slice(count).split('').reverse().join('') + s;
+};
+
+var kmp = function(txt, patt) {
+    let newString = patt + '#' + txt;
+    let pi = new Array(newString.length).fill(0);
+    let i = 1, k = 0;
+    while (i < newString.length) {
+        if (newString[i] === newString[k]) {
+            k++;
+            pi[i] = k;
+            i++;
+        } else {
+            if (k > 0) {
+                k = pi[k - 1];
+            } else {
+                pi[i] = 0;
+                i++;
+            }
+        }
+    }
+    return pi[newString.length - 1];
+};",Hard,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var shortestPalindrome = function(s) {
+    if (typeof s !== 'string') {
+        throw new TypeError('Input must be a string.');
+    }
+
+    const reverse = s => s.split('').reverse().join('');
+    const reversedS = reverse(s);
+
+    for (let i = 0; i < s.length; i++) {
+        if (s.substring(0, s.length - i) === reversedS.substring(i)) {
+            return reversedS.substring(0, i) + s;
+        }
+    }
+
+    return reversedS + s; // Fallback, should never hit this line
+};","The function 'shortestPalindrome' first checks if the input is a string. It then defines a helper function 'reverse' to reverse the input string. The main logic iterates over the string, checking if the substring from the start to a decreasing index is a palindrome by comparing it to the corresponding substring of the reversed string. If a palindrome is found, the function constructs the shortest palindrome by prepending the necessary characters from the reversed string to the original string. The approach ensures that the function returns the shortest possible palindrome by checking from the longest possible palindrome down to the shortest."
+45,"var findLadders = function(beginWord, endWord, wordList) {
+    if (!wordList.includes(endWord)) return [];
+    
+    const result = [], map = new Map(), steps = new Map();
+	
+    for (const word of wordList) {
+        for (let i = 0; i < word.length; i++) {
+            const hash = word.substring(0, i) + '*' + word.substring(i + 1);
+			
+            if (!map.has(hash)) map.set(hash, []);
+			
+            map.get(hash).push(word);
+            steps.set(hash, wordList.length);
+        }
+    }
+    
+    const queue = [[beginWord]];
+	
+    while (queue.length > 0) {
+        const current = queue.shift();
+        const set = new Set(current);
+        const lastWord = current[current.length - 1];
+        if (lastWord === endWord) {
+            if (result.length === 0 || current.length === result[0].length)
+                result.push(current);
+            else break;
+        } else {
+            for (let i = 0; i < lastWord.length; i++) {
+                const hash = lastWord.substring(0, i) + '*' + lastWord.substring(i + 1);
+                if (!map.has(hash) || current.length > steps.get(hash))
+					continue;
+					
+                for (const nextWord of map.get(hash))
+                    if (!set.has(nextWord))
+						queue.push([...current, nextWord]);
+						
+                steps.set(hash, current.length);
+            }
+        }
+    }
+    return result;
+};",Hard,"/**
+ * @param {string} beginWord
+ * @param {string} endWord
+ * @param {string[]} wordList
+ * @return {string[][]}
+ */
+var findLadders = function(beginWord, endWord, wordList) {
+    const wordSet = new Set(wordList);
+    if (!wordSet.has(endWord)) return [];
+
+    const queue = [[beginWord]];
+    const visited = new Set([beginWord]);
+    const results = [];
+    let found = false;
+
+    while (queue.length > 0 && !found) {
+        const levelSize = queue.length;
+        const currentLevelVisited = new Set();
+
+        for (let i = 0; i < levelSize; i++) {
+            const path = queue.shift();
+            const lastWord = path[path.length - 1];
+
+            for (let j = 0; j < lastWord.length; j++) {
+                for (let k = 97; k <= 122; k++) { // ASCII values for 'a' to 'z'
+                    const newWord = lastWord.slice(0, j) + String.fromCharCode(k) + lastWord.slice(j + 1);
+                    if (newWord === endWord) {
+                        results.push([...path, newWord]);
+                        found = true;
+                    } else if (!visited.has(newWord) && wordSet.has(newWord)) {
+                        queue.push([...path, newWord]);
+                        currentLevelVisited.add(newWord);
+                    }
+                }
+            }
+        }
+
+        currentLevelVisited.forEach(word => visited.add(word));
+    }
+
+    return results;
+};","The provided JavaScript function 'findLadders' uses a breadth-first search (BFS) approach to find all shortest transformation sequences from 'beginWord' to 'endWord'. It initializes a queue with the 'beginWord' and explores all possible one-letter transformations. If a valid transformation is found in 'wordList' and hasn't been visited in the current BFS level, it's added to the queue. This ensures that all paths explored are the shortest possible. The function checks if the transformation reaches 'endWord' and collects such paths. The use of a set for 'visited' words prevents revisiting and ensures efficiency. The function handles cases where 'endWord' isn't in 'wordList' by returning an empty array early. This implementation follows ES6+ syntax and includes error handling and readability best practices."
+46,"const isMatch = function (string, pattern) {
+  let s = 0, p = 0;
+  let starIdx = -1, pointer = -1;
+
+  while (s < string.length) {
+    if ((p < pattern.length && string[s] === pattern[p]) || pattern[p] === ""?"") {
+      s++;
+      p++;
+    } 
+	else if (p < pattern.length && pattern[p] === ""*"") {
+      starIdx = p;
+      pointer = s;
+      p++;
+    } 
+	else if (starIdx === -1) return false;
+    else {
+      p = starIdx + 1;
+      s = pointer + 1;
+      pointer = s;
+    }
+  }
+  for (let idx = p; idx < pattern.length; idx++) {
+    if (pattern[idx] !== ""*"") return false;
+  }
+  return true;
+};",Hard,"/**
+ * @param {string} s
+ * @param {string} p
+ * @return {boolean}
+ */
+var isMatch = function(s, p) {
+    if (!s && !p) return true;
+    if (!p) return false;
+
+    let dp = Array(s.length + 1).fill(false).map(() => Array(p.length + 1).fill(false));
+    dp[0][0] = true;
+
+    for (let j = 1; j <= p.length; j++) {
+        if (p[j - 1] === '*') dp[0][j] = dp[0][j - 1];
+    }
+
+    for (let i = 1; i <= s.length; i++) {
+        for (let j = 1; j <= p.length; j++) {
+            if (p[j - 1] === '?' || s[i - 1] === p[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else if (p[j - 1] === '*') {
+                dp[i][j] = dp[i - 1][j] || dp[i][j - 1];
+            }
+        }
+    }
+
+    return dp[s.length][p.length];
+};","The provided JavaScript function 'isMatch' uses dynamic programming to solve the wildcard matching problem. The function initializes a 2D array 'dp' where dp[i][j] is true if the first i characters of string 's' match the first j characters of pattern 'p'. The base case is set where both the string and pattern are empty, resulting in a true value. The function then handles '*' in the pattern by propagating the truth values across the row if the previous value is true. For each character in 's' and 'p', it checks for a direct match or a '?' wildcard, updating the dp table accordingly. The '*' character allows for matches of any sequence, updating the dp table to reflect matches of previous sequences or characters. The final result is obtained from dp[s.length][p.length], indicating whether the entire string matches the pattern."
+47,"var isMatch = function(s, p) {
+    const m = s.length, n = p.length;
+    const dp = new Array(m+1).fill().map(() => new Array(n+1).fill(false));
+    dp[0][0] = true; // empty pattern matches empty string
+
+    // initialize first row (empty string)
+    for (let j = 1; j <= n; j++) {
+        if (p[j-1] === '*')
+        dp[0][j] = dp[0][j-2];
+    }
+
+    // fill in remaining cells
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+        if (s[i-1] === p[j-1] || p[j-1] === '.') {
+            dp[i][j] = dp[i-1][j-1];
+        } else if (p[j-1] === '*') {
+            dp[i][j] = dp[i][j-2]; // zero occurrences
+            if (s[i-1] === p[j-2] || p[j-2] === '.') {
+            dp[i][j] = dp[i][j] || dp[i-1][j]; // one or more occurrences
+            }
+        }
+        }
+    }
+    return dp[m][n];
+}",Hard,"/**
+ * @param {string} s
+ * @param {string} p
+ * @return {boolean}
+ */
+var isMatch = function(s, p) {
+    if (p === s) return true;
+    if (!p) return false;
+
+    let firstMatch = (s.length > 0 && (p[0] === s[0] || p[0] === '.'));
+
+    if (p.length >= 2 && p[1] === '*') {
+        return (isMatch(s, p.substring(2)) || (firstMatch && isMatch(s.substring(1), p)));
+    } else {
+        return firstMatch && isMatch(s.substring(1), p.substring(1));
+    }
+};","The provided JavaScript function 'isMatch' uses recursion to solve the regular expression matching problem. It checks if the pattern matches the entire string using the special characters '.' and '*'. The function first checks for exact match or if the pattern is empty. It then checks if the first characters of the string and the pattern match, considering '.' as a wildcard. The '*' character is handled by checking two conditions: the pattern without the '*' and its preceding element, and the string without the first character if the first characters matched. This approach ensures that all possible combinations are considered, and the use of recursion simplifies the handling of the '*' character. Modern ES6+ syntax is used for clarity and conciseness."
+48,"/**
+ * @param {number[]} balloons - The input array representing the balloon values.
+ * @return {number} - The maximum coins that can be collected.
+ */
+var maxCoins = function(balloons) {
+    const n = balloons.length;
+
+    // Pad the `balloons` array with 1 on both sides to simplify boundary cases
+    balloons.push(1);
+    balloons.unshift(1);
+
+    // Create a DP table initialized with 0, with size (n+2) x (n+2)
+    const dp = Array.from({ length: n + 2 }, () => Array(n + 2).fill(0));
+
+    // Iterate backwards over all possible subarray starting points
+    for (let left = n; left >= 1; left--) {
+        // Iterate over all possible subarray ending points
+        for (let right = left; right <= n; right++) {
+            let maxCoins = -Infinity; // Store the maximum coins for subarray [left, right]
+
+            // Try bursting each balloon `idx` in the range as the last balloon
+            for (let lastBurst = left; lastBurst <= right; lastBurst++) {
+                // Calculate the coins for bursting balloon `lastBurst` last
+                const coins = balloons[left - 1] * balloons[lastBurst] * balloons[right + 1] +
+                              dp[left][lastBurst - 1] + dp[lastBurst + 1][right];
+
+                // Update the maximum coins for this subarray
+                maxCoins = Math.max(maxCoins, coins);
+            }
+
+            // Store the maximum coins obtained for subarray [left, right] in the DP table
+            dp[left][right] = maxCoins;
+        }
+    }
+
+    // Return the maximum coins for bursting all balloons between 1 and n
+    return dp[1][n];
+};
+
+/**
+ * Time Complexity: O(n^3)
+ * - We have three nested loops: one for `left`, one for `right`, and one for choosing the last balloon to burst in the range.
+ * 
+ * Space Complexity: O(n^2)
+ * - We use a DP table of size (n+2) x (n+2) to store the results of subproblems.
+ */",Hard,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxCoins = function(nums) {
+    if (!Array.isArray(nums) || nums.some(num => typeof num !== 'number')) {
+        throw new Error('Invalid input: nums must be an array of numbers.');
+    }
+
+    const n = nums.length;
+    const extendedNums = [1, ...nums, 1];
+    const dp = Array.from({ length: n + 2 }, () => Array(n + 2).fill(0));
+
+    for (let length = 1; length <= n; length++) {
+        for (let left = 1; left <= n - length + 1; left++) {
+            const right = left + length - 1;
+            for (let i = left; i <= right; i++) {
+                dp[left][right] = Math.max(dp[left][right],
+                    dp[left][i - 1] + extendedNums[left - 1] * extendedNums[i] * extendedNums[right + 1] + dp[i + 1][right]);
+            }
+        }
+    }
+
+    return dp[1][n];
+};","The provided JavaScript function 'maxCoins' solves the problem of maximizing the coins collected by bursting balloons in a specific order. The function uses dynamic programming (DP) to break down the problem into smaller subproblems. An extended array 'extendedNums' is created to handle the boundary conditions by adding a '1' at both ends of the original array. A 2D DP array 'dp' is used where dp[left][right] represents the maximum coins that can be obtained by bursting all balloons between indices left and right in the extended array. The function iterates over all possible subarrays of 'nums', and for each subarray, it iterates over all possible positions of the last balloon to burst, updating the DP table based on the recursive relation. This approach ensures that all combinations are considered, and the maximum coins collected are calculated efficiently. Error handling is included to ensure the input is a valid array of numbers."
+49,"var solveSudoku = function(board) {
+    const solve = () => {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (board[row][col] === '.') {
+                    for (let num = '1'; num <= '9'; num++) {
+                        if (isValid(board, row, col, num)) {
+                            board[row][col] = num;
+                            if (solve()) return true;
+                            board[row][col] = '.';
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    
+    const isValid = (board, row, col, num) => {
+        for (let i = 0; i < 9; i++) {
+            if (board[row][i] === num || board[i][col] === num) return false;
+        }
+        let startRow = Math.floor(row / 3) * 3;
+        let startCol = Math.floor(col / 3) * 3;
+        for (let i = startRow; i < startRow + 3; i++) {
+            for (let j = startCol; j < startCol + 3; j++) {
+                if (board[i][j] === num) return false;
+            }
+        }
+        return true;
+    };
+    
+    solve();
+};",Hard,"/**
+ * @param {character[][]} board
+ * @return {void} Do not return anything, modify board in-place instead.
+ */
+var solveSudoku = function(board) {
+    const isValid = (row, col, num) => {
+        for (let i = 0; i < 9; i++) {
+            const blockRow = 3 * Math.floor(row / 3) + Math.floor(i / 3);
+            const blockCol = 3 * Math.floor(col / 3) + i % 3;
+            if (board[row][i] === num || board[i][col] === num || board[blockRow][blockCol] === num) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const solve = () => {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (board[row][col] === '.') {
+                    for (let num = '1'; num <= '9'; num++) {
+                        if (isValid(row, col, num)) {
+                            board[row][col] = num;
+                            if (solve()) {
+                                return true;
+                            } else {
+                                board[row][col] = '.';
+                            }
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    solve();
+};","The provided JavaScript function 'solveSudoku' uses a backtracking algorithm to solve the Sudoku puzzle. The function modifies the input board in-place. It includes a helper function 'isValid' to check if a number can be placed in a specific position without violating Sudoku rules. The 'solve' function recursively tries to fill the board, backtracking when a number placement leads to no solution. The use of ES6 features like 'let' for block-scoped variables and template literals enhances readability and compliance with modern JavaScript standards. Error handling isn't explicitly required here as the function assumes valid input dimensions and characters."
