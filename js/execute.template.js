@@ -138,10 +138,11 @@ function test() {
 
 try {
     test();
-    process.exit(0);
 }
 catch (e) {
     console.log(JSON.stringify({
         evaluationError: e
     }));
 }
+
+process.exit(0);

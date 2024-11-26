@@ -1,0 +1,2437 @@
+gt_code,level,refactor_code,rationale,eslint_count_original,eslint_count_refactored,closure_count_original,closure_count_refactored,test_cases,closure_optimized_code,runtimeOriginal,runtimeOptimized,runtimeRefactored,numOptimizedCorrect,numRefactoredCorrect,total
+"var createHelloWorld = function() { 
+    return function() {
+        return ""Hello World"";
+    }
+}",Easy,"/**
+ * @return {Function}
+ */
+var createHelloWorld = function() {
+    return function(...args) {
+        return ""Hello World"";
+    }
+};
+
+/**
+ * const f = createHelloWorld();
+ * f(); // ""Hello World""
+ */","The `createHelloWorld` function returns a new function. This inner function uses the spread syntax (`...args`) to accept any number of arguments, although it ignores them. It always returns the string ""Hello World"". This solution satisfies all the prompt requirements.",4,6,5,4,"{""functionOrClassName"": ""createHelloWorld"", ""tests"": [""createHelloWorld()()"", ""(() => {const a = createHelloWorld(); return a();})()"", ""(() => {const a = createHelloWorld; return a()();})()"", ""(() => {let f = createHelloWorld(); return f();})()"", ""(() => {let a = createHelloWorld; let b = a(); return b();})()"", ""(() => {const a = createHelloWorld(); const b = a; return b();})()"", ""(() => {const f = createHelloWorld(); return f();})()"", ""(() => {let f = createHelloWorld; return f()();})()"", ""(() => {const a = createHelloWorld(); const b = a(); return b();})()"", ""(() => {let a = createHelloWorld(); let b = a; return b()();})()"", ""(() => {let f = createHelloWorld(); let g = f(); return g();})()""]}","let createHelloWorld=function(){return function(){return""Hello World""}};
+",0.26670799999999417,0.17862500000001091,0.15841600000000255,11,11,11
+"var createCounter = function(init) {
+  let presentCount = init;
+
+  function increment() {
+    return ++presentCount;
+  }
+
+  function decrement() {
+      return --presentCount;
+  }
+
+  function reset() {
+      return (presentCount = init);
+  }
+
+  return { increment, decrement, reset };
+};",Easy,"/**
+ * @param {integer} init
+ * @return { increment: Function, decrement: Function, reset: Function }
+ */
+var createCounter = function(init) {
+    let currentCount = init;
+
+    const increment = () => {
+        currentCount += 1;
+        return currentCount;
+    };
+
+    const decrement = () => {
+        currentCount -= 1;
+        return currentCount;
+    };
+
+    const reset = () => {
+        currentCount = init;
+        return currentCount;
+    };
+
+    return { increment, decrement, reset };
+};","This code directly implements the requested functionality. It initializes currentCount with the provided init value. The increment, decrement, and reset functions modify and return the currentCount as specified. The object containing these functions is then returned.",9,8,3,7,"{""functionOrClassName"": ""createCounter"", ""tests"": [""createCounter(5).increment()"", ""createCounter(5).decrement()"", ""createCounter(5).reset()"", ""createCounter(0).increment()"", ""createCounter(0).decrement()"", ""createCounter(0).reset()"", ""createCounter(-5).increment()"", ""createCounter(-5).decrement()"", ""createCounter(-5).reset()"", ""createCounter(100).increment()"", ""createCounter(100).decrement()"", ""createCounter(100).reset()"", ""(() => {const counter = createCounter(5); counter.increment(); counter.decrement(); return counter.reset();})()"", ""(() => {const counter = createCounter(0); counter.increment(); counter.increment(); return counter.reset();})()"", ""(() => {const counter = createCounter(-5); counter.decrement(); counter.decrement(); return counter.reset();})()"", ""(() => {const counter = createCounter(10); for (let i = 0; i < 5; i++) counter.increment(); return counter.reset();})()"", ""(() => {const counter = createCounter(20); for (let i = 0; i < 5; i++) counter.decrement(); return counter.reset();})()""]}","let createCounter=function(b){let a=b;return{h:function(){return++a},g:function(){return--a},reset:function(){return a=b}}};
+",0.2663340000000005,0.46979100000000074,0.4122910000000104,4,17,17
+"var map = function(arr, fn) {
+    const transformedArr = [];
+    arr.forEach((element, index) => {
+      transformedArr[index] = fn(element, index);
+    });
+    return transformedArr;
+  };",Easy,"/**
+ * @param {number[]} arr
+ * @param {Function} fn
+ * @return {number[]}
+ */
+var map = function(arr, fn) {
+    const newArray = [];
+    for (let i = 0; i < arr.length; i++) {
+        newArray.push(fn(arr[i], i));
+    }
+    return newArray;
+};","This code iterates through the input array `arr` using a `for` loop. In each iteration, it applies the provided function `fn` to the current element `arr[i]` and its index `i`. The result of `fn(arr[i], i)` is then pushed into the `newArray`. Finally, the function returns the `newArray` containing the transformed elements.",3,5,3,8,"{""functionOrClassName"": ""map"", ""tests"": [""map([1, 2, 3], (x) => x * 2)"", ""map([1, 2, 3], (x, i) => x + i)"", ""map([], (x) => x * 2)"", ""map([1, 2, 3], (x) => x.toString())"", ""map([1, 2, 3], (x) => x % 2 === 0 ? 'even' : 'odd')"", ""map([1, 2, 3, 4, 5], (x) => x * x)"", ""map([1.1, 2.2, 3.3], (x) => Math.floor(x))"", ""map(['a', 'b', 'c'], (x) => x.toUpperCase())"", ""map([true, false, true], (x) => !x)"", ""map([null, undefined, null], (x) => x === null ? 'null' : 'undefined')"", ""map([{a: 1}, {a: 2}], (x) => x.a)"", ""(() => {const arr = [1, 2, 3]; return map(arr, (x) => arr[x - 1] * 2);})()"", ""(() => {const fn = (x) => x * 2; return map([1, 2, 3], fn);})()""]}","let map=function(c,d){const a=[];c.forEach((e,b)=>{a[b]=d(e,b)});return a};
+",0.3561250000000058,0.2617910000000023,0.5125000000000028,13,13,13
+"var filter = function(arr, fn) {
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (fn(arr[i], i)) {
+      result.push(arr[i]);
+    }
+  }
+  return result;
+};",Easy,"/**
+ * @param {number[]} arr
+ * @param {Function} fn
+ * @return {number[]}
+ */
+var filter = function(arr, fn) {
+    const filteredArr = [];
+    for (let i = 0; i < arr.length; i++) {
+        if (fn(arr[i], i)) {
+            filteredArr.push(arr[i]);
+        }
+    }
+    return filteredArr;
+};","This code iterates through the input array `arr`. In each iteration, it calls the provided function `fn` with the current element `arr[i]` and its index `i`. If `fn` returns a truthy value, the element is added to the `filteredArr`. Finally, the function returns the `filteredArr` containing only the elements that satisfied the filter function. Error handling isn't explicitly needed here since the function is designed to handle various data types and scenarios due to the flexible nature of the filter function parameter.",5,5,3,8,"{""functionOrClassName"": ""filter"", ""tests"": [""filter([1, 2, 3], (x) => x > 1)"", ""filter([1, 2, 3], (x) => x > 0)"", ""filter([1, 2, 3], (x, i) => i > 0)"", ""filter([1, 2, 3], (x, i) => x > i)"", ""filter([1, 2, 3, 4, 5], (x) => x % 2 === 0)"", ""filter([1, 2, 3, 4, 5], (x) => x % 2 !== 0)"", ""filter([1, 2, 3, 4, 5], (x, i) => i % 2 === 0)"", ""filter([1, 2, 3, 4, 5], (x, i) => x % 2 === 0 && i % 2 === 0)"", ""filter([], (x) => x > 0)"", ""filter([null, undefined, 0, 1, 2], (x) => x)"", ""filter([1, 2, 3], (x) => {let remainder = x%3; return remainder === 0;})"", ""filter([1, 2, 3, 4, 5, 6], (x) => {let remainder = x%3; return remainder === 0;})""]}","let filter=function(b,d){const c=[];for(let a=0;a<b.length;a++)d(b[a],a)&&c.push(b[a]);return c};
+",0.2561670000000049,0.21820800000000418,0.33516600000000096,12,12,12
+"/**
+ * @param {number[]} nums
+ * @param {Function} fn
+ * @param {number} init
+ * @return {number}
+ */
+var reduce = function(nums, fn, init) {
+  let val = init;
+  for (let i = 0; i < nums.length; i++) {
+    val = fn(val, nums[i]);
+  }
+  return val;
+};",Easy,"/**
+ * @param {number[]} nums
+ * @param {Function} fn
+ * @param {number} init
+ * @return {number}
+ */
+var reduce = function(nums, fn, init) {
+    let val = init;
+    if (nums.length === 0) {
+        return init;
+    }
+    for (let i = 0; i < nums.length; i++) {
+        val = fn(val, nums[i]);
+    }
+    return val;
+};","This code iterates through the input array `nums`. In each iteration, it applies the provided function `fn` with the current accumulated value `val` and the current element of the array `nums[i]`. The result of this function call updates the accumulated value `val`. If the input array is empty, the initial value `init` is returned directly. This logic effectively replicates the functionality of the `reduce` method without using it directly.",5,6,6,6,"{""functionOrClassName"": ""reduce"", ""tests"": [""reduce([1,2,3,4], (a,b) => a + b, 0)"", ""reduce([1,2,3,4], (a,b) => a * b, 1)"", ""reduce([1,2,3,4], (a,b) => a - b, 0)"", ""reduce([], (a,b) => a + b, 0)"", ""reduce([5], (a,b) => 2 * a + b, 2)"", ""reduce([1,2,3,4], (a,b) => Math.max(a,b), -Infinity)"", ""reduce([1,2,3,4], (a,b) => Math.min(a,b), Infinity)"", ""reduce([1,2,3,4,5,6,7,8,9,10], (a,b) => a + b, 100)"", ""reduce([1,2,3,4], (a,b) => a.toString() + b.toString(), \""\"")"", ""reduce([1,2,3,4], (a,b) => a + b, 5)"", ""reduce([1,2,3,4], (a,b) => {if (a > b) {return a;} else {return b;}}, 0)""]}","let reduce=function(c,d,a){for(let b=0;b<c.length;b++)a=d(a,c[b]);return a};
+",0.25087500000000773,0.1957090000000079,0.18770800000000065,11,11,11
+"/**
+ * @param {Function} fn
+ * @param {number} t
+ * @return {Function}
+ */
+var timeLimit = function(fn, t) {
+  return async function(...args) {
+    return new Promise((delayresolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(timeoutId);
+        reject(""Time Limit Exceeded"");
+      }, t);
+
+      fn(...args)
+        .then((result) => {
+          clearTimeout(timeoutId);
+          delayresolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+  };
+};
+
+/**
+ * const limited = timeLimit((t) => new Promise(res => setTimeout(res, t)), 100);
+ * limited(150).catch(console.log) // ""Time Limit Exceeded"" at t=100ms
+ */",Medium,"/**
+ * @param {Function} fn
+ * @param {number} t
+ * @return {Function} 
+ */
+var timeLimit = function(fn, t) {
+    return async function(...args) {
+        return new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                reject(""Time Limit Exceeded"");
+            }, t);
+
+            try {
+                const result = await fn(...args);
+                clearTimeout(timeoutId);
+                resolve(result);
+            } catch (error) {
+                clearTimeout(timeoutId);
+                reject(error);
+            }
+        });
+    };
+};","The solution uses a Promise and a setTimeout to implement the time limit functionality. The Promise is resolved with the result of the input function if it completes within the time limit. If the time limit is exceeded, the Promise is rejected with the message 'Time Limit Exceeded'. A try-catch block handles potential errors during the execution of the input function. The setTimeout is cleared in both the resolve and reject cases to prevent memory leaks and unexpected behavior.  The ...args syntax is used to pass any number of arguments to the input function.",12,1,4,2,"{""functionOrClassName"": ""timeLimit"", ""tests"": [""(() => {const limited = timeLimit((t) => new Promise(res => setTimeout(res, t)), 100); return limited(50);})()"", ""(() => {const limited = timeLimit((t) => new Promise(res => setTimeout(res, t)), 100); return limited(150).catch(err => err);})()"", ""(() => {const limited = timeLimit((t) => new Promise(res => setTimeout(res, t)), 100); return limited(100).catch(err => err);})()"", ""(() => {const limited = timeLimit((t) => new Promise(res => setTimeout(res, 0)), 100); return limited(50);})()"", ""(() => {const limited = timeLimit((t) => new Promise((res, rej) => setTimeout(() => rej('Error'), t)), 100); return limited(50).catch(err => err);})()"", ""(() => {const limited = timeLimit((t) => new Promise((res, rej) => setTimeout(() => rej('Error'), t)), 100); return limited(150).catch(err => err);})()"", ""(() => {const limited = timeLimit((t) => {throw 'Error'}, 100); return limited(50).catch(err => err);})()"", ""(() => {const limited = timeLimit((t) => new Promise(res => setTimeout(res, t)), 0); return limited(50).catch(err => err);})()"", ""(() => {const limited = timeLimit((t) => new Promise(res => setTimeout(res, t)), 1000); return limited(50);})()"", ""(() => {const limited = timeLimit(async (t) => {await new Promise(res => setTimeout(res, t)); return t;}, 100); return limited(50);})()"", ""(() => {const limited = timeLimit(async (t) => {await new Promise(res => setTimeout(res, t)); return t;}, 100); return limited(150).catch(err => err);})()"", ""(() => {const limited = timeLimit(async (t) => {await new Promise((res, rej) => setTimeout(() => rej('Error'), t)); return t;}, 100); return limited(50).catch(err => err);})()"", ""(() => {const limited = timeLimit(async (t) => {await new Promise((res, rej) => setTimeout(() => rej('Error'), t)); return t;}, 100); return limited(150).catch(err => err);})()"", ""(() => {const limited = timeLimit((t) => new Promise(res => setTimeout(() => res(t), t)), 100); return limited(50);})()""]}","let timeLimit=function(d,e){return async function(...f){return new Promise((g,c)=>{const a=setTimeout(()=>{clearTimeout(a);c(""Time Limit Exceeded"")},e);d(...f).then(b=>{clearTimeout(a);g(b)}).catch(b=>{clearTimeout(a);c(b)})})}};
+",-1,-1,-1,-1,-1,-1
+"const TimeLimitedCache = function() {
+    this.cache = new Map();  // Using Map so we don't need a size variable
+};
+
+TimeLimitedCache.prototype.set = function(key, value, duration) {
+    let found = this.cache.has(key);
+    if (found) clearTimeout(this.cache.get(key).ref);  // Cancel previous timeout
+    this.cache.set(key, {
+        value,  // Equivalent to `value: value`
+        ref: setTimeout(() => this.cache.delete(key), duration)
+    });
+    return found;
+};
+
+TimeLimitedCache.prototype.get = function(key) {
+    return this.cache.has(key) ? this.cache.get(key).value : -1;
+};
+
+TimeLimitedCache.prototype.count = function() {
+    return this.cache.size;
+};",Medium,"var TimeLimitedCache = function() {
+    this.cache = new Map();
+    this.timeouts = new Map();
+};
+
+/** 
+ * @param {number} key
+ * @param {number} value
+ * @param {number} duration time until expiration in ms
+ * @return {boolean} if un-expired key already existed
+ */
+TimeLimitedCache.prototype.set = function(key, value, duration) {
+    const existingTimeout = this.timeouts.get(key);
+    if (existingTimeout) {
+        clearTimeout(existingTimeout);
+    }
+
+    const existed = this.cache.has(key);
+    this.cache.set(key, value);
+
+    const timeout = setTimeout(() => {
+        this.cache.delete(key);
+        this.timeouts.delete(key);
+    }, duration);
+    this.timeouts.set(key, timeout);
+
+    return existed;
+};
+
+/** 
+ * @param {number} key
+ * @return {number} value associated with key
+ */
+TimeLimitedCache.prototype.get = function(key) {
+    if (this.cache.has(key)) {
+        return this.cache.get(key);
+    }
+    return -1;
+};
+
+/** 
+ * @return {number} count of non-expired keys
+ */
+TimeLimitedCache.prototype.count = function() {
+    return this.cache.size;
+};","This code uses a Map to store the key-value pairs and another Map to store the timeouts associated with each key. The set method checks if a timeout already exists for the given key. If so, it clears the existing timeout. It then sets the key-value pair in the cache and creates a new timeout. The get method returns the value associated with the key if it exists and hasn't expired. The count method returns the number of non-expired keys in the cache. Using Maps allows for efficient key lookups and deletions.",14,10,6,5,"{""functionOrClassName"": ""TimeLimitedCache"", ""tests"": [""(() => {const cache = new TimeLimitedCache(); return cache.set(1, 1, 1000);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); return cache.get(1);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); return cache.count();})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); cache.set(1, 2, 1000); return cache.get(1);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); setTimeout(() => { return cache.get(1); }, 2000);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); cache.set(2, 2, 2000); return cache.count();})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); cache.set(2, 2, 2000); cache.set(1, 10, 1000); return cache.get(1);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); return cache.get(2);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 0); return cache.get(1);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); cache.set(2, 2, 2000); cache.set(3, 3, 3000); return cache.count();})()"", ""(() => {const cache = new TimeLimitedCache(); return cache.get(1);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); cache.set(1, 1, 1000); return cache.count();})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); setTimeout(() => { return cache.count(); }, 2000);})()"", ""(() => {const cache = new TimeLimitedCache(); cache.set(1, 1, 1000); cache.set(2, 2, 1000); setTimeout(() => { return cache.count(); }, 2000);})()""]}","function b(){this.cache=new Map}b.prototype.set=function(a,d,e){let c=this.cache.has(a);c&&clearTimeout(this.cache.get(a).g);this.cache.set(a,{value:d,g:setTimeout(()=>this.cache.delete(a),e)});return c};b.prototype.get=function(a){return this.cache.has(a)?this.cache.get(a).value:-1};b.prototype.count=function(){return this.cache.size};let TimeLimitedCache=b;
+",1.6426249999999953,0.307707999999991,0.5312920000000076,14,14,14
+"var debounce = function(fn, t) {
+    let id;
+        return function (...args) {
+                clearTimeout(id);
+                id = setTimeout(() => fn(...args), t);
+        }
+};",Medium,"/**
+ * @param {Function} fn
+ * @param {number} t milliseconds
+ * @return {Function} 
+ */
+var debounce = function(fn, t) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            fn(...args);
+        }, t);
+    }
+};","This code implements debounce functionality by using setTimeout to schedule the execution of the given function fn after t milliseconds. Each subsequent call to the debounced function within the t millisecond window clears the existing timeout using clearTimeout and sets a new timeout, effectively delaying the execution until t milliseconds have passed since the last call. The ...args syntax allows the debounced function to accept and pass any arguments to the original function fn when it's eventually executed. By storing timeoutId in the closure, we ensure that each call to the debounced function has access to and can clear the appropriate timeout.",8,8,4,5,"{""functionOrClassName"": ""debounce"", ""tests"": [""debounce(() => 1, 100)()"", ""debounce(() => {console.log(2); return 3;}, 200)()"", ""debounce((a, b) => a + b, 100)(1, 2)"", ""debounce(function(a, b) {return this.c + a + b;}, 200).bind({c: 5})(10, 20)"", ""(() => {let f = debounce((a, b) => a + b, 150); f(1, 2); return f(3, 4);})()"", ""(() => {let f = debounce((a, b) => a + b, 50); f(1, 2); return f(3, 4);})()"", ""(() => {let f = debounce((a) => a * 2, 50); return f(5);})()"", ""(() => {let f = debounce((a) => {let ret = 0; for (let i = 0; i < a; ++i) ret += i; return ret;}, 200); return f(5);})()"", ""(() => {let f = debounce((...args) => args.reduce((a, b) => a + b, 0), 100); return f(1, 2, 3, 4, 5);})()"", ""(() => {let f = debounce(async (a, b) => await Promise.resolve(a + b), 100); return f(1, 2);})()"", ""(() => {let f = debounce((a, b) => new Promise((resolve, reject) => {setTimeout(() => {resolve(a + b);}, 200);}), 100); return f(1, 2);})()"", ""(() => {let f = debounce((a, b) => a + b, 0); return f(1, 2);})()"", ""(() => {let f = debounce((a, b) => a + b, -1); return f(1, 2);})()"", ""(() => {let f = debounce((a, b) => a + b, -100); return f(1, 2);})()"", ""(() => {let f = debounce((a, b) => a + b, Infinity); return f(1, 2);})()"", ""(() => {let f = debounce((a, b) => a + b, NaN); return f(1, 2);})()""]}","let debounce=function(b,c){let a;return function(...d){clearTimeout(a);a=setTimeout(()=>b(...d),c)}};
+",-1,-1,-1,-1,-1,-1
+"var promiseAll = async function(functions) {
+    return new Promise((resolve, reject) => {
+        let results = [];
+        functions.forEach(fn => {
+            fn()
+            .then(val => results.push(val))
+            .catch(reason => reject(reason));
+        });
+        resolve(results);
+    })};
+
+var promiseAll = async function(functions) {
+    return new Promise((resolve,reject)=>{
+        if(functions.length === 0) {
+            resolve([]);
+            return;
+        }
+        const arr=new Array(functions.length);
+        arr.fill(null);
+        let count=0
+        functions.forEach(async(fn,i)=>{
+            try{
+                arr[i]=await fn()
+                count++
+            
+                if(count===functions.length){
+                    resolve(arr);
+                }
+            }
+            catch(e){
+                reject(e);
+            }
+        
+        });
+    });
+};",Medium,"/**
+ * @param {Array<Function>} functions
+ * @return {Promise<any>}
+ */
+var promiseAll = function(functions) {
+  return new Promise((resolve, reject) => {
+    const results = [];
+    let completedCount = 0;
+    const n = functions.length;
+
+    if (n === 0) {
+      resolve([]);
+      return;
+    }
+
+    for (let i = 0; i < n; i++) {
+      functions[i]()
+        .then(result => {
+          results[i] = result;
+          completedCount++;
+          if (completedCount === n) {
+            resolve(results);
+          }
+        })
+        .catch(error => {
+          reject(error);
+        });
+    }
+  });
+};","This code implements a custom promiseAll function that mimics the behavior of Promise.all. It initializes an array results to store the resolved values and a counter completedCount. The function iterates through the input functions array. For each function, it calls the function and attaches a then handler and a catch handler to the returned promise. The then handler stores the resolved value in the results array at the corresponding index and increments completedCount. If completedCount equals the length of functions, it resolves the main promise with results. The catch handler rejects the main promise with the reason of the first rejection. If the input array is empty, it resolves the promise with an empty array.",14,10,11,7,"{""functionOrClassName"": ""promiseAll"", ""tests"": [""promiseAll([])"", ""promiseAll([async () => 1])"", ""promiseAll([async () => 1, async () => 2, async () => 3])"", ""promiseAll([async () => Promise.resolve(1), async () => Promise.resolve(2)])"", ""promiseAll([async () => Promise.reject('Error')])"", ""promiseAll([async () => 1, async () => Promise.reject('Error'), async () => 3])"", ""promiseAll([async () => {throw new Error('Error')}])"", ""promiseAll([async () => 1, async () => {throw new Error('Error')}, async () => 3])"", ""promiseAll([async () => new Promise(resolve => setTimeout(() => resolve(1), 100)), async () => 2])"", ""promiseAll([async () => new Promise(resolve => setTimeout(() => resolve(1), 100)), async () => new Promise((resolve, reject) => setTimeout(() => reject('Error'), 50))])"", ""promiseAll([async () => Promise.resolve(1), async () => Promise.resolve(2), async () => Promise.resolve(3), async () => Promise.resolve(4), async () => Promise.resolve(5)])"", ""promiseAll([async () => 1, async () => 2, async () => 3, async () => 4, async () => 5, async () => Promise.reject('Error')])"", ""promiseAll([async () => 'a', async () => 'b', async () => 'c'])"", ""promiseAll([async () => { const obj = { key: 'value' }; return obj; }])""]}",,1.0774160000000137,0.34941700000000253,0.8728749999999934,0,0,14
+"class EventEmitter {
+  constructor() {
+    this.events = new Map();
+  }
+
+  subscribe(event, cb) {
+    if (!this.events.has(event)) {
+      this.events.set(event, []);
+    }
+
+    const listeners = this.events.get(event);
+    listeners.push(cb);
+
+    return {
+      unsubscribe: () => {
+        const index = listeners.indexOf(cb);
+        if (index !== -1) {
+          listeners.splice(index, 1);
+        }
+      }
+    };
+  }
+
+  emit(event, args = []) {
+    if (!this.events.has(event)) {
+      return [];
+    }
+
+    const listeners = this.events.get(event);
+    const results = [];
+
+    for (const listener of listeners) {
+      results.push(listener(...args));
+    }
+
+    return results;
+  }
+}",Medium,"class EventEmitter {
+    constructor() {
+        this.events = {};
+    }
+
+    /**
+     * @param {string} eventName
+     * @param {Function} callback
+     * @return {Object}
+     */
+    subscribe(eventName, callback) {
+        if (!this.events[eventName]) {
+            this.events[eventName] = [];
+        }
+        this.events[eventName].push(callback);
+
+        return {
+            unsubscribe: () => {
+                if (this.events[eventName]) {
+                    this.events[eventName] = this.events[eventName].filter(
+                        (cb) => cb !== callback
+                    );
+                }
+            },
+        };
+    }
+
+    /**
+     * @param {string} eventName
+     * @param {Array} args
+     * @return {Array}
+     */
+    emit(eventName, args = []) {
+        const callbacks = this.events[eventName] || [];
+        return callbacks.map((callback) => callback(...args));
+    }
+}","This code implements the EventEmitter class with subscribe and emit methods.  The subscribe method adds the callback to an array associated with the event name. It returns an object with an unsubscribe method that removes the callback. The emit method iterates through the callbacks for the given event and calls each one with the provided arguments, returning the results in an array.  Error handling is implicit - if an event has no subscribers, an empty array is returned. This approach is efficient and adheres to the prompt's requirements.",4,1,3,7,"{""functionOrClassName"": ""EventEmitter"", ""tests"": [""new EventEmitter()"", ""(() => {const emitter = new EventEmitter(); return emitter.subscribe('event1', () => {});})()"", ""(() => {const emitter = new EventEmitter(); return emitter.emit('event1');})()"", ""(() => {const emitter = new EventEmitter(); emitter.subscribe('event1', () => {}); return emitter.emit('event1');})()"", ""(() => {const emitter = new EventEmitter(); emitter.subscribe('event1', (a, b) => a + b); return emitter.emit('event1', [1, 2]);})()"", ""(() => {const emitter = new EventEmitter(); const sub1 = emitter.subscribe('event1', () => 1); const sub2 = emitter.subscribe('event1', () => 2); return emitter.emit('event1');})()"", ""(() => {const emitter = new EventEmitter(); const sub = emitter.subscribe('event1', () => {}); sub.unsubscribe(); return emitter.emit('event1');})()"", ""(() => {const emitter = new EventEmitter(); const sub1 = emitter.subscribe('event1', () => 1); const sub2 = emitter.subscribe('event1', () => 2); sub1.unsubscribe(); return emitter.emit('event1');})()"", ""(() => {const emitter = new EventEmitter(); emitter.subscribe('event1', () => {}); return emitter.emit('event2');})()"", ""(() => {const emitter = new EventEmitter(); const sub = emitter.subscribe('event1', () => {}); sub.unsubscribe(); sub.unsubscribe(); return emitter.emit('event1');})()"", ""(() => {const emitter = new EventEmitter(); const sub = emitter.subscribe('event1', () => {throw new Error('test error');}); return emitter.emit('event1');})()"", ""(() => {const emitter = new EventEmitter(); emitter.subscribe('event1', (a) => a); emitter.subscribe('event2', (a, b) => a + b); return emitter.emit('event1', [1]);})()"", ""(() => {const emitter = new EventEmitter(); emitter.subscribe('event1', (a) => a); emitter.subscribe('event2', (a, b) => a + b); return emitter.emit('event2', [1, 2]);})()""]}","class a{}let EventEmitter=a;
+",0.4761660000000063,0.3491250000000008,0.3405000000000058,1,11,13
+"class Calculator {
+  constructor(value) {
+    this.result = value;
+  }
+  add(value) {
+    this.result += value;
+    return this;
+  }
+
+  subtract(value) {
+    this.result -= value;
+    return this;
+  }
+
+  multiply(value) {
+    this.result *= value;
+    return this;
+  }
+
+  divide(value) {
+    if (value === 0) {
+      throw new Error('Division by zero is not allowed');
+    }
+    this.result /= value;
+    return this;
+  }
+
+  power(value) {
+    this.result = Math.pow(this.result, value);
+    return this;
+  }
+
+  getResult() {
+    return this.result;
+  }
+}",Medium,"class Calculator {
+    /** 
+     * @param {number} value
+     */
+    constructor(value) {
+        this.result = value;
+    }
+
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    add(value) {
+        this.result += value;
+        return this;
+    }
+
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    subtract(value) {
+        this.result -= value;
+        return this;
+    }
+
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    multiply(value) {
+        this.result *= value;
+        return this;
+    }
+
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    divide(value) {
+        if (value === 0) {
+            throw new Error(""Division by zero is not allowed"");
+        }
+        this.result /= value;
+        return this;
+    }
+
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    power(value) {
+        this.result = Math.pow(this.result, value);
+        return this;
+    }
+
+    /** 
+     * @return {number}
+     */
+    getResult() {
+        return this.result;
+    }
+}","The Calculator class is designed to perform basic arithmetic operations with method chaining. The constructor initializes the result with the provided value. Each arithmetic method updates the result and returns the Calculator instance, enabling chaining. Error handling is implemented for division by zero. The getResult method returns the final calculated result. This approach ensures clear separation of concerns and maintainability.",3,3,8,6,"{""functionOrClassName"": ""Calculator"", ""tests"": [""new Calculator(5).add(3).getResult()"", ""new Calculator(10).subtract(2).getResult()"", ""new Calculator(2).multiply(4).getResult()"", ""new Calculator(10).divide(2).getResult()"", ""new Calculator(2).power(3).getResult()"", ""new Calculator(0).add(5).getResult()"", ""new Calculator(100).subtract(50).getResult()"", ""new Calculator(5).multiply(0).getResult()"", ""new Calculator(1).divide(1).getResult()"", ""new Calculator(2).power(0).getResult()"", ""new Calculator(5).add(3).subtract(2).getResult()"", ""new Calculator(2).multiply(3).divide(2).getResult()"", ""new Calculator(2).power(2).add(2).getResult()"", ""new Calculator(10).divide(2).multiply(3).getResult()"", ""(() => { let calc = new Calculator(5); calc.add(2); calc.multiply(3); return calc.getResult(); })()"", ""(() => { let calc = new Calculator(10); calc.subtract(5); calc.divide(2); return calc.getResult(); })()"", ""(() => { let calc = new Calculator(2); calc.power(3); calc.add(1); return calc.getResult(); })()"", ""(() => { let calc = new Calculator(5); return calc.add(2.5).getResult(); })()"", ""(() => { let calc = new Calculator(10); return calc.subtract(-5).getResult(); })()"", ""(() => { let calc = new Calculator(2); return calc.multiply(3.5).getResult(); })()""]}","class a{add(){return this}}let Calculator=a;
+",0.3380409999999898,0.5084579999999903,0.4207090000000022,0,20,20
+"/**
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+
+class ListNode {
+  constructor(val, next) {
+    this.val = (val === undefined ? 0 : val);
+    this.next = (next === undefined ? null : next);
+  }
+}
+
+function arrayToList(array) {
+    if (array.length === 0) return null;
+
+    let head = new ListNode(array[0]);
+    let current = head;
+
+    for (let i = 1; i < array.length; i++) {
+        current.next = new ListNode(array[i]);
+        current = current.next;
+    }
+
+    return head;
+}
+
+var mergeKLists = function (lists) {
+    let nums = []
+
+    for (let i = 0; i < lists.length; i++) {
+        let current = lists[i]
+        while (current !== null) {
+            nums.push(current.val)
+            current = current.next
+        }
+    }
+
+    return arrayToList(nums.sort((a, b) => a - b))
+};",Medium,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+var mergeKLists = function(lists) {
+    if (!lists || lists.length === 0) return null;
+
+    const mergeTwoLists = (l1, l2) => {
+        if (!l1) return l2;
+        if (!l2) return l1;
+
+        let head = null;
+        if (l1.val < l2.val) {
+            head = l1;
+            l1 = l1.next;
+        } else {
+            head = l2;
+            l2 = l2.next;
+        }
+
+        let current = head;
+        while (l1 && l2) {
+            if (l1.val < l2.val) {
+                current.next = l1;
+                l1 = l1.next;
+            } else {
+                current.next = l2;
+                l2 = l2.next;
+            }
+            current = current.next;
+        }
+
+        current.next = l1 || l2;
+        return head;
+    };
+
+    while (lists.length > 1) {
+        const mergedLists = [];
+        for (let i = 0; i < lists.length; i += 2) {
+            const l1 = lists[i];
+            const l2 = lists[i + 1];
+            mergedLists.push(mergeTwoLists(l1, l2));
+        }
+        lists = mergedLists;
+    }
+
+    return lists[0] || null;
+};",This code implements a solution to merge k sorted linked lists using the divide-and-conquer approach. It leverages a helper function mergeTwoLists to merge two lists at a time. The main function iteratively merges pairs of lists until only one list remains. Error handling is included to manage empty or null input. The code is organized for readability and uses modern JavaScript syntax.,22,21,16,7,"{""functionOrClassName"": ""mergeKLists"", ""tests"": [""mergeKLists([])"",""mergeKLists([arrayToList([1,4,5]),arrayToList([1,3,4]),arrayToList([2,6])])"", ""mergeKLists([arrayToList([1, 2, 3])])"", ""mergeKLists([null])"", ""mergeKLists([arrayToList([])])"", ""mergeKLists([arrayToList([1])])"", ""mergeKLists([arrayToList([1, 2, 3]), arrayToList([4, 5, 6]), arrayToList([7, 8, 9])])"", ""mergeKLists([arrayToList([1, 3, 5]), arrayToList([2, 4, 6]), arrayToList([0, 7, 8])])"", ""mergeKLists([arrayToList([1, 1, 1]), arrayToList([1, 1, 1]), arrayToList([1, 1, 1])])"", ""mergeKLists([arrayToList([-1, 0, 1]), arrayToList([-2, -1, 0]), arrayToList([0, 1, 2])])"", ""mergeKLists([arrayToList([5, 4, 3, 2, 1]), arrayToList([5, 4, 3, 2, 1]), arrayToList([5, 4, 3, 2, 1])])"", ""mergeKLists([arrayToList([1, 2, 3]), null, arrayToList([4, 5, 6])])"", ""mergeKLists([arrayToList([1, 2, 3]), arrayToList([]), arrayToList([4, 5, 6])])"", ""mergeKLists([arrayToList([1]), arrayToList([2]), arrayToList([3]), arrayToList([4]), arrayToList([5]), arrayToList([6]), arrayToList([7]), arrayToList([8]), arrayToList([9]), arrayToList([10])])""]}","class e{constructor(a){this.g=void 0===a?0:a;this.next=null}}function f(a){if(0===a.length)return null;let d=new e(a[0]),c=d;for(let b=1;b<a.length;b++)c.next=new e(a[b]),c=c.next;return d}let mergeKLists=function(a){let d=[];for(let c=0;c<a.length;c++){let b=a[c];for(;null!==b;)d.push(b.g),b=b.next}return f(d.sort((c,b)=>c-b))};
+",0.3217909999999904,0.49295800000000156,0.25141599999999187,2,2,14
+"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {string}
+ */
+var mergeAlternately = function(word1, word2) {
+ let result = '';
+  for (let i = 0; i < Math.max(word1.length, word2.length); i++) {
+    if (i < word1.length) result += word1[i];
+    if (i < word2.length) result += word2[i];
+  }
+  return result;
+};",Easy,"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {string} 
+ */
+var mergeAlternately = function(word1, word2) {
+    let merged = """";
+    let i = 0;
+    let j = 0;
+    while (i < word1.length || j < word2.length) {
+        if (i < word1.length) {
+            merged += word1[i];
+            i++;
+        }
+        if (j < word2.length) {
+            merged += word2[j];
+            j++;
+        }
+    }
+    return merged;
+};","This code iterates through both strings using two pointers, i and j, respectively. In each iteration, it appends the current character from word1 (if within bounds) to the merged string, then does the same for word2. This alternating append continues until both pointers have reached the end of their respective strings. The resulting merged string is then returned.",7,10,2,2,"{""functionOrClassName"": ""mergeAlternately"", ""tests"": [""mergeAlternately(\""abc\"", \""pqr\"")"", ""mergeAlternately(\""ab\"", \""pqrs\"")"", ""mergeAlternately(\""abcd\"", \""pq\"")"", ""mergeAlternately(\""\"", \""\"")"", ""mergeAlternately(\""a\"", \""\"")"", ""mergeAlternately(\""\"", \""b\"")"", ""mergeAlternately(\""a\"", \""bc\"")"", ""mergeAlternately(\""abc\"", \""b\"")"", ""mergeAlternately(\""12345\"", \""67890\"")"", ""mergeAlternately(\""1\"", \""234567890\"")"", ""mergeAlternately(\""1234567890\"", \""1\"")"", ""mergeAlternately(\""11111\"", \""22222\"")"", ""mergeAlternately(\""123\"", \""456\"")"", ""mergeAlternately(\""11\"", \""2\"")"", ""mergeAlternately(\""1\"", \""22\"")""]}","let mergeAlternately=function(b,c){let d="""";for(let a=0;a<Math.max(b.length,c.length);a++)a<b.length&&(d+=b[a]),a<c.length&&(d+=c[a]);return d};
+",0.18712499999999466,0.1457499999999925,0.35249999999999204,15,15,15
+"var gcdOfStrings = function (str1, str2) {
+    // handle the base case
+    if (str1 + str2 !== str2 + str1) return '';
+    let a = str1.length
+    let b = str2.length
+
+    // loop (divide) until you find the 
+    // highest common factor (length of string) 
+    // like we did in maths
+    while (b) {
+        let temp = b
+        b = a % b
+        a = temp
+    }
+    return str1.substring(0, a)
+};",Easy,"/**
+ * @param {string} str1
+ * @param {string} str2
+ * @return {string}
+ */
+var gcdOfStrings = function(str1, str2) {
+    if (str1 + str2 !== str2 + str1) {
+        return """";
+    }
+
+    let gcd = (a, b) => {
+        while (b) {
+            let temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    };
+
+    return str1.substring(0, gcd(str1.length, str2.length));
+};","The provided code efficiently determines the greatest common divisor (GCD) of two strings, str1 and str2. It begins by checking if the concatenation of str1 and str2 is equal to the concatenation of str2 and str1. If they aren't equal, it signifies that no common divisor exists, and an empty string is returned. Otherwise, a Euclidean algorithm-based GCD function is employed to find the GCD of the lengths of the two strings. Finally, a substring of str1, from the beginning up to the calculated GCD length, is returned as the largest common divisor of both strings. This approach ensures correctness and efficiency in identifying the largest string that divides both input strings.",13,10,9,2,"{""functionOrClassName"": ""gcdOfStrings"", ""tests"": [""gcdOfStrings(\""ABCABC\"", \""ABC\"")"", ""gcdOfStrings(\""ABABAB\"", \""ABAB\"")"", ""gcdOfStrings(\""LEET\"", \""CODE\"")"", ""gcdOfStrings(\""ABCDEF\"", \""ABC\"")"", ""gcdOfStrings(\""TAU\"", \""TAU\"")"", ""gcdOfStrings(\""AAAAAAAAA\"", \""AA\"")"", ""gcdOfStrings(\""ababab\"", \""abab\"")"", ""gcdOfStrings(\""NLNLNLNLNL\"", \""NL\"")"", ""gcdOfStrings(\""OBC\"", \""OBC\"")"", ""gcdOfStrings(\""ABC\"", \""ABCABC\"")"", ""gcdOfStrings(\""A\"", \""B\"")"", ""gcdOfStrings(\""AAA\"", \""AA\"")""]}","let gcdOfStrings=function(b,a){if(b+a!==a+b)return"""";let c=b.length;for(a=a.length;a;){let d=a;a=c%a;c=d}return b.substring(0,c)};
+",0.15787499999999,0.12108299999999872,0.2604170000000039,12,12,12
+"var reverseWords = function(s) {
+    let words = s.split(' ');
+    let res = [];
+
+    for (let i = words.length - 1; i >= 0; i--) {
+        if (words[i]) {
+            res.push(words[i]);
+        }
+    }
+
+    return res.join(' ');
+};",Medium,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var reverseWords = function(s) {
+    // Trim leading and trailing spaces
+    s = s.trim();
+
+    // Split the string into words
+    const words = s.split(/\s+/);
+
+    // Reverse the array of words
+    const reversedWords = words.reverse();
+
+    // Join the reversed words with a single space
+    const reversedString = reversedWords.join(' ');
+
+    // Return the reversed string
+    return reversedString;
+};","The solution trims the input string to remove leading/trailing spaces and then splits the string into an array of words using the split method with a regular expression that matches one or more whitespace characters. The order of words in the array is reversed using the reverse method. Finally, the reversed words are joined back into a single string with single spaces using the join method. This approach handles multiple spaces between words effectively and ensures that the returned string has only single spaces separating the words.",11,8,3,2,"{""functionOrClassName"": ""reverseWords"", ""tests"": [""reverseWords(\""the sky is blue\"")"", ""reverseWords(\""  hello world  \"")"", ""reverseWords(\""a good   example\"")"", ""reverseWords(\""  Bob    Loves  Alice   \"")"", ""reverseWords(\""the\"")"", ""reverseWords(\""\"")"", ""reverseWords(\""    \"")"", ""reverseWords(\"" 1\"")"", ""reverseWords(\""1 \"")"", ""reverseWords(\""This is a long sentence with multiple spaces\"")"", ""reverseWords(\""  leading and trailing spaces  \"")"", ""reverseWords(\""This is a sentence with no extra spaces\"")"", ""reverseWords(\""  This  is a  sentence with  multiple spaces between words  \"")"", ""reverseWords(\""  OneWord  \"")"", ""reverseWords(\""Two Words\"")""]}","let reverseWords=function(a){a=a.split("" "");let c=[];for(let b=a.length-1;0<=b;b--)a[b]&&c.push(a[b]);return c.join("" "")};
+",0.22358400000000245,0.15720799999999713,1.0908330000000035,15,15,15
+"var productExceptSelf = function(nums) {
+    const output = Array(nums.length).fill(1);
+
+    let left = 1;
+    for (let i = 0; i < nums.length; i++) {
+        output[i] *= left;
+        left *= nums[i];
+    }
+
+    let right = 1;
+    for (let i = nums.length - 1; i >= 0; i--) {
+        output[i] *= right;
+        right *= nums[i];
+    }
+
+    return output;    
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var productExceptSelf = function(nums) {
+    const n = nums.length;
+    const result = new Array(n).fill(1);
+
+    // Calculate prefix products
+    let prefixProduct = 1;
+    for (let i = 0; i < n; i++) {
+        result[i] = prefixProduct;
+        prefixProduct *= nums[i];
+    }
+
+    // Calculate suffix products and multiply with prefix products
+    let suffixProduct = 1;
+    for (let i = n - 1; i >= 0; i--) {
+        result[i] *= suffixProduct;
+        suffixProduct *= nums[i];
+    }
+
+    return result;
+};","This code calculates the product of all elements except self without using division and in O(n) time. It uses two passes: one to calculate prefix products and store them in the result array, and another to calculate suffix products and multiply them with the corresponding prefix products already stored in the result. This approach avoids division and efficiently computes the desired output.",11,14,3,7,"{""functionOrClassName"": ""productExceptSelf"", ""tests"": [""productExceptSelf([1,2,3,4])"", ""productExceptSelf([0,0])"", ""productExceptSelf([1,0])"", ""productExceptSelf([0,1])"", ""productExceptSelf([1,1])"", ""productExceptSelf([-1,1])"", ""productExceptSelf([1,-1])"", ""productExceptSelf([-1,-1])"", ""productExceptSelf([1,2,3,4,5])"", ""productExceptSelf([5,4,3,2,1])"", ""productExceptSelf([1,2,0,4,5])"", ""productExceptSelf([1,2,3,0,5])"", ""productExceptSelf([0,2,3,4,5])"", ""productExceptSelf([1,0,0,0,0])"", ""productExceptSelf([0,1,0,0,0])"", ""productExceptSelf([0,0,1,0,0])"", ""productExceptSelf([0,0,0,1,0])"", ""productExceptSelf([0,0,0,0,1])""]}","let productExceptSelf=function(b){const c=Array(b.length).fill(1);var d=1;for(var a=0;a<b.length;a++)c[a]*=d,d*=b[a];d=1;for(a=b.length-1;0<=a;a--)c[a]*=d,d*=b[a];return c};
+",0.2357499999999959,0.42379200000000594,0.18745800000000656,18,18,18
+"/**
+ * @param {character[]} chars
+ * @return {number}
+ */
+var compress = function(chars) {
+    let write = 0;
+    let read = 0;
+
+    while (read < chars.length) {
+        let char = chars[read];
+        let count = 0;
+
+        // Count the number of consecutive characters
+        while (read < chars.length && chars[read] === char) {
+            count++;
+            read++;
+        }
+        chars[write] = char;
+        write++;
+        if (count > 1) {
+            for (let digit of String(count)) {
+                chars[write] = digit;
+                write++;
+            }
+        }
+    }
+
+    return write;
+};",Medium,"/**
+ * @param {character[]} chars
+ * @return {number}
+ */
+var compress = function(chars) {
+    if (!chars || chars.length === 0) {
+        return 0;
+    }
+
+    let writeIndex = 0;
+    let readIndex = 0;
+
+    while (readIndex < chars.length) {
+        const currentChar = chars[readIndex];
+        let count = 0;
+
+        while (readIndex < chars.length && chars[readIndex] === currentChar) {
+            readIndex++;
+            count++;
+        }
+
+        chars[writeIndex++] = currentChar;
+
+        if (count > 1) {
+            const countStr = count.toString();
+            for (const digit of countStr) {
+                chars[writeIndex++] = digit;
+            }
+        }
+    }
+
+    return writeIndex;
+};","This code iterates through the input array 'chars', keeping track of consecutive repeating characters. A 'writeIndex' maintains the position for writing the compressed characters back into the array. When a group of repeating characters is encountered, the character and its count (if greater than 1) are written to the array. The function returns the new length of the modified array, indicated by 'writeIndex'.",13,12,5,5,"{""functionOrClassName"": ""compress"", ""tests"": [""compress([\""a\"",\""a\"",\""b\"",\""b\"",\""c\"",\""c\"",\""c\""])"", ""compress([\""a\""])"", ""compress([\""a\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\""])"", ""compress([\""a\"",\""a\"",\""a\"",\""b\"",\""b\"",\""a\"",\""a\""])"", ""compress([])"", ""compress([\""a\"",\""a\"",\""b\"",\""c\""])"", ""compress([\""a\"",\""b\"",\""c\""])"", ""compress([\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\""])"", ""compress([\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""b\""])"", ""compress([\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""a\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""b\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\"",\""c\""])""]}","let compress=function(a){let b=0,c=0;for(;c<a.length;){let e=a[c],d=0;for(;c<a.length&&a[c]===e;)d++,c++;a[b]=e;b++;if(1<d)for(let f of String(d))a[b]=f,b++}return b};
+",0.20820799999999906,0.14279200000000003,0.5742919999999998,10,10,10
+"/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var longestOnes = function(nums, k) {
+    let left = 0
+    let max_length = 0
+    let zero_count = 0
+    for (let right = 0; right < nums.length; right++) {
+        if(nums[right] == 0){
+            zero_count += 1
+        }
+        while(zero_count > k) {
+            if(nums[left] == 0) {
+                zero_count -= 1
+            }
+            left++
+        }
+        // Calculate the length of the current valid window 
+        // and update max_length
+        max_length = Math.max(max_length, right- left + 1)
+    }
+    return max_length
+};",Medium,"/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var longestOnes = function(nums, k) {
+    let left = 0;
+    let right = 0;
+    let maxConsecutiveOnes = 0;
+    let zerosFlipped = 0;
+
+    while (right < nums.length) {
+        if (nums[right] === 0) {
+            zerosFlipped++;
+        }
+
+        while (zerosFlipped > k) {
+            if (nums[left] === 0) {
+                zerosFlipped--;
+            }
+            left++;
+        }
+
+        maxConsecutiveOnes = Math.max(maxConsecutiveOnes, right - left + 1);
+        right++;
+    }
+
+    return maxConsecutiveOnes;
+};","This code implements a sliding window approach. The `left` and `right` pointers define the window's boundaries. The `zerosFlipped` variable tracks the number of zeros within the current window. The outer loop expands the window by moving the `right` pointer. If a zero is encountered, `zerosFlipped` is incremented. The inner loop shrinks the window from the left until `zerosFlipped` is no longer greater than `k`. The `maxConsecutiveOnes` variable keeps track of the maximum window size seen so far. This approach efficiently finds the longest subarray with at most k zeros.",24,15,13,5,"{""functionOrClassName"": ""longestOnes"", ""tests"": [""longestOnes([1,1,1,0,0,0,1,1,1,1,0], 2)"", ""longestOnes([0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,1,1], 3)"", ""longestOnes([1,0,0,0,1,1,0,0,1,1], 0)"", ""longestOnes([1,1,1,1,1,1,1,1,1,1], 5)"", ""longestOnes([0,0,0,0,0], 0)"", ""longestOnes([0,0,0,0,0], 2)"", ""longestOnes([], 0)"", ""longestOnes([1], 0)"", ""longestOnes([0], 1)"", ""longestOnes([1,0,1,0,1,0,1], 4)"", ""longestOnes([1,0,1,0,1,0,1,0,1,0,1], 10)"", ""longestOnes([0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0], 5)""]}","let longestOnes=function(b,f){let c=0,d=0,e=0;for(let a=0;a<b.length;a++){for(0==b[a]&&(e+=1);e>f;)0==b[c]&&--e,c++;d=Math.max(d,a-c+1)}return d};
+",0.17637500000000728,0.13808300000000884,0.4223750000000024,12,12,12
+"/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[][]}
+ */
+var findDifference = function(nums1, nums2) {
+    let set1 = new Set(nums1);
+    let set2 = new Set(nums2);
+    let uniqueToNums1 = Array.from(set1).filter(x => !set2.has(x));
+    let uniqueToNums2 = Array.from(set2).filter(x => !set1.has(x));
+
+    return [uniqueToNums1, uniqueToNums2];
+};",Medium,"/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[][]}
+ */
+var findDifference = function(nums1, nums2) {
+    const set1 = new Set(nums1);
+    const set2 = new Set(nums2);
+    const diff1 = [];
+    const diff2 = [];
+
+    for (const num of set1) {
+        if (!set2.has(num)) {
+            diff1.push(num);
+        }
+    }
+
+    for (const num of set2) {
+        if (!set1.has(num)) {
+            diff2.push(num);
+        }
+    }
+
+    return [diff1, diff2];
+};","This code leverages Sets for efficient lookups. It initializes two sets, set1 and set2, with the elements of nums1 and nums2 respectively. Then, it iterates through each set, checking if an element is present in the other set using the has() method. If an element is not found in the other set, it's added to the corresponding difference array (diff1 or diff2). Finally, the function returns a 2D array containing the two difference arrays.",12,7,9,9,"{""functionOrClassName"": ""findDifference"", ""tests"": [""findDifference([1, 2, 3], [2, 4, 6])"", ""findDifference([1, 2, 3, 3], [2, 3, 4, 6])"", ""findDifference([1, 2, 3], [2, 4, 6, 1, 2, 3])"", ""findDifference([], [])"", ""findDifference([1, 2, 3], [])"", ""findDifference([], [4, 5, 6])"", ""findDifference([1], [1])"", ""findDifference([1, 1, 1, 2, 2, 3], [1, 2, 4, 5, 6])"", ""findDifference([1, 2, 3, 4, 5], [5, 4, 3, 2, 1])"", ""findDifference([1, 2, 3, 4, 5, 5, 5, 5], [5, 4, 3, 2, 1, 1, 1, 1])""]}","let findDifference=function(a,b){let d=new Set(a),e=new Set(b);a=Array.from(d).filter(c=>!e.has(c));b=Array.from(e).filter(c=>!d.has(c));return[a,b]};
+",0.19562500000000682,0.15670799999999474,0.5251250000000027,10,10,10
+"/**
+ * @param {string} s
+ * @return {string}
+ */
+var removeStars = function(s) {
+let i = 0;
+    let stk = [];
+     while(i<s.length){
+         if(s.charAt(i)===""*""){
+            if(stk.length>0){
+                stk.pop();
+            }
+         }
+         else {
+             stk.push(s.charAt(i))
+         }
+         i++;
+     }
+    return stk.join("""");
+};",Medium,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var removeStars = function(s) {
+    let stack = [];
+    for (let char of s) {
+        if (char === '*') {
+            stack.pop();
+        } else {
+            stack.push(char);
+        }
+    }
+    return stack.join('');
+};","This code iterates through the input string 's'. If a character is a star, it pops the last element from the stack, effectively removing the closest non-star character to its left and the star itself. Otherwise, the character is pushed onto the stack. Finally, the remaining characters in the stack are joined to form the resulting string. This approach ensures that the operations are performed according to the problem description and handles all stars efficiently.",9,6,3,2,"{""functionOrClassName"": ""removeStars"", ""tests"": [""removeStars(\""leet**cod*e\"")"", ""removeStars(\""erase*****\"")"", ""removeStars(\""\"")"", ""removeStars(\""a\"")"", ""removeStars(\""*\"")"", ""removeStars(\""**\"")"", ""removeStars(\""***\"")"", ""removeStars(\""****\"")"", ""removeStars(\""*****\"")"", ""removeStars(\""abcdef\"")"", ""removeStars(\""aabbccddeeff\"")"", ""removeStars(\""a*b*c*d*e*f\"")"", ""removeStars(\""*******\"")"", ""removeStars(\""le*et**cod*e\"")"", ""removeStars(\""erase*****\"")""]}","let removeStars=function(c){let a=0,b=[];for(;a<c.length;)""*""===c.charAt(a)?0<b.length&&b.pop():b.push(c.charAt(a)),a++;return b.join("""")};
+",0.20974999999999966,0.40458300000000236,0.1708330000000018,15,15,15
+"var predictPartyVictory = function(senate) {
+    senate = senate.split('');
+    while(senate.length) {
+        var first = senate.shift();
+        var len = senate.length;
+
+        for(var i=0; i<len; i++) {
+            if(first != senate[i]) {
+                senate.splice(i, 1);
+                senate.push(first);
+                break;
+            }
+        }
+        if(i == len) {
+            return first == 'D' ? 'Dire' : 'Radiant';
+        }
+    }
+};",Medium,"/**
+ * @param {string} senate
+ * @return {string}
+ */
+var predictPartyVictory = function(senate) {
+    let n = senate.length;
+    let radiant = [];
+    let dire = [];
+    let banned = new Array(n).fill(false);
+
+    for (let i = 0; i < n; i++) {
+        if (senate[i] === 'R') {
+            radiant.push(i);
+        } else {
+            dire.push(i);
+        }
+    }
+
+    while (radiant.length > 0 && dire.length > 0) {
+        let r_idx = radiant.shift();
+        let d_idx = dire.shift();
+
+        if (!banned[r_idx] && !banned[d_idx]) {
+            if (r_idx < d_idx) {
+                radiant.push(r_idx + n);
+                banned[d_idx] = true;
+            } else {
+                dire.push(d_idx + n);
+                banned[r_idx] = true;
+            }
+        } else if (!banned[r_idx]) {
+            radiant.push(r_idx + n);
+        } else if (!banned[d_idx]) {
+            dire.push(d_idx + n);
+        }
+    }
+
+    return radiant.length > 0 ? ""Radiant"" : ""Dire"";
+};","This code simulates the voting process using queues for Radiant and Dire senators. Senators ban opponents based on their index in the original senate string. A 'banned' array tracks banned senators. The simulation continues until one party has no remaining senators.  The function returns ""Radiant"" if the Radiant party wins, and ""Dire"" otherwise. This approach efficiently handles the round-based banning process and ensures that the correct winning party is determined based on the given rules.",22,35,6,2,"{""functionOrClassName"": ""predictPartyVictory"", ""tests"": [""predictPartyVictory(\""RD\"")"", ""predictPartyVictory(\""RDD\"")"", ""predictPartyVictory(\""DDRRR\"")"", ""predictPartyVictory(\""RDDR\"")"", ""predictPartyVictory(\""RDRDR\"")"", ""predictPartyVictory(\""RRRDDD\"")"", ""predictPartyVictory(\""DRRDRDR\"")"", ""predictPartyVictory(\""RRRRDDDD\"")"", ""predictPartyVictory(\""DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD","let predictPartyVictory=function(a){for(a=a.split("""");a.length;){for(var c=a.shift(),d=a.length,b=0;b<d;b++)if(c!=a[b]){a.splice(b,1);a.push(c);break}if(b==d)return""D""==c?""Dire"":""Radiant""}};
+",-1,-1,-1,-1,-1,-1
+"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteMiddle = function(head) {
+    if(head === null)return null;
+    prev = new ListNode(0);
+    prev.next = head;
+    slow = prev;
+    fast = head;
+    while(fast != null && fast.next != null){
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    slow.next = slow.next.next;
+    return prev.next;
+};",Medium,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteMiddle = function(head) {
+    if (!head || !head.next) return null; // Handle empty or single-node list
+
+    let slow = head;
+    let fast = head;
+    let prev = null;
+
+    while (fast && fast.next) {
+        prev = slow;
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+
+    prev.next = slow.next; // Skip the middle node
+
+    return head;
+};","The provided code efficiently removes the middle node from a singly linked list. It uses the fast and slow pointer technique. The fast pointer moves two steps at a time while the slow pointer moves one step. When the fast pointer reaches the end, the slow pointer is at the middle. We use a 'prev' pointer to keep track of the node before the slow pointer so that we can easily skip the middle node by adjusting the 'next' pointers.",24,8,10,6,"{""functionOrClassName"": ""deleteMiddle"", ""tests"": [""deleteMiddle(null)"", ""deleteMiddle(new ListNode(1))"", ""deleteMiddle(new ListNode(1, new ListNode(2)))"", ""deleteMiddle(new ListNode(1, new ListNode(2, new ListNode(3))))"", ""deleteMiddle(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4)))))"", ""deleteMiddle(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, new ListNode(5))))))"", ""deleteMiddle(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, new ListNode(5, new ListNode(6)))))))"", ""deleteMiddle(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, new ListNode(5, new ListNode(6, new ListNode(7))))))))"", ""(() => {let a = new ListNode(1); let b = new ListNode(2); let c = new ListNode(3); a.next = b; b.next = c; return deleteMiddle(a);})()"", ""(() => {let a = new ListNode(1); let b = new ListNode(2); let c = new ListNode(3); let d = new ListNode(4); a.next = b; b.next = c; c.next = d; return deleteMiddle(a);})()""]}",,0.286208000000002,0.1965409999999963,0.17779199999999662,9,10,10
+"function lowestCommonAncestor(root, p, q) {
+  if (!root || root === p || root === q) return root;
+  var resL = lowestCommonAncestor(root.left, p, q);
+  var resR = lowestCommonAncestor(root.right, p, q);
+  return (resL && resR) ? root : (resL || resR);
+}",Medium,"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {TreeNode}
+ */
+var lowestCommonAncestor = function(root, p, q) {
+    if (!root || root === p || root === q) {
+        return root;
+    }
+
+    const leftLCA = lowestCommonAncestor(root.left, p, q);
+    const rightLCA = lowestCommonAncestor(root.right, p, q);
+
+    if (leftLCA && rightLCA) {
+        return root; // Both nodes found in different subtrees
+    }
+
+    return leftLCA || rightLCA; // One or both nodes found in a single subtree
+};","This code implements a recursive approach to find the LCA. It checks three base cases: if the current node is null, p, or q, then it returns the current node. Otherwise, it recursively searches the left and right subtrees. If both p and q are found in different subtrees, the current node is the LCA. If p and q are found in the same subtree, the LCA is returned from that subtree.",11,8,4,10,"{""functionOrClassName"": ""lowestCommonAncestor"", ""tests"": [""lowestCommonAncestor(null, null, null)"", ""lowestCommonAncestor(null, {val: 1}, null)"", ""lowestCommonAncestor({val: 1}, {val: 1}, null)"", ""lowestCommonAncestor({val: 1}, null, {val: 1})"", ""lowestCommonAncestor({val: 1, left: {val: 2}, right: {val: 3}}, {val: 1}, {val: 3})"", ""lowestCommonAncestor({val: 1, left: {val: 2}, right: {val: 3}}, {val: 2}, {val: 3})"", ""lowestCommonAncestor({val: 1, left: {val: 2}, right: {val: 3}}, {val: 2}, {val: 2})"", ""lowestCommonAncestor({val: 1, left: {val: 2, left: {val: 4}}, right: {val: 3}}, {val: 2}, {val: 4})"", ""lowestCommonAncestor({val: 1, left: {val: 2, left: {val: 4}}, right: {val: 3}}, {val: 4}, {val: 3})"", ""lowestCommonAncestor({val: 1, left: {val: 2, left: {val: 4}}, right: {val: 3, right: {val: 5}}}, {val: 4}, {val: 5})"", ""lowestCommonAncestor({val: 1, left: {val: 2, left: {val: 4, left: {val: 6}}}, right: {val: 3}}, {val: 6}, {val: 4})"", ""lowestCommonAncestor({val: 1, left: {val: 2}, right: {val: 3}}, {val: 6}, {val: 7})"", ""lowestCommonAncestor({val: 1, left: {val: 2}, right: {val: 3}}, {val: 3}, {val: 2})""]}","function c(a,b,d){if(!a||a===b||a===d)return a;var e=c(a.left,b,d);b=c(a.right,b,d);return e&&b?a:e||b}let lowestCommonAncestor=c;
+",0.22962499999999864,0.17149999999999466,0.42629200000000367,13,13,13
+"var findCircleNum = function (isConnected) {
+
+    let provinces = 0;
+    let visited = new Array(isConnected.length).fill(false);
+
+    for (let i = 0; i < isConnected.length; i++) {
+        if (!visited[i]) {
+            provinces++;
+            dfs(isConnected, visited, i);
+        }
+    }
+    return provinces;
+};
+
+function dfs(isConnected, visited, i) {
+
+    visited[i] = true;
+    
+    for (let j = 0; j < isConnected.length; j++) {
+        if (isConnected[i][j] === 1 && !visited[j]) {
+            dfs(isConnected, visited, j);
+        }
+    }
+}",Medium,"/**
+ * @param {number[][]} isConnected
+ * @return {number}
+ */
+var findCircleNum = function(isConnected) {
+    if (!isConnected || isConnected.length === 0) {
+        return 0; // Handle empty input
+    }
+
+    const n = isConnected.length;
+    const visited = new Array(n).fill(false);
+    let provinces = 0;
+
+    const dfs = (city) => {
+        visited[city] = true;
+        for (let neighbor = 0; neighbor < n; neighbor++) {
+            if (isConnected[city][neighbor] === 1 && !visited[neighbor]) {
+                dfs(neighbor);
+            }
+        }
+    };
+
+    for (let i = 0; i < n; i++) {
+        if (!visited[i]) {
+            dfs(i);
+            provinces++;
+        }
+    }
+
+    return provinces;
+};","This code uses Depth-First Search (DFS) to find the number of provinces.  It initializes a visited array to keep track of visited cities. The main loop iterates through each city. If a city hasn't been visited, it performs DFS starting from that city, marking all reachable cities as visited. Each time a new DFS starts, it signifies a new province. The function returns the total count of provinces. Error handling is included for an empty input array.",14,15,4,5,-1,-1,-1,-1,-1,-1,-1,-1
+"var findPeakElement = function(nums) {
+    var start = 0, end = nums.length - 1;
+    while (start < end) {
+        var mid = Math.floor((start + end) / 2);
+        if (mid === 0) {
+            return nums[0] >= nums[1] ? 0 : 1;
+        }
+        if (mid === end) {
+            return nums[end - 1] >= nums[end - 2] ? end - 1 : end - 2;
+        }
+
+        if (nums[mid] > nums[mid + 1] && nums[mid] > nums[mid - 1]) {
+            return mid;
+        }
+        if (nums[mid] < nums[mid - 1]) {
+            end = mid - 1;
+        } else {
+            start = mid + 1;
+        }
+    }
+    return start;
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var findPeakElement = function(nums) {
+    let left = 0;
+    let right = nums.length - 1;
+
+    while (left < right) {
+        const mid = Math.floor((left + right) / 2);
+
+        if (nums[mid] > nums[mid + 1]) {
+            // We are on a descending slope, so the peak must be to the left
+            // or at mid itself.
+            right = mid;
+        } else {
+            // We are on an ascending slope, so the peak must be to the right.
+            left = mid + 1;
+        }
+    }
+
+    // At this point, left and right will converge to a peak element's index.
+    return left;
+};","This solution uses a binary search approach to find a peak element in O(log n) time. The core idea is to compare the middle element with its right neighbor. If the middle element is greater, then a peak element must exist in the left half (including the middle element). Otherwise, a peak element must exist in the right half. This process is repeated until the search space converges to a single element, which is guaranteed to be a peak element due to the given constraints.",27,9,5,5,"{""functionOrClassName"": ""findPeakElement"", ""tests"": [""findPeakElement([1,2,3,1])"", ""findPeakElement([1,2,1,3,5,6,4])"", ""findPeakElement([1])"", ""findPeakElement([1, 2])"", ""findPeakElement([2, 1])"", ""findPeakElement([1, 2, 3])"", ""findPeakElement([3, 2, 1])"", ""findPeakElement([1, 3, 2, 4, 3])"", ""findPeakElement([1,2,3,4,5,4,3,2,1,0])"", ""findPeakElement([0,1,2,3,4,5,4,3,2,1])"", ""findPeakElement([1,2,3,4,5])"", ""findPeakElement([5,4,3,2,1])""]}","let findPeakElement=function(a){for(var d=0,c=a.length-1;d<c;){var b=Math.floor((d+c)/2);if(0===b)return a[0]>=a[1]?0:1;if(b===c)return a[c-1]>=a[c-2]?c-1:c-2;if(a[b]>a[b+1]&&a[b]>a[b-1])return b;a[b]<a[b-1]?c=b-1:d=b+1}return d};
+",0.16958300000000293,0.4162910000000011,0.1282500000000084,12,11,12
+"var twoSum = function(nums, target) {
+    
+    let numToIndexMap = {};
+
+    
+    for (let i = 0; i < nums.length; i++) {
+        
+        let diff = target - nums[i];
+
+        
+        if (numToIndexMap.hasOwnProperty(diff)) {
+            
+            return [i, numToIndexMap[diff]];
+        }
+
+        
+        numToIndexMap[nums[i]] = i;
+    }
+
+    
+    return null;
+};",Easy,"/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    if (!Array.isArray(nums) || !nums.length || typeof target !== 'number') {
+        throw new Error(""Invalid input. Please provide a non-empty array of numbers and a target number."");
+    }
+
+    const numMap = new Map();
+
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+
+        if (numMap.has(complement)) {
+            return [numMap.get(complement), i];
+        }
+
+        numMap.set(nums[i], i);
+    }
+
+    return []; // No solution found
+};","This code utilizes a Map to store each number encountered in the array along with its index. For every number in the input array, it calculates the complement needed to reach the target. It then checks if the complement exists in the Map. If found, it returns the indices of the current number and its complement. If no solution is found after iterating through the entire array, an empty array is returned. This approach offers a time complexity of O(n) due to the single pass through the array and constant-time lookups in the Map.",8,6,3,8,"{""functionOrClassName"": ""twoSum"", ""tests"": [""twoSum([2,7,11,15], 9)"", ""twoSum([3,2,4], 6)"", ""twoSum([3,3], 6)"", ""twoSum([1, 4, 5, 7, 9, 11], 12)"", ""twoSum([1, 4, 5, 7, 9, 11], 22)"", ""twoSum([1, 4, 5, 7, 9, 11], 2)"", ""twoSum([-1, -3, 7, 5], 4)"", ""twoSum([-1, -3, 7, 5], 12)"", ""twoSum([0, 4, 3, 0], 0)"", ""twoSum([2,5,5,11], 10)"", ""twoSum([1, 2, 3, 4, 5], 7)"", ""twoSum([1, 2, 3, 4, 5], 10)""]}","let twoSum=function(b,e){let c={};for(let a=0;a<b.length;a++){let d=e-b[a];if(c.hasOwnProperty(d))return[a,c[d]];c[b[a]]=a}return null};
+",0.19275000000000375,0.14662500000000023,0.3589580000000012,12,0,12
+"var isAnagram = function(s, t) {
+    if (s.length !== t.length) {
+        return false;
+    }
+    
+    var freq = new Array(26).fill(0);
+    for (var i = 0; i < s.length; i++) {
+        freq[s.charCodeAt(i) - 'a'.charCodeAt(0)]++;
+        freq[t.charCodeAt(i) - 'a'.charCodeAt(0)]--;
+    }
+    
+    for (var i = 0; i < freq.length; i++) {
+        if (freq[i] !== 0) {
+            return false;
+        }
+    }
+    
+    return true;
+};",Easy,"/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isAnagram = function(s, t) {
+    if (s.length !== t.length) {
+        return false;
+    }
+
+    const sCharCounts = {};
+    const tCharCounts = {};
+
+    for (let i = 0; i < s.length; i++) {
+        sCharCounts[s[i]] = (sCharCounts[s[i]] || 0) + 1;
+        tCharCounts[t[i]] = (tCharCounts[t[i]] || 0) + 1;
+    }
+
+    for (const char in sCharCounts) {
+        if (sCharCounts[char] !== tCharCounts[char]) {
+            return false;
+        }
+    }
+
+    return true;
+};","This code checks if two strings 's' and 't' are anagrams of each other. It first handles the edge case where the lengths of the strings are different, returning 'false' if they don't match. Then, it initializes two objects, 'sCharCounts' and 'tCharCounts', to store character counts for each string. It iterates through both strings, incrementing the character counts in the respective objects. Finally, it iterates through the keys of 'sCharCounts' and checks if the counts match in 'tCharCounts'. If any count doesn't match, it returns 'false'. Otherwise, it returns 'true' after checking all characters.",34,13,6,2,"{""functionOrClassName"": ""isAnagram"", ""tests"": [""isAnagram(\""anagram\"", \""nagaram\"")"", ""isAnagram(\""rat\"", \""car\"")"", ""isAnagram(\""a\"", \""ab\"")"", ""isAnagram(\""ab\"", \""a\"")"", ""isAnagram(\""anagram\"", \""margana\"")"", ""isAnagram(\""listen\"", \""silent\"")"", ""isAnagram(\""triangle\"", \""integral\"")"", ""isAnagram(\""hello\"", \""world\"")"", ""isAnagram(\""aacc\"", \""caca\"")"", ""isAnagram(\""ab\"", \""ba\"")"", ""isAnagram(\""elb\"", \""bel\"")"", ""isAnagram(\""study\"", \""dusty\"")"", ""isAnagram(\""night\"", \""thing\"")"", ""isAnagram(\""inch\"", \""chin\"")"", ""isAnagram(\""act\"", \""cat\"")""]}","let isAnagram=function(c,d){if(c.length!==d.length)return!1;for(var b=Array(26).fill(0),a=0;a<c.length;a++)b[c.charCodeAt(a)-97]++,b[d.charCodeAt(a)-97]--;for(a=0;a<b.length;a++)if(0!==b[a])return!1;return!0};
+",0.28170800000000895,0.5259159999999952,0.28187499999999943,15,15,15
+"var romanToInt = function(s) {
+    let res = 0;
+    const roman = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    };
+
+    for (let i = 0; i < s.length - 1; i++) {
+        if (roman[s[i]] < roman[s[i + 1]]) {
+            res -= roman[s[i]];
+        } else {
+            res += roman[s[i]];
+        }
+    }
+
+    return res + roman[s[s.length - 1]];    
+};",Easy,"/**
+ * @param {string} s
+ * @return {number}
+ */
+var romanToInt = function(s) {
+    const romanMap = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    };
+
+    let result = 0;
+    for (let i = 0; i < s.length; i++) {
+        const currentVal = romanMap[s[i]];
+        const nextVal = romanMap[s[i + 1]];
+
+        if (nextVal && currentVal < nextVal) {
+            result -= currentVal;
+        } else {
+            result += currentVal;
+        }
+    }
+
+    return result;
+};","This code iterates through the Roman numeral string, checking if the current numeral's value is less than the next one. If it is, the current value is subtracted (e.g., IV = -1 + 5 = 4). Otherwise, the current value is added. This approach efficiently handles the subtractive cases of Roman numerals while maintaining a clean and readable code structure.",11,10,3,2,"{""functionOrClassName"": ""romanToInt"", ""tests"": [""romanToInt(\""III\"")"", ""romanToInt(\""LVIII\"")"", ""romanToInt(\""MCMXCIV\"")"", ""romanToInt(\""IX\"")"", ""romanToInt(\""IV\"")"", ""romanToInt(\""XL\"")"", ""romanToInt(\""XC\"")"", ""romanToInt(\""CD\"")"", ""romanToInt(\""CM\"")"", ""romanToInt(\""MMMCMXCIX\"")"", ""romanToInt(\""I\"")"", ""romanToInt(\""V\"")"", ""romanToInt(\""X\"")"", ""romanToInt(\""L\"")"", ""romanToInt(\""C\"")"", ""romanToInt(\""D\"")"", ""romanToInt(\""M\"")""]}","let romanToInt=function(a){let d=0;const c={I:1,V:5,X:10,L:50,C:100,D:500,M:1E3};for(let b=0;b<a.length-1;b++)d=c[a[b]]<c[a[b+1]]?d-c[a[b]]:d+c[a[b]];return d+c[a[a.length-1]]};
+",0.22299999999999898,0.3897919999999999,0.17241599999999835,17,17,17
+"var isPalindrome = function(x) {
+    if (x < 0) {
+        return false;
+    }
+
+    let reverse = 0;
+    let xcopy = x;
+
+    while (x > 0) {
+        reverse = (reverse * 10) + (x % 10);
+        x = Math.floor(x / 10);
+    }
+
+    return reverse === xcopy;    
+};",Easy,"/**
+ * @param {number} x
+ * @return {boolean}
+ */
+var isPalindrome = function(x) {
+    if (x < 0) {
+        return false; // Negative numbers are not palindromes
+    }
+
+    const original = x;
+    let reversed = 0;
+
+    while (x > 0) {
+        reversed = (reversed * 10) + (x % 10);
+        x = Math.floor(x / 10);
+    }
+
+    return original === reversed;
+};","This code checks if a given integer x is a palindrome. It first handles the edge case of negative numbers, which cannot be palindromes. Then, it reverses the integer x using a while loop and stores it in the reversed variable. Finally, it compares the original integer with the reversed integer and returns true if they are equal, and false otherwise. The approach of reversing the integer and comparing it with the original is efficient and easy to understand.",12,11,3,2,"{""functionOrClassName"": ""isPalindrome"", ""tests"": [""isPalindrome(121)"", ""isPalindrome(-121)"", ""isPalindrome(10)"", ""isPalindrome(12321)"", ""isPalindrome(123321)"", ""isPalindrome(1221)"", ""isPalindrome(0)"", ""isPalindrome(1)"", ""isPalindrome(9999)"", ""isPalindrome(100001)"", ""isPalindrome(1000001)"", ""isPalindrome(2147483647)"", ""isPalindrome(2147447412)"", ""isPalindrome(1234567899)""]}","let isPalindrome=function(a){if(0>a)return!1;let b=0,c=a;for(;0<a;)b=10*b+a%10,a=Math.floor(a/10);return b===c};
+",0.16058400000000006,0.12691700000000594,0.37945799999999963,14,14,14
+"/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var fizzBuzz = function(n) {
+    var ans = [];
+
+    for (var i = 1; i <= n; i++) {
+        if (i % 3 === 0 && i % 5 === 0) {
+            ans.push(""FizzBuzz"");
+        } else if (i % 3 === 0) {
+            ans.push(""Fizz"");
+        } else if (i % 5 === 0) {
+            ans.push(""Buzz"");
+        } else {
+            ans.push(i.toString());
+        }
+    }
+
+    return ans;
+};",Easy,"/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var fizzBuzz = function(n) {
+    if (typeof n !== 'number' || !Number.isInteger(n) || n < 1) {
+        throw new Error(""Input must be a positive integer."");
+    }
+    const result = [];
+    for (let i = 1; i <= n; i++) {
+        if (i % 3 === 0 && i % 5 === 0) {
+            result.push(""FizzBuzz"");
+        } else if (i % 3 === 0) {
+            result.push(""Fizz"");
+        } else if (i % 5 === 0) {
+            result.push(""Buzz"");
+        } else {
+            result.push(i.toString());
+        }
+    }
+    return result;
+};","This code iterates from 1 to n. In each iteration, it checks if the current number (i) is divisible by 3 and/or 5 using the modulo operator (%). If divisible by both 3 and 5, it pushes ""FizzBuzz"" to the result array. If divisible by only 3, it pushes ""Fizz"". If divisible by only 5, it pushes ""Buzz"". Otherwise, it pushes the number itself (converted to a string) to the result array. Error handling is included to validate the input n, ensuring it's a positive integer. This approach is efficient and follows best practices for code clarity and organization.",18,15,6,4,"{""functionOrClassName"": ""fizzBuzz"", ""tests"": [""fizzBuzz(1)"", ""fizzBuzz(2)"", ""fizzBuzz(3)"", ""fizzBuzz(5)"", ""fizzBuzz(15)"", ""fizzBuzz(0)"", ""fizzBuzz(100)"", ""fizzBuzz(30)"", ""fizzBuzz(21)"", ""fizzBuzz(50)"", ""fizzBuzz(99)"", ""fizzBuzz(1000)"", ""fizzBuzz(3000)"", ""fizzBuzz(5000)"", ""fizzBuzz(15000)"", ""fizzBuzz(1)"", ""fizzBuzz(4)"", ""fizzBuzz(7)"", ""fizzBuzz(11)"", ""fizzBuzz(13)""]}","let fizzBuzz=function(c){for(var b=[],a=1;a<=c;a++)0===a%3&&0===a%5?b.push(""FizzBuzz""):0===a%3?b.push(""Fizz""):0===a%5?b.push(""Buzz""):b.push(a.toString());return b};
+",3.2606250000000045,1.9772920000000056,2.5463340000000017,20,19,20
+"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    const hash = {};
+    let res = 0;
+    let majority = 0;
+
+    for (let n of nums) {
+        hash[n] = 1 + (hash[n] || 0);
+        if (hash[n] > majority) {
+            res = n;
+            majority = hash[n];
+        }
+    }
+
+    return res;    
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    if (!nums || nums.length === 0) {
+        return null; // Or throw an error: throw new Error(""Input array is invalid."");
+    }
+
+    let candidate = null;
+    let count = 0;
+
+    for (const num of nums) {
+        if (count === 0) {
+            candidate = num;
+        }
+        count += (num === candidate) ? 1 : -1;
+    }
+
+    return candidate;
+};","This code implements the Boyer-Moore Voting Algorithm. It's highly efficient, with a time complexity of O(n) and constant space complexity. The algorithm works by maintaining a 'candidate' and a 'count'.  It iterates through the array, incrementing the count if the current element matches the candidate and decrementing it otherwise. If the count reaches zero, the next element becomes the new candidate.  Due to the majority element's frequency, it will always emerge as the final candidate.",8,10,5,6,"{""functionOrClassName"": ""majorityElement"", ""tests"": [""majorityElement([3,2,3])"", ""majorityElement([2,2,1,1,1,2,2])"", ""majorityElement([1])"", ""majorityElement([1, 2])"", ""majorityElement([1, 1, 2])"", ""majorityElement([1, 2, 2])"", ""majorityElement([1, 1, 2, 2, 3])"", ""majorityElement([3, 3, 4, 2, 4, 4, 2, 4, 4])"", ""majorityElement([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10])"", ""majorityElement([2, 2, 2, 2, 2, 1, 3, 4, 5, 6, 7, 8, 9, 10])"", ""majorityElement([1, 2, 3, 4, 5, 1, 1, 1, 1, 1])""]}","let majorityElement=function(e){const b={};let c=0,d=0;for(let a of e)b[a]=1+(b[a]||0),b[a]>d&&(c=a,d=b[a]);return c};
+",0.18554100000000062,0.1420840000000112,0.4037500000000023,11,9,11
+"
+var firstUniqChar = function(s) {
+    let mp = {};
+
+    for (let a of s) {
+        mp[a] = (mp[a] || 0) + 1;
+    }
+
+    for (let i = 0; i < s.length; i++) {
+        if (mp[s[i]] === 1) {
+            return i;
+        }
+    }
+
+    return -1;
+};
+",Easy,"/**
+ * @param {string} s
+ * @return {number}
+ */
+var firstUniqChar = function(s) {
+    const charCount = new Map();
+
+    for (const char of s) {
+        charCount.set(char, (charCount.get(char) || 0) + 1);
+    }
+
+    for (let i = 0; i < s.length; i++) {
+        if (charCount.get(s[i]) === 1) {
+            return i;
+        }
+    }
+
+    return -1;
+};","This code iterates through the input string 's' using a Map to store character counts. The first loop counts each character's occurrences. The second loop checks for the first character with a count of 1 and returns its index. If no such character is found, it returns -1. This approach is efficient with O(n) time complexity as it iterates through the string twice at most.",13,10,3,2,"{""functionOrClassName"": ""firstUniqChar"", ""tests"": [""firstUniqChar(\""leetcode\"")"", ""firstUniqChar(\""loveleetcode\"")"", ""firstUniqChar(\""aabb\"")"", ""firstUniqChar(\""dddccdbba\"")"", ""firstUniqChar(\""z\"")"", ""firstUniqChar(\""aadadaad\"")"", ""firstUniqChar(\""abcabcbb\"")"", ""firstUniqChar(\""\"")"", ""firstUniqChar(\""cc\"")"", ""firstUniqChar(\""ovo\"")"", ""firstUniqChar(\""blahblah\"")""]}","let firstUniqChar=function(b){let c={};for(var a of b)c[a]=(c[a]||0)+1;for(a=0;a<b.length;a++)if(1===c[b[a]])return a;return-1};
+",0.21087500000000148,0.12920799999999133,0.4475000000000051,11,11,11
+"function binarySearch(nums, target) {
+  let left = 0;
+  let right = nums.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    
+    if (nums[mid] === target) {
+      return mid;
+    } else if (nums[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  
+  return -1;
+}",Easy,"/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var search = function(nums, target) {
+    let left = 0;
+    let right = nums.length - 1;
+
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+
+        if (nums[mid] === target) {
+            return mid;
+        } else if (nums[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return -1;
+};","This code implements the binary search algorithm. 
+1. Initialize left and right pointers to the start and end of the array respectively.
+2. While left is less than or equal to right:
+    a. Calculate the middle index.
+    b. If the element at the middle index is equal to the target, return the middle index.
+    c. If the element at the middle index is less than the target, move the left pointer to mid + 1.
+    d. If the element at the middle index is greater than the target, move the right pointer to mid - 1.
+3. If the target is not found, return -1.",8,9,2,5,"{""functionOrClassName"": ""binarySearch"", ""tests"": [""binarySearch([1, 2, 3, 4, 5], 3)"", ""binarySearch([1, 2, 3, 4, 5], 6)"", ""binarySearch([1, 2, 3, 4, 5], 1)"", ""binarySearch([1, 2, 3, 4, 5], 5)"", ""binarySearch([1, 2, 3, 4, 5], 2)"", ""binarySearch([2, 5], 2)"", ""binarySearch([2, 5], 5)"", ""binarySearch([2, 5], 3)"", ""binarySearch([2, 5], 1)"", ""binarySearch([2, 5], 6)"", ""binarySearch([], 1)"", ""binarySearch([1], 1)"", ""binarySearch([1, 5], 5)"", ""binarySearch([1, 5], 1)"", ""binarySearch([1, 3, 5, 7, 9, 11], 7)"", ""binarySearch([1, 3, 5, 7, 9, 11], 12)"", ""binarySearch([1, 3, 5, 7, 9, 11], 0)"", ""binarySearch([1, 5, 6, 8, 10], 10)"", ""binarySearch([1, 5, 6, 8, 10], 1)""]}","let binarySearch=function(b,e){let c=0,d=b.length-1;for(;c<=d;){const a=Math.floor((c+d)/2);if(b[a]===e)return a;b[a]<e?c=a+1:d=a-1}return-1};
+",0.22141700000000242,0.3894159999999971,0.28070799999998997,19,0,19
+"var moveZeroes = function(nums) {
+    let left = 0;
+
+    for (let right = 0; right < nums.length; right++) {
+        if (nums[right] !== 0) {
+            [nums[right], nums[left]] = [nums[left], nums[right]];
+            left++;
+        }
+    }
+
+    return nums;    
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var moveZeroes = function(nums) {
+    if (!Array.isArray(nums)) {
+        throw new TypeError(""Input must be an array."");
+    }
+    let left = 0; // Pointer to track the position for placing non-zero elements
+    for (let right = 0; right < nums.length; right++) {
+        if (nums[right] !== 0) {
+            // If the current element is non-zero, swap it with the element at the left pointer
+            if (left !== right) {
+                [nums[left], nums[right]] = [nums[right], nums[left]];
+            }
+            left++; // Increment the left pointer
+        }
+    }
+};","This code uses the two-pointer approach. The ""left"" pointer keeps track of the index where the next non-zero element should be placed. The ""right"" pointer iterates through the array. When a non-zero element is encountered, it's swapped with the element at the ""left"" pointer, and the ""left"" pointer is incremented. This ensures that all non-zero elements are moved to the beginning of the array in their original order, while the zeroes are effectively shifted to the end. Error handling is included to check for valid array input.",6,8,3,5,"{""functionOrClassName"": ""moveZeroes"", ""tests"": [""moveZeroes([0,1,0,3,12])"", ""moveZeroes([0])"", ""moveZeroes([1])"", ""moveZeroes([1, 0])"", ""moveZeroes([0, 1])"", ""moveZeroes([0, 0, 0])"", ""moveZeroes([1, 1, 1])"", ""moveZeroes([0, 1, 0, 2, 0, 0, 3, 4, 0, 5])"", ""moveZeroes([1, 2, 3, 4, 5, 0, 0, 0, 0, 0])"", ""moveZeroes([0, 0, 0, 0, 0, 1, 2, 3, 4, 5])"", ""moveZeroes([-1, 0, 1])"", ""moveZeroes([-1, 0, -1, 0, 1])""]}","let moveZeroes=function(a){let c=0;for(let b=0;b<a.length;b++)0!==a[b]&&([a[b],a[c]]=[a[c],a[b]],c++);return a};
+",0.1958750000000009,0.44462500000000205,0.16458299999999326,12,0,12
+"/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(input) {
+    var start = 0
+    var end = input.length - 1
+    while (start < end) {
+        var s = input.charCodeAt(start)
+        var e = input.charCodeAt(end)
+    
+        if (!isLetter(s)) {
+            start++
+            continue
+        }
+        if (!isLetter(e)) {
+            end--
+            continue
+        }
+    
+        if (toLowerCase(s) !== toLowerCase(e)) {
+            return false 
+        } 
+        start++
+        end--
+  }
+  return true
+};
+
+var isLetter = function(code) {
+    if (((code >= 48) && (code <= 57))  // numbers
+    || ((code >= 65) && (code <= 90))  // uppercase
+    || ((code >= 97) && (code <= 122))) {  // lowercase
+        return true
+    }
+    else {
+        return false
+    }
+}
+
+var toLowerCase = function(code) {
+    if (code >= 65 && code <= 90) {
+        return code + 32    
+    }
+    else {
+        return code
+    }
+}",Easy,"/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+    s = s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    let left = 0;
+    let right = s.length - 1;
+    while (left < right) {
+        if (s[left] !== s[right]) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+    return true;
+};","The provided JavaScript code checks if a given string \""s\"" is a palindrome. It first converts the input string to lowercase and removes any non-alphanumeric characters using a regular expression. Then, it uses a two-pointer approach with \""left\"" and \""right\"" pointers to compare characters from both ends of the cleaned string. If any mismatch is found, it returns \""false\"". Otherwise, if the loop completes without finding any mismatches, it returns \""true\"". This approach efficiently handles various edge cases and ensures that only alphanumeric characters are considered during the palindrome check.",49,10,30,2,"{""functionOrClassName"": ""isPalindrome"", ""tests"": [""isPalindrome(\""A man, a plan, a canal: Panama\"")"", ""isPalindrome(\""race a car\"")"", ""isPalindrome(\"" \"")"", ""isPalindrome(\"".,\"")"", ""isPalindrome(\""0P\"")"", ""isPalindrome(\""a\"")"", ""isPalindrome(\""\"")"", ""isPalindrome(\""ab\"")"", ""isPalindrome(\""aba\"")"", ""isPalindrome(\""aa\"")"", ""isPalindrome(\""ab ba\"")"", ""isPalindrome(\""1ab1\"")"", ""isPalindrome(\""1221\"")"", ""isPalindrome(\""1a2b2a1\"")""]}","function f(a){return 48<=a&&57>=a||65<=a&&90>=a||97<=a&&122>=a?!0:!1}let isPalindrome=function(a){for(var d=0,e=a.length-1;d<e;){var b=a.charCodeAt(d),c=a.charCodeAt(e);if(f(b)){if(f(c)){if((65<=b&&90>=b?b+32:b)!==(65<=c&&90>=c?c+32:c))return!1;d++}e--}else d++}return!0};
+",0.19154199999999832,0.4367499999999893,0.4143329999999992,14,14,14
+"var isPowerOfThree = function(n) {
+    if (n === 0) return false;
+    if (n === 1) return true;
+    
+    if (!(n%3)) return isPowerOfThree(n/3);
+    
+    return false;
+};",Easy,"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isPowerOfThree = function(n) {
+    if (n <= 0) {
+        return false;
+    }
+
+    while (n % 3 === 0) {
+        n /= 3;
+    }
+
+    return n === 1;
+};","This code checks if a given integer n is a power of three. It handles edge cases by returning 'false' for non-positive inputs. It iteratively divides n by 3 as long as it's divisible, and finally checks if the result is 1. This approach efficiently determines if n can be expressed as 3 raised to an integer power.",11,10,3,2,"{""functionOrClassName"": ""isPowerOfThree"", ""tests"": [""isPowerOfThree(0)"", ""isPowerOfThree(1)"", ""isPowerOfThree(3)"", ""isPowerOfThree(9)"", ""isPowerOfThree(27)"", ""isPowerOfThree(81)"", ""isPowerOfThree(243)"", ""isPowerOfThree(5)"", ""isPowerOfThree(10)"", ""isPowerOfThree(45)"", ""isPowerOfThree(15)"", ""isPowerOfThree(19683)"", ""isPowerOfThree(59049)"", ""isPowerOfThree(177147)"", ""isPowerOfThree(531441)"", ""isPowerOfThree(-1)"", ""isPowerOfThree(-3)"", ""isPowerOfThree(-27)"", ""isPowerOfThree(19684)"", ""isPowerOfThree(59050)"", ""isPowerOfThree(177148)""]}","function b(a){return 0===a?!1:1===a?!0:a%3?!1:b(a/3)}let isPowerOfThree=b;
+",0.19762500000000216,0.15491699999999753,0.3829159999999945,21,21,21
+"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var findDisappearedNumbers = function(nums) {
+    let obj={}
+    for(let n of nums){
+        obj[n]=1
+    }
+    let arr=[]
+    for(let i=1;i<=nums.length;i++){
+        if(!obj[i]) arr.push(i)
+    }
+    return arr
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var findDisappearedNumbers = function(nums) {
+    if (!Array.isArray(nums)) {
+        throw new TypeError(""Input must be an array."");
+    }
+    if (!nums.every(num => typeof num === 'number')) {
+        throw new TypeError(""Array elements must be numbers."");
+    }
+
+    const n = nums.length;
+    const present = new Set();
+    for (const num of nums) {
+        present.add(num);
+    }
+
+    const missing = [];
+    for (let i = 1; i <= n; i++) {
+        if (!present.has(i)) {
+            missing.push(i);
+        }
+    }
+
+    return missing;
+};","This code iterates through the input array `nums` and adds each number to a `Set` called `present`. Then, it iterates from 1 to `n` (the length of `nums`) and checks if each number is present in the `Set`. If a number is not present, it's added to the `missing` array. This approach has a time complexity of O(n) because it iterates through the input array and the range [1, n] once. The space complexity is also O(n) in the worst case, where all numbers in the range [1, n] are missing, due to storing up to n numbers in the set and missing array. Error handling is included to check for invalid input types.",11,9,12,7,"{""functionOrClassName"": ""findDisappearedNumbers"", ""tests"": [""findDisappearedNumbers([4,3,2,7,8,2,3,1])"", ""findDisappearedNumbers([1,1])"", ""findDisappearedNumbers([1,2,3,4,5,6,7,8])"", ""findDisappearedNumbers([1])"", ""findDisappearedNumbers([])"", ""findDisappearedNumbers([1,2,2,2,2,2,2,2])"", ""findDisappearedNumbers([1,2,2,4,5,6,7,8])"", ""findDisappearedNumbers([1,1,1,1,1,1,1,1])"", ""findDisappearedNumbers([2,2,3,3,4,4,5,5])"", ""findDisappearedNumbers([1,2,3,4,5,6,7,7])""]}","let findDisappearedNumbers=function(c){let d={};for(var a of c)d[a]=1;a=[];for(let b=1;b<=c.length;b++)d[b]||a.push(b);return a};
+",0.17979199999999196,0.13554200000000094,0.4991669999999999,10,10,10
+"/**
+ * @param {number[]} cost
+ * @return {number}
+ */
+var minCostClimbingStairs = function(cost) {
+    cost.push(0);
+
+    for (let i = cost.length - 4; i >= 0; i--) {
+        cost[i] += Math.min(cost[i + 1], cost[i + 2]);
+    }
+
+    return Math.min(cost[0], cost[1]);    
+};",Easy,"/**
+ * @param {number[]} cost
+ * @return {number}
+ */
+var minCostClimbingStairs = function(cost) {
+    const n = cost.length;
+    const dp = new Array(n + 1).fill(0);
+
+    for (let i = 2; i <= n; i++) {
+        dp[i] = Math.min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2]);
+    }
+
+    return dp[n];
+};","This code uses dynamic programming to determine the minimum cost to reach the top of the stairs. `dp[i]` stores the minimum cost to reach step `i`. The code iterates through the `cost` array, calculating the minimum cost to reach each step by considering either taking one step from the previous step or two steps from the step before that. The final result is stored in `dp[n]`, which represents the minimum cost to reach the top (step `n`). The base cases `dp[0]` and `dp[1]` are initialized to 0 because they represent the starting steps, which have no cost to reach.",12,13,5,5,"{""functionOrClassName"": ""minCostClimbingStairs"", ""tests"": [""minCostClimbingStairs([10,15,20])"", ""minCostClimbingStairs([1,100,1,1,1,100,1,1,100,1])"", ""minCostClimbingStairs([0,0,0,0])"", ""minCostClimbingStairs([1,2,3,4,5,6,7,8,9,10])"", ""minCostClimbingStairs([1,1,1,1,1,1,1,1,1,1])"", ""minCostClimbingStairs([1,2])"", ""minCostClimbingStairs([0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5])"", ""minCostClimbingStairs([5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5","let minCostClimbingStairs=function(a){a.push(0);for(let b=a.length-4;0<=b;b--)a[b]+=Math.min(a[b+1],a[b+2]);return Math.min(a[0],a[1])};
+",-1,-1,-1,-1,-1,-1
+"/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    let res = """";
+    let x=0, y=0, rem=0;
+    while(a!="""" || b!="""") {
+        if(a!="""") {
+            x = parseInt(a.slice(-1));
+            a = a.slice(0,-1);
+        }
+        if(b!="""") {
+            y = parseInt(b.slice(-1));
+            b = b.slice(0,-1);
+        }
+        if(x+y+rem == 2) {
+            rem=1;
+            res = ""0"" + res;
+        }
+        else if(x+y+rem == 3) {
+            rem=1;
+            res = ""1"" + res;
+        }
+        else {
+            res = (x+y+rem).toString() + res;
+            rem=0;
+        }
+        x=0;
+        y=0;
+    }
+    if(rem==1) res = ""1"" + res;
+    return res;
+
+};",Easy,"/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    let i = a.length - 1;
+    let j = b.length - 1;
+    let carry = 0;
+    let result = """";
+
+    while (i >= 0 || j >= 0 || carry) {
+        const digitA = i >= 0 ? parseInt(a[i]) : 0;
+        const digitB = j >= 0 ? parseInt(b[j]) : 0;
+        const sum = digitA + digitB + carry;
+        const remainder = sum % 2;
+        carry = Math.floor(sum / 2);
+        result = remainder.toString() + result;
+        i--;
+        j--;
+    }
+
+    return result;
+};","This code iterates through the binary strings `a` and `b` from right to left, simulating the binary addition process. It maintains a `carry` variable to handle overflows. In each iteration, it calculates the sum of corresponding digits and the carry, appends the remainder to the `result` string, and updates the carry. The loop continues until all digits and the carry are processed.  Error handling is implicitly managed by JavaScript's loose typing system; invalid input will produce a numerical result of NaN, which will propagate through the calculation and return a nonsensical string. This approach prioritizes conciseness and efficiency.",39,30,4,4,"{""functionOrClassName"": ""addBinary"", ""tests"": [""addBinary(\""11\"", \""1\"")"", ""addBinary(\""1010\"", \""1011\"")"", ""addBinary(\""1\"", \""0\"")"", ""addBinary(\""0\"", \""0\"")"", ""addBinary(\""111\"", \""111\"")"", ""addBinary(\""100\"", \""110010\"")"", ""addBinary(\""11\"", \""100\"")"", ""addBinary(\""101\"", \""1\"")"", ""addBinary(\""1\"", \""1111\"")"", ""addBinary(\""1111\"", \""1111\"")"", ""addBinary(\""0\"", \""1\"")"", ""addBinary(\""1\"", \""1\"")""]}","let addBinary=function(c,d){let a="""",e=0,f=0,b=0;for(;""""!=c||""""!=d;)""""!=c&&(e=parseInt(c.slice(-1)),c=c.slice(0,-1)),""""!=d&&(f=parseInt(d.slice(-1)),d=d.slice(0,-1)),2==e+f+b?(b=1,a=""0""+a):3==e+f+b?(b=1,a=""1""+a):(a=(e+f+b).toString()+a,b=0),f=e=0;1==b&&(a=""1""+a);return a};
+",0.18850000000000477,0.43429100000000176,0.1442079999999919,12,12,12
+"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+    const seen = new Set();
+    
+    while (n !== 1 && !seen.has(n)) {
+        seen.add(n);
+        let sum = 0;
+        
+        let numStr = n.toString();
+        for (let i = 0; i < numStr.length; i++) {
+            let digit = Number(numStr[i]);
+            sum += digit * digit;
+        }
+        
+        n = sum;  
+    }
+    return n === 1;
+};",Easy,"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+    const seen = new Set();
+    while (n !== 1 && !seen.has(n)) {
+        seen.add(n);
+        n = sumOfSquares(n);
+    }
+    return n === 1;
+
+    function sumOfSquares(num) {
+        let sum = 0;
+        while (num > 0) {
+            const digit = num % 10;
+            sum += digit * digit;
+            num = Math.floor(num / 10);
+        }
+        return sum;
+    }
+};","This code implements the happy number algorithm by repeatedly calculating the sum of squares of digits until either 1 is reached or a cycle is detected. A Set is used to efficiently track seen numbers. The sumOfSquares helper function calculates the sum of squares of digits for a given number. The main function returns true if the number is happy (eventually reaches 1), and false otherwise (enters a cycle). Error handling is implicitly handled by JavaScript's number type system.",12,13,2,2,"{""functionOrClassName"": ""isHappy"", ""tests"": [""isHappy(1)"", ""isHappy(2)"", ""isHappy(7)"", ""isHappy(10)"", ""isHappy(13)"", ""isHappy(19)"", ""isHappy(23)"", ""isHappy(28)"", ""isHappy(31)"", ""isHappy(32)"", ""isHappy(100)"", ""isHappy(999)"", ""isHappy(2023)"", ""isHappy(123456789)"", ""isHappy(987654321)"", ""isHappy(Number.MAX_SAFE_INTEGER)"", ""isHappy(1111111)"", ""isHappy(7777777)"", ""isHappy(123123123)"", ""isHappy(999999999)""]}","let isHappy=function(a){const c=new Set;for(;1!==a&&!c.has(a);){c.add(a);let d=0;a=a.toString();for(let b=0;b<a.length;b++){let e=Number(a[b]);d+=e*e}a=d}return 1===a};
+",0.2922499999999957,0.4389579999999995,0.24654200000000515,20,20,20
+"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function (root) {
+    if (!root) return 0
+    let leftSubHeight = maxDepth(root.left)
+    let rightSubHeight = maxDepth(root.right) 
+    return Math.max(leftSubHeight, rightSubHeight) + 1
+};",Easy,"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function(root) {
+    if (!root) return 0;
+
+    const leftDepth = maxDepth(root.left);
+    const rightDepth = maxDepth(root.right);
+
+    return Math.max(leftDepth, rightDepth) + 1;
+};","This code uses a recursive approach to find the maximum depth of a binary tree.  The base case is when the root is null, in which case the depth is 0. Otherwise, the function recursively calculates the maximum depth of the left and right subtrees. The maximum depth of the current node is then 1 plus the maximum of the left and right subtree depths. This approach effectively explores all paths from the root to leaf nodes and determines the longest one.",9,7,8,4,"{""functionOrClassName"": ""maxDepth"", ""tests"": [""maxDepth(null)"", ""maxDepth(new TreeNode(1))"", ""maxDepth(new TreeNode(1, new TreeNode(2), null))"", ""maxDepth(new TreeNode(1, null, new TreeNode(2)))"", ""maxDepth(new TreeNode(1, new TreeNode(2), new TreeNode(3)))"", ""maxDepth(new TreeNode(1, new TreeNode(2, new TreeNode(4), null), new TreeNode(3)))"", ""maxDepth(new TreeNode(1, new TreeNode(2, null, new TreeNode(4)), new TreeNode(3)))"", ""maxDepth(new TreeNode(1, new TreeNode(2, new TreeNode(4), new TreeNode(5)), new TreeNode(3)))"", ""maxDepth(new TreeNode(1, new TreeNode(2), new TreeNode(3, new TreeNode(4), new TreeNode(5))))"", ""maxDepth(new TreeNode(1, new TreeNode(2, new TreeNode(4, new TreeNode(5)), new TreeNode(6)), new TreeNode(3, new TreeNode(7), new TreeNode(8))))"", ""maxDepth(new TreeNode(3, new TreeNode(9), new TreeNode(20, new TreeNode(15), new TreeNode(7))))"", ""maxDepth(new TreeNode(1, new TreeNode(2, new TreeNode(3, new TreeNode(4, new TreeNode(5)))))"", ""maxDepth(new TreeNode(0, new TreeNode(-1), new TreeNode(1)))""]}","function a(b){return b?Math.max(a(b.left),a(b.right))+1:0}let maxDepth=a;
+",0.325374999999994,0.19754199999999855,0.20316699999999344,13,13,13
+"/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function (headA, headB) {
+  
+    let nodeA = headA;
+    let nodeB = headB;
+    
+    
+    while (nodeA !== nodeB) {
+        
+        nodeA = !nodeA ? headB : nodeA.next;
+        
+        nodeB = !nodeB ? headA : nodeB.next;
+    }
+    
+    
+    return nodeA;
+};",Easy,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function(headA, headB) {
+    let pA = headA;
+    let pB = headB;
+
+    while (pA !== pB) {
+        pA = pA === null ? headB : pA.next;
+        pB = pB === null ? headA : pB.next;
+    }
+
+    return pA;
+};","This code uses a two-pointer approach to find the intersection of two linked lists.  Two pointers, pA and pB, are initialized to the heads of the two lists respectively. In a while loop, the pointers traverse their respective lists. If a pointer reaches the end of its list, it's redirected to the head of the other list. This ensures that both pointers will eventually meet at the intersection point (if one exists) or both become null if there is no intersection. The time complexity of this approach is O(m+n) where m and n are the lengths of the two lists, and the space complexity is O(1) as it uses only two pointers.",8,6,8,8,"{""functionOrClassName"": ""getIntersectionNode"", ""tests"": [""(() => {const listA = {val: 4, next: {val: 1, next: {val: 8, next: {val: 4, next: {val: 5, next: null}}}}}; const listB = {val: 5, next: {val: 6, next: {val: 1, next: {val: 8, next: {val: 4, next: {val: 5, next: null}}}}}}; return getIntersectionNode(listA, listB);})()"", ""(() => {const listA = {val: 1, next: {val: 9, next: {val: 1, next: {val: 2, next: {val: 4, next: null}}}}}; const listB = {val: 3, next: {val: 2, next: {val: 4, next: null}}}; return getIntersectionNode(listA, listB);})()"", ""(() => {const listA = {val: 2, next: {val: 6, next: {val: 4, next: null}}}; const listB = {val: 1, next: {val: 5, next: null}}; return getIntersectionNode(listA, listB);})()"", ""getIntersectionNode(null, null)"", ""(() => {const listA = {val: 1, next: null}; return getIntersectionNode(listA, listA);})()"", ""(() => {const listA = {val: 1, next: {val: 2, next: null}}; const listB = listA.next; return getIntersectionNode(listA, listB);})()"", ""(() => {const listA = {val: 1, next: {val: 2, next: {val: 3, next: null}}}; const listB = {val: 1, next: {val: 2, next: {val: 3, next: null}}}; return getIntersectionNode(listA, listB);})()"", ""(() => {const listA = {val: 1, next: {val: 3, next: {val: 5, next: {val: 7, next: {val: 9, next: {val: 11, next: null}}}}}}; const listB = {val: 2, next: {val: 4, next: {val: 6, next: {val: 8, next: {val: 10, next: null}}}}} ; return getIntersectionNode(listA, listB);})()"", ""(() => {const listA = {val: 1, next: null}; const listB = {val: 2, next: null}; return getIntersectionNode(listA, listB);})()"", ""(() => { return getIntersectionNode(null, {val: 1, next: null});})()"", ""(() => {const listA = {val: 1, next: {val: 2, next: {val: 3, next: {val: 4, next: {val: 5, next: null}}}}}; const listB = {val: 6, next: {val: 7, next: listA.next.next}}; return getIntersectionNode(listA, listB);})()""]}","let getIntersectionNode=function(c,d){let a=c,b=d;for(;a!==b;)a=a?a.next:d,b=b?b.next:c;return a};
+",0.27308299999999974,0.21170899999999904,0.19154200000001254,11,11,11
+"var minDistance = function(word1, word2) {
+    const cache = {}
+    function dp(i, j) {
+        if (cache[`${i}->${j}`] !== undefined) {
+            return cache[`${i}->${j}`]
+        }
+        if (i >= word1.length) {
+            return word2.length - j;
+        } 
+        if (j >= word2.length) {
+            return word1.length - i;
+        }
+        if (word1[i] === word2[j]) {
+            return dp(i+1, j+1);
+        }
+        let insert = 1 + dp(i, j+1);
+        let del = 1 + dp(i+1, j);
+        let repl = 1 + dp(i+1, j+1);
+        const res = Math.min(insert, del, repl);
+        cache[`${i}->${j}`] = res;
+        return res;
+    }
+    return dp(0, 0)
+};",Medium,"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {number}
+ */
+var minDistance = function(word1, word2) {
+    const m = word1.length;
+    const n = word2.length;
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+    for (let i = 0; i <= m; i++) {
+        dp[i][0] = i;
+    }
+
+    for (let j = 0; j <= n; j++) {
+        dp[0][j] = j;
+    }
+
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (word1[i - 1] === word2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = Math.min(
+                    dp[i - 1][j] + 1, // deletion
+                    dp[i][j - 1] + 1, // insertion
+                    dp[i - 1][j - 1] + 1 // replacement
+                );
+            }
+        }
+    }
+
+    return dp[m][n];
+};","This code implements the dynamic programming approach to solve the edit distance problem. It initializes a 2D array dp where dp[i][j] represents the minimum number of operations to convert word1[0...i-1] to word2[0...j-1]. The code iterates through the array, calculating each value based on the three possible operations (insertion, deletion, replacement) and the previous values in the array. The final result is stored in dp[m][n].",24,38,6,2,"{""functionOrClassName"": ""minDistance"", ""tests"": [""minDistance(\""horse\"", \""ros\"")"", ""minDistance(\""intention\"", \""execution\"")"", ""minDistance(\""a\"", \""b\"")"", ""minDistance(\""ab\"", \""bc\"")"", ""minDistance(\""abc\"", \""adc\"")"", ""minDistance(\""sea\"", \""eat\"")"", ""minDistance(\""leetcode\"", \""etco\"")"", ""minDistance(\""\"", \""\"")"", ""minDistance(\""a\"", \""\"")"", ""minDistance(\""\"", \""a\"")"", ""minDistance(\""park\"", \""spake\"")"", ""minDistance(\""mart\"", \""karma\"")"", ""minDistance(\""dinitrophenylhydrazine\"", \""benzalphenylhydrazone\"")""]}","let minDistance=function(d,e){function c(a,b){if(void 0!==f[`${a}->${b}`])return f[`${a}->${b}`];if(a>=d.length)return e.length-b;if(b>=e.length)return d.length-a;if(d[a]===e[b])return c(a+1,b+1);var g=1+c(a,b+1);let h=1+c(a+1,b),k=1+c(a+1,b+1);g=Math.min(g,h,k);return f[`${a}->${b}`]=g}const f={};return c(0,0)};
+",1.2202079999999995,1.372166000000007,0.4931669999999997,13,13,13
+"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var longestConsecutive = function(nums) {
+    if(!nums.length) return 0;
+    
+    let count = 1;
+    let largestSequence = 0;
+    
+    nums = new Set(nums);
+    nums = Array.from(nums);
+    nums.sort((a,b)=> a-b);
+   
+
+    for(let i=0 ; i<nums.length ; i++){
+        let diff = nums[i+1] - nums[i]; 
+        if(diff == 1){
+             count++;
+        }else{
+            if(count > largestSequence){
+                largestSequence = count;
+            }
+            count = 1;
+        }
+
+    }
+    return largestSequence;;
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var longestConsecutive = function(nums) {
+    if (!nums || nums.length === 0) {
+        return 0;
+    }
+
+    const numSet = new Set(nums);
+    let longestStreak = 0;
+
+    for (const num of numSet) {
+        if (!numSet.has(num - 1)) { // Check if it's the start of a sequence
+            let currentNum = num;
+            let currentStreak = 1;
+
+            while (numSet.has(currentNum + 1)) {
+                currentNum += 1;
+                currentStreak += 1;
+            }
+
+            longestStreak = Math.max(longestStreak, currentStreak);
+        }
+    }
+
+    return longestStreak;
+};","This code implements the O(n) solution using a Set. It first handles the edge case of an empty or null input array. Then, it creates a Set from the input array for efficient lookups. It iterates through the Set. For each number, it checks if it's the start of a consecutive sequence (by checking if num-1 exists). If it is, it iterates while incrementing the current number and streak length. Finally, it updates the longestStreak if a longer sequence is found. This approach ensures each number is visited at most twice, resulting in O(n) time complexity.",19,12,6,5,"{""functionOrClassName"": ""longestConsecutive"", ""tests"": [""longestConsecutive([100,4,200,1,3,2])"", ""longestConsecutive([0,3,7,2,5,8,4,6,0,1])"", ""longestConsecutive([1,2,3,4,5,6,7,8,9,10])"", ""longestConsecutive([])"", ""longestConsecutive([1])"", ""longestConsecutive([1,3,5,7,9])"", ""longestConsecutive([1,1,1,1,1])"", ""longestConsecutive([-1,0,1])"", ""longestConsecutive([9,1,4,7,3,-1,0,5,8,-1,6])"", ""longestConsecutive([1,2,0,1])"", ""longestConsecutive([0])"", ""longestConsecutive([1,5,2,4,3])"", ""longestConsecutive([10,9,8,7,6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10])"", ""longestConsecutive([100, 200, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50])""]}","let longestConsecutive=function(a){if(!a.length)return 0;let c=1,d=0;a=new Set(a);a=Array.from(a);a.sort((b,e)=>b-e);for(let b=0;b<a.length;b++)1==a[b+1]-a[b]?c++:(c>d&&(d=c),c=1);return d};
+",0.2648750000000035,0.4339169999999939,0.19737499999999386,14,14,14
+"var shortestPalindrome = function(s) {
+    let count = kmp(s.split('').reverse().join(''), s);
+    return s.slice(count).split('').reverse().join('') + s;
+};
+
+var kmp = function(txt, patt) {
+    let newString = patt + '#' + txt;
+    let pi = new Array(newString.length).fill(0);
+    let i = 1, k = 0;
+    while (i < newString.length) {
+        if (newString[i] === newString[k]) {
+            k++;
+            pi[i] = k;
+            i++;
+        } else {
+            if (k > 0) {
+                k = pi[k - 1];
+            } else {
+                pi[i] = 0;
+                i++;
+            }
+        }
+    }
+    return pi[newString.length - 1];
+};",Hard,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var shortestPalindrome = function(s) {
+  if (!s) return """";
+
+  let n = s.length;
+  let reversedS = s.split('').reverse().join('');
+  let lps = calculateLPS(s + '#' + reversedS);
+
+  let prefixLength = lps[lps.length - 1];
+  let suffix = s.substring(prefixLength);
+  let reversedSuffix = suffix.split('').reverse().join('');
+
+  return reversedSuffix + s;
+};
+
+function calculateLPS(s) {
+  let n = s.length;
+  let lps = new Array(n).fill(0);
+
+  for (let i = 1; i < n; i++) {
+    let j = lps[i - 1];
+    while (j > 0 && s[i] !== s[j]) {
+      j = lps[j - 1];
+    }
+    if (s[i] === s[j]) {
+      j++;
+    }
+    lps[i] = j;
+  }
+  return lps;
+}","This code efficiently finds the shortest palindrome by prepending characters. It utilizes the KMP algorithm's longest proper prefix suffix (LPS) calculation to determine the longest palindrome prefix in the given string. By calculating the LPS array of the concatenated string (original + '#' + reversed), we can identify the length of the longest palindrome prefix. The remaining suffix is then reversed and prepended to the original string to form the shortest palindrome. This approach avoids unnecessary character additions and provides an optimal solution.",25,35,5,4,"{""functionOrClassName"": ""shortestPalindrome"", ""tests"": [""shortestPalindrome(\""aacecaaa\"")"", ""shortestPalindrome(\""abcd\"")"", ""shortestPalindrome(\""aba\"")"", ""shortestPalindrome(\""a\"")"", ""shortestPalindrome(\""\"")"", ""shortestPalindrome(\""racecar\"")"", ""shortestPalindrome(\""abacaba\"")"", ""shortestPalindrome(\""madam\"")"", ""shortestPalindrome(\""level\"")"", ""shortestPalindrome(\""deified\"")"", ""shortestPalindrome(\""rotor\"")"", ""shortestPalindrome(\""aabba\"")"", ""shortestPalindrome(\""aaaaaaaaaaaaaaaaaaaaaaaa\"")"", ""shortestPalindrome(\""aaba\"")"", ""shortestPalindrome(\""abb\"")""]}","let shortestPalindrome=function(d){var a=d.split("""").reverse().join("""");a=d+""#""+a;let e=Array(a.length).fill(0),b=1,c=0;for(;b<a.length;)a[b]===a[c]?(c++,e[b]=c,b++):0<c?c=e[c-1]:(e[b]=0,b++);return d.slice(e[a.length-1]).split("""").reverse().join("""")+d};
+",0.29650000000000887,0.5782910000000072,0.24383299999999508,15,15,15
+"var findLadders = function(beginWord, endWord, wordList) {
+    if (!wordList.includes(endWord)) return [];
+    
+    const result = [], map = new Map(), steps = new Map();
+	
+    for (const word of wordList) {
+        for (let i = 0; i < word.length; i++) {
+            const hash = word.substring(0, i) + '*' + word.substring(i + 1);
+			
+            if (!map.has(hash)) map.set(hash, []);
+			
+            map.get(hash).push(word);
+            steps.set(hash, wordList.length);
+        }
+    }
+    
+    const queue = [[beginWord]];
+	
+    while (queue.length > 0) {
+        const current = queue.shift();
+        const set = new Set(current);
+        const lastWord = current[current.length - 1];
+        if (lastWord === endWord) {
+            if (result.length === 0 || current.length === result[0].length)
+                result.push(current);
+            else break;
+        } else {
+            for (let i = 0; i < lastWord.length; i++) {
+                const hash = lastWord.substring(0, i) + '*' + lastWord.substring(i + 1);
+                if (!map.has(hash) || current.length > steps.get(hash))
+					continue;
+					
+                for (const nextWord of map.get(hash))
+                    if (!set.has(nextWord))
+						queue.push([...current, nextWord]);
+						
+                steps.set(hash, current.length);
+            }
+        }
+    }
+    return result;
+};",Hard,"/**
+ * @param {string} beginWord
+ * @param {string} endWord
+ * @param {string[]} wordList
+ * @return {string[][]}
+ */
+var findLadders = function(beginWord, endWord, wordList) {
+    if (!wordList.includes(endWord)) return [];
+
+    const adjList = new Map();
+    const visited = new Set();
+    const queue = [[beginWord, [beginWord]]];
+    const result = [];
+    let minLength = Infinity;
+
+    for (const word of wordList) {
+        for (let i = 0; i < word.length; i++) {
+            const pattern = word.slice(0, i) + '*' + word.slice(i + 1);
+            adjList.set(pattern, adjList.get(pattern) || []);
+            adjList.get(pattern).push(word);
+        }
+    }
+
+    while (queue.length) {
+        const [currWord, path] = queue.shift();
+        if (path.length > minLength) continue; // Optimization
+
+        if (currWord === endWord) {
+            minLength = path.length;
+            result.push([...path]);
+            continue;
+        }
+
+        visited.add(currWord);
+
+        for (let i = 0; i < currWord.length; i++) {
+            const pattern = currWord.slice(0, i) + '*' + currWord.slice(i + 1);
+            if (adjList.has(pattern)) {
+                for (const neighbor of adjList.get(pattern)) {
+                    if (!visited.has(neighbor)) {
+                        queue.push([neighbor, [...path, neighbor]]);
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+};","This code uses a breadth-first search (BFS) approach to find the shortest transformation sequences. It constructs an adjacency list using patterns with '*' representing a single character difference. The BFS explores possible paths, keeping track of the shortest path length.  When the endWord is reached, the current path is added to the result if its length is the shortest found so far. The visited set prevents cycles and redundant explorations.  The code includes an optimization to prune longer paths during the BFS.",31,23,3,8,"{""functionOrClassName"": ""findLadders"",
+  ""tests"": [
+    ""findLadders(\""hit\"", \""cog\"", [\""hot\"",\""dot\"",\""dog\"",\""lot\"",\""log\"",\""cog\""])"",
+    ""findLadders(\""hit\"", \""cog\"", [\""hot\"",\""dot\"",\""dog\"",\""lot\"",\""log\""])"",
+    ""findLadders(\""hit\"", \""cog\"", [])"",
+    ""findLadders(\""red\"", \""tax\"", [\""ted\"",\""tex\"",\""red\"",\""tax\"",\""tad\"",\""den\"",\""rex\"",\""pee\""])"",
+    ""findLadders(\""red\"", \""tax\"", [\""ted\"",\""tex\"",\""red\"",\""tad\"",\""den\"",\""rex\"",\""pee\""])"",
+    ""findLadders(\""a\"", \""c\"", [\""a\"", \""b\"", \""c\""])"",
+    ""findLadders(\""hot\"", \""dog\"", [\""hot\"", \""dog\""])"",
+    ""findLadders(\""leet\"", \""code\"", [\""lest\"",\""leet\"",\""lose\"",\""code\"",\""lode\"",\""robe\"",\""lost\""])"",
+    ""findLadders(\""talk\"", \""tail\"", [\""talk\"",\""tons\"",\""fall\"",\""tail\"",\""gale\"",\""hall\"",\""neal\"",\""tale\"",\""teal\""])"",
+    ""findLadders(\""magic\"", \""pearl\"", [\""magic\"",\""manic\"",\""mania\"",\""maniaq\"",\""maniah\"",\""maniai\"",\""manial\"",\""manip\"",\""manis\"",\""manit\"",\""maniu\"",\""maniv\"",\""maniw\"",\""maniy\"",\""maniz\"",\""manja\"",\""manjb\"",\""manjc\"",\""manjd\"",\""manje\"",\""manjf\"",\""manjg\"",\""manjh\"",\""manji\"",\""manjj\"",\""manjk\"",\""manjl\"",\""manjm\"",\""manjn\"",\""manjo\"",\""manjp\"",\""manjq\"",\""manjr\"",\""manjs\"",\""manjt\"",\""manju\"",\""manjv\"",\""manjw\"",\""manjx\"",\""manjy\"",\""manjz\"",\""manka\"",\""mankb\"",\""mankc\"",\""mankd\"",\""manke\"",\""mankf\"",\""mankg\"",\""mankh\"",\""manki\"",\""mankj\"",\""mankk\"",\""mankl\"",\""mankm\"",\""mankn\"",\""manko\"",\""mankp\"",\""mankq\"",\""mankr\"",\""manks\"",\""mankt\"",\""manku\"",\""mankv\"",\""mankw\"",\""mankx\"",\""manky\"",\""mankz\"",\""manla\"",\""manlb\"",\""manlc\"",\""manld\"",\""manle\"",\""manlf\"",\""manlg\"",\""manlh\"",\""manli\"",\""manlj\"",\""manlk\"",\""manll\"",\""manlm\"",\""manln\"",\""manlo\"",\""manlp\"",\""manlq\"",\""manlr\"",\""manls\"",\""manlt\"",\""manlu\"",\""manlv\"",\""manlw\"",\""manlx\"",\""manly\"",\""manlz\"",\""manma\"",\""manmb\"",\""pearl\""])"",
+    ""findLadders(\""cet\"", \""ism\"", [\""kid\"",\""tag\"",\""pup\"",\""ail\"",\""tun\"",\""tap\"",\""car\"",\""hat\"",\""pan\"",\""map\"",\""sad\"",\""cab\"",\""ace\"",\""bar\"",\""apt\"",\""bag\"",\""bit\"",\""pie\"",\""bad\"",\""sit\"",\""mad\"",\""pit\"",\""rad\"",\""cat\"",\""pat\"",\""tap\"",\""bat\"",\""tan\"",\""bam\"",\""can\"",\""van\"",\""ram\"",\""pav\"",\""bip\"",\""jib\"",\""bil\"",\""dip\"",\""yap\"",\""sib\"",\""piz\"",\""bam\"",\""zep\"",\""ray\"",\""zip\"",\""zap\"",\""mac\"",\""cap\"",\""sap\"",\""gap\"",\""fab\"",\""hip\"",\""has\"",\""cat\"",\""tad\"",\""arc\"",\""has\"",\""top\"",\""sip\"",\""bit\"",\""bag\"",\""gas\"",\""yip\"",\""tip\"",\""toe\"",\""tap\"",\""tin\"",\""tip\"",\""top\"",\""sip\"",\""fox\"",\""fin\"",\""fit\"",\""hip\"",\""hop\"",\""gap\"",\""jay\"",\""pat\"",\""roy\"",\""ban\"",\""jay\"",\""zap\"",\""cap\"",\""fat\"",\""tap\"",\""cat\"",\""dap\"",\""cap\"",\""bar\"",\""bop\"",\""top\"",\""tar\"",\""cap\"",\""zap\"",\""pap\"",\""rap\"",\""lap\"",\""tat\"",\""pat\"",\""gap\"",\""lab\"",\""lap\"",\""tag\"",\""tap\"",\""bop\"",\""tar\"",\""rad\"",\""tao\"",\""tad\"",\""tin\"",\""pap\"",\""pit\"",\""tap\"",\""tad\"",\""tap\"",\""dad\"",\""tap\"",\""dot\"",\""dab\"",\""dap\"",\""bit\"",\""bar\"",\""tap\"",\""tap\"",\""yap\"",\""car\"",\""nap\"",\""tap\"",\""tar\"",\""tam\"",\""tep\"",\""taw\"",\""pep\""])""
+  ]
+}","let findLadders=function(e,l,a){if(!a.includes(l))return[];const g=[],f=new Map,k=new Map;for(var d of a)for(var b=0;b<d.length;b++){var c=d.substring(0,b)+""*""+d.substring(b+1);f.has(c)||f.set(c,[]);f.get(c).push(d);k.set(c,a.length)}for(e=[[e]];0<e.length;)if(a=e.shift(),d=new Set(a),b=a[a.length-1],b===l)if(0===g.length||a.length===g[0].length)g.push(a);else break;else for(c=0;c<b.length;c++){const h=b.substring(0,c)+""*""+b.substring(c+1);if(f.has(h)&&!(a.length>k.get(h))){for(const m of f.get(h))d.has(m)||
+e.push([...a,m]);k.set(h,a.length)}}return g};
+",2.2731660000000034,2.796375000000012,5.508375000000001,11,11,11
+"const isMatch = function (string, pattern) {
+  let s = 0, p = 0;
+  let starIdx = -1, pointer = -1;
+
+  while (s < string.length) {
+    if ((p < pattern.length && string[s] === pattern[p]) || pattern[p] === ""?"") {
+      s++;
+      p++;
+    } 
+	else if (p < pattern.length && pattern[p] === ""*"") {
+      starIdx = p;
+      pointer = s;
+      p++;
+    } 
+	else if (starIdx === -1) return false;
+    else {
+      p = starIdx + 1;
+      s = pointer + 1;
+      pointer = s;
+    }
+  }
+  for (let idx = p; idx < pattern.length; idx++) {
+    if (pattern[idx] !== ""*"") return false;
+  }
+  return true;
+};",Hard,"/**
+ * @param {string} s
+ * @param {string} p
+ * @return {boolean} */
+var isMatch = function(s, p) {
+    const m = s.length;
+    const n = p.length;
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(false));
+    dp[0][0] = true;
+    for (let j = 1; j <= n; j++) {
+        if (p[j - 1] === '*') {
+            dp[0][j] = dp[0][j - 1];
+        }
+    }
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (p[j - 1] === '*') {
+                dp[i][j] = dp[i - 1][j] || dp[i][j - 1];
+            } else if (p[j - 1] === '?' || s[i - 1] === p[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            }
+        }
+    }
+    return dp[m][n];
+};","This code implements a dynamic programming approach to wildcard pattern matching. A 2D boolean array 'dp' is used where dp[i][j] indicates if the first 'i' characters of string 's' match the first 'j' characters of pattern 'p'. Base cases include dp[0][0] as true (empty string matches empty pattern) and handling '*' at the beginning of the pattern. The code iterates through the 'dp' array, filling it based on the characters in 's' and 'p'. If 'p' has '*', dp[i][j] is true if either dp[i-1][j] (match with previous character of 's') or dp[i][j-1] (match without current character of 's') is true. If 'p' has '?' or the characters match, dp[i][j] is true if dp[i-1][j-1] is true. Finally, dp[m][n] indicates if the entire string 's' matches the entire pattern 'p'.",17,32,2,2,"{""functionOrClassName"": ""isMatch"", ""tests"": [""isMatch(\""aa\"", \""a\"")"", ""isMatch(\""aa\"", \""*\"")"", ""isMatch(\""cb\"", \""?a\"")"", ""isMatch(\""adceb\"", \""*a*b\"")"", ""isMatch(\""acdcb\"", \""a*c?b\"")"", ""isMatch(\""aa\"", \""aa\"")"", ""isMatch(\""aaa\"", \""aa\"")"", ""isMatch(\""aa\"", \""a*\"")"", ""isMatch(\""aa\"", \""?*\"")"", ""isMatch(\""ab\"", \""?*\"")"", ""isMatch(\""aab\"", \""c*a*b\"")"", ""isMatch(\""mississippi\"", \""m??*ss*?i*pi\"")""]}","let isMatch=function(c,b){let d=0,a=0,e=-1,f=-1;for(;d<c.length;)if(a<b.length&&c[d]===b[a]||""?""===b[a])d++,a++;else if(a<b.length&&""*""===b[a])e=a,f=d,a++;else{if(-1===e)return!1;a=e+1;f=d=f+1}for(c=a;c<b.length;c++)if(""*""!==b[c])return!1;return!0};
+",0.16833300000000406,0.2680000000000007,0.23204200000000696,12,12,12
+"var isMatch = function(s, p) {
+    const m = s.length, n = p.length;
+    const dp = new Array(m+1).fill().map(() => new Array(n+1).fill(false));
+    dp[0][0] = true; // empty pattern matches empty string
+
+    // initialize first row (empty string)
+    for (let j = 1; j <= n; j++) {
+        if (p[j-1] === '*')
+        dp[0][j] = dp[0][j-2];
+    }
+
+    // fill in remaining cells
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+        if (s[i-1] === p[j-1] || p[j-1] === '.') {
+            dp[i][j] = dp[i-1][j-1];
+        } else if (p[j-1] === '*') {
+            dp[i][j] = dp[i][j-2]; // zero occurrences
+            if (s[i-1] === p[j-2] || p[j-2] === '.') {
+            dp[i][j] = dp[i][j] || dp[i-1][j]; // one or more occurrences
+            }
+        }
+        }
+    }
+    return dp[m][n];
+}",Hard,"/**
+ * @param {string} s
+ * @param {string} p
+ * @return {boolean}
+ */
+var isMatch = function(s, p) {
+    const dp = Array(s.length + 1).fill(null).map(() => Array(p.length + 1).fill(false));
+    dp[0][0] = true;
+
+    for (let j = 1; j <= p.length; j++) {
+        if (p[j - 1] === '*') {
+            dp[0][j] = dp[0][j - 2];
+        }
+    }
+
+    for (let i = 1; i <= s.length; i++) {
+        for (let j = 1; j <= p.length; j++) {
+            if (s[i - 1] === p[j - 1] || p[j - 1] === '.') {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else if (p[j - 1] === '*') {
+                dp[i][j] = dp[i][j - 2];
+                if (p[j - 2] === '.' || p[j - 2] === s[i - 1]) {
+                    dp[i][j] = dp[i][j] || dp[i - 1][j];
+                }
+            }
+        }
+    }
+
+    return dp[s.length][p.length];
+};","This code implements a dynamic programming approach to solve the regular expression matching problem. A 2D boolean array 'dp' is used to store the matching results of substrings. dp[i][j] stores whether the first i characters of s match the first j characters of p. The code iterates through the dp array, filling it based on the characters in s and p. The base cases are handled: an empty pattern matches an empty string, and '*' can match zero preceding elements. The logic for matching individual characters, '.', and '*' is implemented using the appropriate conditions. Finally, dp[s.length][p.length] contains the result of matching the entire input string s with the entire pattern p.",44,32,5,2,"{""functionOrClassName"": ""isMatch"", ""tests"": [""isMatch(\""aa\"", \""a\"")"", ""isMatch(\""aa\"", \""a*\"")"", ""isMatch(\""ab\"", \"".*\"")"", ""isMatch(\""aab\"", \""c*a*b\"")"", ""isMatch(\""mississippi\"", \""mis*is*p*.\"")"", ""isMatch(\""ab\"", \""a.*\"")"", ""isMatch(\""aaa\"", \""a*a\"")"", ""isMatch(\""aaa\"", \""ab*a*c*a\"")"", ""isMatch(\""a\"", \""ab*\"")"", ""isMatch(\""a\"", \"".\"")"", ""isMatch(\""bbbba\"", \"".*a*a\"")"", ""isMatch(\""ab\"", \"".*c\"")"", ""isMatch(\""aaaaaaaaaaaaab\"", \""a*a*a*a*a*a*a*a*a*a*c\"")""]}","let isMatch=function(f,d){const g=f.length,e=d.length,c=Array(g+1).fill().map(()=>Array(e+1).fill(!1));c[0][0]=!0;for(var a=1;a<=e;a++)""*""===d[a-1]&&(c[0][a]=c[0][a-2]);for(a=1;a<=g;a++)for(let b=1;b<=e;b++)f[a-1]===d[b-1]||"".""===d[b-1]?c[a][b]=c[a-1][b-1]:""*""===d[b-1]&&(c[a][b]=c[a][b-2],f[a-1]===d[b-2]||"".""===d[b-2])&&(c[a][b]=c[a][b]||c[a-1][b]);return c[g][e]};
+",0.6244999999999976,0.5188749999999942,0.2810830000000095,13,13,13
+"/**
+ * @param {number[]} balloons - The input array representing the balloon values.
+ * @return {number} - The maximum coins that can be collected.
+ */
+var maxCoins = function(balloons) {
+    const n = balloons.length;
+
+    // Pad the `balloons` array with 1 on both sides to simplify boundary cases
+    balloons.push(1);
+    balloons.unshift(1);
+
+    // Create a DP table initialized with 0, with size (n+2) x (n+2)
+    const dp = Array.from({ length: n + 2 }, () => Array(n + 2).fill(0));
+
+    // Iterate backwards over all possible subarray starting points
+    for (let left = n; left >= 1; left--) {
+        // Iterate over all possible subarray ending points
+        for (let right = left; right <= n; right++) {
+            let maxCoins = -Infinity; // Store the maximum coins for subarray [left, right]
+
+            // Try bursting each balloon `idx` in the range as the last balloon
+            for (let lastBurst = left; lastBurst <= right; lastBurst++) {
+                // Calculate the coins for bursting balloon `lastBurst` last
+                const coins = balloons[left - 1] * balloons[lastBurst] * balloons[right + 1] +
+                              dp[left][lastBurst - 1] + dp[lastBurst + 1][right];
+
+                // Update the maximum coins for this subarray
+                maxCoins = Math.max(maxCoins, coins);
+            }
+
+            // Store the maximum coins obtained for subarray [left, right] in the DP table
+            dp[left][right] = maxCoins;
+        }
+    }
+
+    // Return the maximum coins for bursting all balloons between 1 and n
+    return dp[1][n];
+};
+
+/**
+ * Time Complexity: O(n^3)
+ * - We have three nested loops: one for `left`, one for `right`, and one for choosing the last balloon to burst in the range.
+ * 
+ * Space Complexity: O(n^2)
+ * - We use a DP table of size (n+2) x (n+2) to store the results of subproblems.
+ */",Hard,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxCoins = function(nums) {
+    const n = nums.length;
+    const vals = [1, ...nums, 1]; // Add padding 1s
+
+    const dp = Array(n + 2).fill(0).map(() => Array(n + 2).fill(0));
+
+    for (let len = 1; len <= n; len++) {
+        for (let i = 1; i <= n - len + 1; i++) {
+            const j = i + len - 1;
+            for (let k = i; k <= j; k++) {
+                dp[i][j] = Math.max(
+                    dp[i][j],
+                    dp[i][k - 1] + vals[i - 1] * vals[k] * vals[j + 1] + dp[k + 1][j]
+                );
+            }
+        }
+    }
+
+    return dp[1][n];
+};","This solution uses dynamic programming. `dp[i][j]` stores the maximum coins obtained by bursting balloons from index i to j. We iterate through different lengths of subarrays and calculate `dp[i][j]` by considering each balloon k within the range [i, j] as the last balloon to be burst. The formula `dp[i][k - 1] + vals[i - 1] * vals[k] * vals[j + 1] + dp[k + 1][j]` represents the coins obtained by bursting balloons in the left subarray, the last balloon k, and the balloons in the right subarray. Padding 1s are added to handle boundary cases.",22,26,5,5,"{""functionOrClassName"": ""maxCoins"", ""tests"": [""maxCoins([3,1,5,8])"", ""maxCoins([1,5])"", ""maxCoins([1])"", ""maxCoins([])"", ""maxCoins([7,9,8,0,7,1,3,5,5,2,3,3])"", ""maxCoins([8,2,6,8,9,8,1,4,1,5,3,0,7,7,0,4,2,2])"", ""maxCoins([9,76])"", ""maxCoins([1,3,2,4,5])"", ""maxCoins([1,10,1,1,10])"", ""maxCoins([5,4,3,2,1])""]}","let maxCoins=function(b){const d=b.length;b.push(1);b.unshift(1);const f=Array.from({length:d+2},()=>Array(d+2).fill(0));for(let a=d;1<=a;a--)for(let c=a;c<=d;c++){let g=-Infinity;for(let e=a;e<=c;e++)g=Math.max(g,b[a-1]*b[e]*b[c+1]+f[a][e-1]+f[e+1][c]);f[a][c]=g}return f[1][d]};
+",0.8151670000000024,1.2176669999999916,0.91004199999999,10,10,10
+"var solveSudoku = function(board) {
+    const solve = () => {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (board[row][col] === '.') {
+                    for (let num = '1'; num <= '9'; num++) {
+                        if (isValid(board, row, col, num)) {
+                            board[row][col] = num;
+                            if (solve()) return true;
+                            board[row][col] = '.';
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    
+    const isValid = (board, row, col, num) => {
+        for (let i = 0; i < 9; i++) {
+            if (board[row][i] === num || board[i][col] === num) return false;
+        }
+        let startRow = Math.floor(row / 3) * 3;
+        let startCol = Math.floor(col / 3) * 3;
+        for (let i = startRow; i < startRow + 3; i++) {
+            for (let j = startCol; j < startCol + 3; j++) {
+                if (board[i][j] === num) return false;
+            }
+        }
+        return true;
+    };
+    
+    solve();
+};",Hard,"/**
+ * @param {character[][]} board
+ * @return {void} Do not return anything, modify board in-place instead.
+ */
+var solveSudoku = function(board) {
+    const N = 9;
+
+    function isValid(row, col, num) {
+        for (let i = 0; i < N; i++) {
+            if (board[row][i] == num || board[i][col] == num) return false;
+        }
+
+        let startRow = Math.floor(row / 3) * 3;
+        let startCol = Math.floor(col / 3) * 3;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (board[startRow + i][startCol + j] == num) return false;
+            }
+        }
+        return true;
+    }
+
+    function solve() {
+        for (let row = 0; row < N; row++) {
+            for (let col = 0; col < N; col++) {
+                if (board[row][col] === '.') {
+                    for (let num = 1; num <= 9; num++) {
+                        if (isValid(row, col, num.toString())) {
+                            board[row][col] = num.toString();
+                            if (solve()) return true;
+                            else board[row][col] = '.'; // backtrack
+                        }
+                    }
+                    return false; // No valid number found
+                }
+            }
+        }
+        return true; // Puzzle solved
+    }
+
+    solve();
+};","This code implements a backtracking algorithm to solve Sudoku. The `isValid` function checks if placing a number at a given cell is valid according to Sudoku rules. The `solve` function recursively tries filling empty cells with numbers from 1 to 9. If a valid number is found, it proceeds to the next empty cell. If no valid number is found for a cell, it backtracks and tries a different number in the previous cell. This process continues until the entire board is filled or no solution is found.",33,39,4,5,-1,-1,-1,-1,-1,-1,-1,-1
