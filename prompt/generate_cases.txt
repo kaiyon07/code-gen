@@ -14,4 +14,4 @@ Write at least 10 tests for this function in the following JSON format. Do not i
 }
 ```
 
-As an example, if your function was "addTwoNumbers", two of the tests could be "addTwoNumbers(5, 3)" or "addTwoNumbers(Number.MIN_SAFE_INTEGER, -1)".
+As an example, if your function was "addTwoNumbers", two of the tests could be "addTwoNumbers(5, 3)" or "addTwoNumbers(Number.MIN_SAFE_INTEGER, -1)". If the test case requires multiple statements to set up, invoke a lambda function with a return statement, e.g., "(() => {let a = addTwoNumbers(5, 3); return addTwoNumbers(a, 2);})()".

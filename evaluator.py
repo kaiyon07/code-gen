@@ -4,6 +4,8 @@ from gemini_api import gemini_response
 import subprocess
 import re
 import json
+import csv
+import time
 
 
 def extract_code_from_markdown(output):
@@ -121,3 +123,37 @@ def evaluate(original_code, output, run_code=True):
         result_parsed['pyError'] = "No parseable output from JavaScript evaluation.. crashed?"
 
     return static_analysis_result | result_parsed
+
+
+def evaluate_batch(in_csv, out_csv, original_code_column: str="gt_code", output_code_column: str="refactor_code",
+                   run_code: bool=True, api_sleep_interval: int=2):
+    with open(in_csv, mode='r') as infile, open(out_csv, mode='w', newline='') as outfile:
+        reader = csv.DictReader(infile)
+
+        fieldnames = reader.fieldnames
+        result_fieldnames = ['eslint_count_original', 'eslint_count_refactored', 'closure_count_original', 'closure_count_refactored']
+
+        if run_code:
+            result_fieldnames += ['runtimeOriginal', 'runtimeOptimized', 'runtimeRefactored', 'numOptimizedCorrect', 'numRefactoredCorrect', 'total']
+
+        fieldnames += result_fieldnames
+        writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for row in reader:
+            try:
+                time.sleep(api_sleep_interval)
+                result = evaluate(row[original_code_column], row[output_code_column], run_code)
+            except Exception as e:
+                result = {'pyError': str(e)}
+
+            print(result)
+
+            for field_name in result_fieldnames:
+                if field_name in result:
+                    row[field_name] = result[field_name]
+                else:
+                    row[field_name] = -1
+
+            writer.writerow(row)
+
