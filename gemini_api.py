@@ -36,7 +36,7 @@ def gemini_json_response(prompt,json_out,model_name, MAX_TOKENS_ANSWER=1000):
     model_name,
     generation_config={
         "max_output_tokens": MAX_TOKENS_ANSWER,
-        "temperature": 0.2,
+        "temperature": 0,
         "response_mime_type": "application/json",
         "response_schema": json_out,
 })
