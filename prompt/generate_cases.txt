@@ -6,7 +6,7 @@ You are given the following JavaScript function:
 Write at least 10 tests for this function in the following JSON format. Do not include any comments in your JSON. Each test should be formulated as a string invoking the function, which, upon `eval()`, will return the output of the function. Note that this format means you do not have to include expected outputs, only inputs.
 ```
 {
-  "functionName": "string",
+  "functionOrClassName": "string",
   "tests": [
     "invocation1",
     "invocation2"

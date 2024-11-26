@@ -94,9 +94,11 @@ def evaluate(original_code, output, run_code=True):
         file.write(test_cases_string)
 
     test_cases_parsed = json.loads(test_cases_string)
+
+    static_analysis_result['test_cases'] = test_cases_string
     
     # Optimize the code using Google Closure Compiler (for performance comparison)
-    optimized_code = optimize_code(google_closure_compiler, original_code, test_cases_parsed['functionName'])
+    optimized_code = optimize_code(google_closure_compiler, original_code, test_cases_parsed['functionOrClassName'])
 
     static_analysis_result['closure_optimized_code'] = optimized_code
 
@@ -134,7 +136,7 @@ def evaluate_batch(in_csv, out_csv, original_code_column: str="gt_code", output_
         result_fieldnames = ['eslint_count_original', 'eslint_count_refactored', 'closure_count_original', 'closure_count_refactored']
 
         if run_code:
-            result_fieldnames += ['runtimeOriginal', 'runtimeOptimized', 'runtimeRefactored', 'numOptimizedCorrect', 'numRefactoredCorrect', 'total']
+            result_fieldnames += ['test_cases', 'closure_optimized_code', 'runtimeOriginal', 'runtimeOptimized', 'runtimeRefactored', 'numOptimizedCorrect', 'numRefactoredCorrect', 'total']
 
         fieldnames += result_fieldnames
         writer = csv.DictWriter(outfile, fieldnames=fieldnames)

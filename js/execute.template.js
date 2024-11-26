@@ -50,7 +50,7 @@ function test() {
 
     // reset variable name if the name is put in VariableEnvironment through use of var
     try {
-        eval(`${inputs.functionName} = null`)
+        eval(`${inputs.functionOrClassName} = null`)
     } catch { }
 
     let runtimeOptimized = 0;
