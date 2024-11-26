@@ -7,6 +7,8 @@ import json
 import csv
 import time
 
+TEST_CASES_CACHE_PATH = "./js/test-cases.json"
+
 
 def extract_code_from_markdown(output):
     # Regex to match the content inside the first code block
@@ -23,6 +25,26 @@ def optimize_code(google_closure_compiler, original_code, function_name):
     # TODO: if minified code has a non-minifiable property called window, this will fail
     optimized_code = closure_optimized_code.replace("window.", "let ")
     return optimized_code
+
+
+def check_test_case_cache(code):
+    with open(TEST_CASES_CACHE_PATH, 'r') as file:
+        test_cases = json.load(file)
+
+    if hash(code) in test_cases:
+        return test_cases[hash(code)]
+
+    return None
+
+
+def write_test_case_cache(code, test_cases_string):
+    with open(TEST_CASES_CACHE_PATH, 'r') as file:
+        test_cases = json.load(file)
+
+    test_cases[hash(code)] = test_cases_string
+
+    with open(TEST_CASES_CACHE_PATH, "w") as file:
+        file.write(json.dumps(test_cases))
 
 
 def evaluate(original_code, output, run_code=True):
@@ -78,16 +100,14 @@ def evaluate(original_code, output, run_code=True):
         return static_analysis_result
 
     # Part 2: Run the code
-    # Create an LLM prompt to generate test cases for the given original_code
-    with open("./prompt/generate_cases.txt", "r") as file:
-        test_cases_prompt = file.read().replace("{function}", original_code)
+    test_cases_string = check_test_case_cache(original_code)
+    if not test_cases_string:
+        # Create an LLM prompt to generate test cases for the given original_code
+        with open("./prompt/generate_cases.txt", "r") as file:
+            test_cases_prompt = file.read().replace("{function}", original_code)
 
-    test_cases_string = extract_code_from_markdown(gemini_response(test_cases_prompt, 'gemini-1.5-pro'))
-    # TEMP CODE TO SET test_case_string
-    # TODO remove the next `with` block and uncomment the code above to generate by chatgpt
-    
-    #with open("./js/inputs.json", "r") as file:
-    #    test_cases_string = file.read()
+        test_cases_string = extract_code_from_markdown(gemini_response(test_cases_prompt, 'gemini-1.5-pro'))
+        write_test_case_cache(original_code, test_cases_string)
 
     # Write the LLM-generated JSON containing test inputs into a JSON file
     with open("./js/inputs.json", "w") as file:
@@ -128,7 +148,7 @@ def evaluate(original_code, output, run_code=True):
 
 
 def evaluate_batch(in_csv, out_csv, original_code_column: str="gt_code", output_code_column: str="refactor_code",
-                   run_code: bool=True, api_sleep_interval: int=2):
+                   run_code: bool=True, api_sleep_interval: int=1, verbose: bool=False):
     with open(in_csv, mode='r') as infile, open(out_csv, mode='w', newline='') as outfile:
         reader = csv.DictReader(infile)
 
@@ -149,7 +169,8 @@ def evaluate_batch(in_csv, out_csv, original_code_column: str="gt_code", output_
             except Exception as e:
                 result = {'pyError': str(e)}
 
-            print(result)
+            if verbose:
+                print(result)
 
             for field_name in result_fieldnames:
                 if field_name in result:
