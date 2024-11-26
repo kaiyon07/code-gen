@@ -138,6 +138,7 @@ function test() {
 
 try {
     test();
+    process.exit(0);
 }
 catch (e) {
     console.log(JSON.stringify({
