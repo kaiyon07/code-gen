@@ -5,6 +5,7 @@ import subprocess
 import re
 import json
 import csv
+import time
 
 
 def extract_code_from_markdown(output):
@@ -124,7 +125,8 @@ def evaluate(original_code, output, run_code=True):
     return static_analysis_result | result_parsed
 
 
-def evaluate_batch(in_csv, out_csv, original_code_column: str="gt_code", output_code_column: str="refactor_code", run_code: bool=True):
+def evaluate_batch(in_csv, out_csv, original_code_column: str="gt_code", output_code_column: str="refactor_code",
+                   run_code: bool=True, api_sleep_interval: int=2):
     with open(in_csv, mode='r') as infile, open(out_csv, mode='w', newline='') as outfile:
         reader = csv.DictReader(infile)
 
@@ -140,6 +142,7 @@ def evaluate_batch(in_csv, out_csv, original_code_column: str="gt_code", output_
 
         for row in reader:
             try:
+                time.sleep(api_sleep_interval)
                 result = evaluate(row[original_code_column], row[output_code_column], run_code)
             except Exception as e:
                 result = {'pyError': str(e)}
