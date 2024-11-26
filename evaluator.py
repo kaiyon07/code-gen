@@ -6,6 +6,7 @@ import re
 import json
 import csv
 import time
+import hashlib
 
 TEST_CASES_CACHE_PATH = "./js/test-cases.json"
 
@@ -27,12 +28,16 @@ def optimize_code(google_closure_compiler, original_code, function_name):
     return optimized_code
 
 
+def code_id(code):
+    return hashlib.shake_128(code.encode()).hexdigest(4)
+
+
 def check_test_case_cache(code):
     with open(TEST_CASES_CACHE_PATH, 'r') as file:
         test_cases = json.load(file)
 
-    if hash(code) in test_cases:
-        return test_cases[hash(code)]
+    if code_id(code) in test_cases:
+        return test_cases[code_id(code)]
 
     return None
 
@@ -41,7 +46,7 @@ def write_test_case_cache(code, test_cases_string):
     with open(TEST_CASES_CACHE_PATH, 'r') as file:
         test_cases = json.load(file)
 
-    test_cases[hash(code)] = test_cases_string
+    test_cases[code_id(code)] = test_cases_string
 
     with open(TEST_CASES_CACHE_PATH, "w") as file:
         file.write(json.dumps(test_cases))
@@ -113,7 +118,18 @@ def evaluate(original_code, output, run_code=True):
     with open("./js/inputs.json", "w") as file:
         file.write(test_cases_string)
 
-    test_cases_parsed = json.loads(test_cases_string)
+    # Try to parse LLM-generated JSON - it may be cut off
+    test_cases_parsed = None
+    for json_completion in ["", "\\\")\"]}", "\"]}", "]}", "}"]:
+        try:
+            test_cases_parsed = json.loads(test_cases_string + json_completion)
+        except json.JSONDecodeError:
+            pass
+        else:
+            break
+
+    if not test_cases_parsed:
+        return static_analysis_result
 
     static_analysis_result['test_cases'] = test_cases_string
     
@@ -148,7 +164,7 @@ def evaluate(original_code, output, run_code=True):
 
 
 def evaluate_batch(in_csv, out_csv, original_code_column: str="gt_code", output_code_column: str="refactor_code",
-                   run_code: bool=True, api_sleep_interval: int=1, verbose: bool=False):
+                   run_code: bool=True, api_sleep_interval: float=1, verbose: bool=False):
     with open(in_csv, mode='r') as infile, open(out_csv, mode='w', newline='') as outfile:
         reader = csv.DictReader(infile)
 
