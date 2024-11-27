@@ -1,0 +1,2378 @@
+gt_code,level,refactor_code,rationale
+"var createHelloWorld = function() { 
+    return function() {
+        return ""Hello World"";
+    }
+}",Easy,"/**
+ * @return {Function}
+ */
+var createHelloWorld = function() {
+    return function(...args) {
+        return ""Hello World"";
+    }
+};","The function createHelloWorld is defined, which returns an inner function. The inner function ignores any input arguments and always returns the string ""Hello World"".  This directly addresses the problem description. No error handling is explicitly needed as the inner function is simple and cannot throw errors. The code uses modern JavaScript syntax (ES6+) and is concise and readable."
+"var createCounter = function(init) {
+  let presentCount = init;
+
+  function increment() {
+    return ++presentCount;
+  }
+
+  function decrement() {
+      return --presentCount;
+  }
+
+  function reset() {
+      return (presentCount = init);
+  }
+
+  return { increment, decrement, reset };
+};",Easy,"/**
+ * @param {integer} init
+ * @return { increment: Function, decrement: Function, reset: Function }
+ */
+var createCounter = function(init) {
+  let count = init;
+  return {
+    increment: function() {
+      return ++count;
+    },
+    decrement: function() {
+      return --count;
+    },
+    reset: function() {
+      count = init;
+      return count;
+    }
+  };
+};","The code initializes a counter with the given init value. It returns an object with three methods: increment, decrement, and reset. Each method modifies the counter and returns the updated value.  The closure ensures that the counter variable is private and only accessible through the returned methods."
+"var map = function(arr, fn) {
+    const transformedArr = [];
+    arr.forEach((element, index) => {
+      transformedArr[index] = fn(element, index);
+    });
+    return transformedArr;
+  };",Easy,"/**
+ * @param {number[]} arr
+ * @param {Function} fn
+ * @return {number[]}
+ */
+var map = function(arr, fn) {
+  if (!Array.isArray(arr) || typeof fn !== 'function') {
+    throw new Error('Invalid input: arr must be an array and fn must be a function.');
+  }
+
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    result.push(fn(arr[i], i));
+  }
+  return result;
+};","The code iterates through the input array `arr` using a `for` loop.  For each element, it applies the provided function `fn`, passing the element and its index as arguments. The result of `fn` is then pushed into a new array `result`. Error handling is included to check if the input `arr` is an array and `fn` is a function; if not, it throws an error. This approach avoids using the built-in `Array.map` method as requested."
+"var filter = function(arr, fn) {
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (fn(arr[i], i)) {
+      result.push(arr[i]);
+    }
+  }
+  return result;
+};",Easy,"/**
+ * @param {number[]} arr
+ * @param {Function} fn
+ * @return {number[]}
+ */
+var filter = function(arr, fn) {
+  if (!Array.isArray(arr) || typeof fn !== 'function') {
+    throw new Error('Invalid input: arr must be an array and fn must be a function.');
+  }
+  const filteredArr = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (fn(arr[i], i)) {
+      filteredArr.push(arr[i]);
+    }
+  }
+  return filteredArr;
+};","The code iterates through the input array `arr`. For each element, it calls the provided function `fn` with the element and its index. If `fn` returns a truthy value, the element is added to the `filteredArr`.  Error handling is included to check if the input `arr` is an array and `fn` is a function. This approach avoids using the built-in `filter` method as requested."
+"/**
+ * @param {number[]} nums
+ * @param {Function} fn
+ * @param {number} init
+ * @return {number}
+ */
+var reduce = function(nums, fn, init) {
+  let val = init;
+  for (let i = 0; i < nums.length; i++) {
+    val = fn(val, nums[i]);
+  }
+  return val;
+};",Easy,"/**
+ * @param {number[]} nums
+ * @param {Function} fn
+ * @param {number} init
+ * @return {number}
+ */
+var reduce = function(nums, fn, init) {
+  if (nums.length === 0) {
+    return init;
+  }
+
+  let val = init;
+  for (let i = 0; i < nums.length; i++) {
+    val = fn(val, nums[i]);
+  }
+  return val;
+};","The code iterates through the input array `nums`. In each iteration, it applies the provided function `fn` to the current accumulated value `val` and the current array element. The result of the function call becomes the new accumulated value. If the array is empty, it returns the initial value `init`.  This approach avoids using the built-in `Array.reduce` method as requested."
+"/**
+ * @param {Function} fn
+ * @param {number} t
+ * @return {Function}
+ */
+var timeLimit = function(fn, t) {
+  return async function(...args) {
+    return new Promise((delayresolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(timeoutId);
+        reject(""Time Limit Exceeded"");
+      }, t);
+
+      fn(...args)
+        .then((result) => {
+          clearTimeout(timeoutId);
+          delayresolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+  };
+};
+
+/**
+ * const limited = timeLimit((t) => new Promise(res => setTimeout(res, t)), 100);
+ * limited(150).catch(console.log) // ""Time Limit Exceeded"" at t=100ms
+ */",Medium,"/**
+ * @param {Function} fn
+ * @param {number} t
+ * @return {Function}
+ */
+var timeLimit = function(fn, t) {
+    return async function(...args) {
+        return new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                reject(""Time Limit Exceeded"");
+            }, t);
+            fn(...args).then((result) => {
+                clearTimeout(timeoutId);
+                resolve(result);
+            }).catch((error) => {
+                clearTimeout(timeoutId);
+                reject(error);
+            });
+        });
+    };
+};","The solution uses Promise.race to handle the timeout.  A Promise is created that resolves with the result of fn if it completes within the time limit t.  If the timeout is reached first, the Promise rejects with ""Time Limit Exceeded"".  Error handling is included to catch any errors thrown by fn."
+"const TimeLimitedCache = function() {
+    this.cache = new Map();  // Using Map so we don't need a size variable
+};
+
+TimeLimitedCache.prototype.set = function(key, value, duration) {
+    let found = this.cache.has(key);
+    if (found) clearTimeout(this.cache.get(key).ref);  // Cancel previous timeout
+    this.cache.set(key, {
+        value,  // Equivalent to `value: value`
+        ref: setTimeout(() => this.cache.delete(key), duration)
+    });
+    return found;
+};
+
+TimeLimitedCache.prototype.get = function(key) {
+    return this.cache.has(key) ? this.cache.get(key).value : -1;
+};
+
+TimeLimitedCache.prototype.count = function() {
+    return this.cache.size;
+};",Medium,"var TimeLimitedCache = function() {
+    this.cache = new Map();
+};
+
+/** 
+ * @param {number} key
+ * @param {number} value
+ * @param {number} duration time until expiration in ms
+ * @return {boolean} if un-expired key already existed
+ */
+TimeLimitedCache.prototype.set = function(key, value, duration) {
+    const now = Date.now();
+    const expirationTime = now + duration;
+    const existingEntry = this.cache.get(key);
+    if (existingEntry && existingEntry.expirationTime > now) {
+        this.cache.set(key, { value, expirationTime });
+        return true; // Key already existed
+    } else {
+        this.cache.set(key, { value, expirationTime });
+        return false; // Key did not exist
+    }
+};
+
+/** 
+ * @param {number} key
+ * @return {number} value associated with key
+ */
+TimeLimitedCache.prototype.get = function(key) {
+    const now = Date.now();
+    const entry = this.cache.get(key);
+    if (entry && entry.expirationTime > now) {
+        return entry.value;
+    } else {
+        return -1;
+    }
+};
+
+/** 
+ * @return {number} count of non-expired keys
+ */
+TimeLimitedCache.prototype.count = function() {
+    const now = Date.now();
+    let count = 0;
+    for (const [key, entry] of this.cache) {
+        if (entry.expirationTime > now) {
+            count++;
+        }
+    }
+    return count;
+};","The TimeLimitedCache class uses a Map to store key-value pairs along with their expiration times.  The set method updates or adds entries, returning a boolean indicating pre-existence. The get method retrieves values, returning -1 if the key is expired or doesn't exist. The count method iterates through the map, counting only non-expired entries.  Date.now() provides the current time for expiration checks. Error handling is implicit through the return values of get and the conditional logic within set and count."
+"var debounce = function(fn, t) {
+    let id;
+        return function (...args) {
+                clearTimeout(id);
+                id = setTimeout(() => fn(...args), t);
+        }
+};",Medium,"/**
+ * @param {Function} fn
+ * @param {number} t milliseconds
+ * @return {Function}
+ */
+var debounce = function(fn, t) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            fn.apply(this, args);
+        }, t);
+    };
+};","The solution uses `setTimeout` to schedule the execution of the function after `t` milliseconds.  `clearTimeout` cancels any pending timeout before scheduling a new one, ensuring that only the last call within the `t` millisecond window is executed.  The spread syntax (`...args`) allows the debounced function to accept any number of arguments and pass them to the original function."
+"var promiseAll = async function(functions) {
+    return new Promise((resolve, reject) => {
+        let results = [];
+        functions.forEach(fn => {
+            fn()
+            .then(val => results.push(val))
+            .catch(reason => reject(reason));
+        });
+        resolve(results);
+    })};
+
+var promiseAll = async function(functions) {
+    return new Promise((resolve,reject)=>{
+        if(functions.length === 0) {
+            resolve([]);
+            return;
+        }
+        const arr=new Array(functions.length);
+        arr.fill(null);
+        let count=0
+        functions.forEach(async(fn,i)=>{
+            try{
+                arr[i]=await fn()
+                count++
+            
+                if(count===functions.length){
+                    resolve(arr);
+                }
+            }
+            catch(e){
+                reject(e);
+            }
+        
+        });
+    });
+};",Medium,"/**
+ * @param {Array<Function>} functions
+ * @return {Promise<any>}
+ */
+var promiseAll = function(functions) {
+  return new Promise((resolve, reject) => {
+    if (!Array.isArray(functions) || functions.length === 0) {
+      resolve([]);
+      return;
+    }
+
+    const results = new Array(functions.length);
+    let completedCount = 0;
+    let rejected = false;
+
+    functions.forEach((func, index) => {
+      func().then((result) => {
+        results[index] = result;
+        completedCount++;
+        if (completedCount === functions.length && !rejected) {
+          resolve(results);
+        }
+      }).catch((error) => {
+        if (!rejected) {
+          rejected = true;
+          reject(error);
+        }
+      });
+    });
+  });
+};","The solution iterates through the array of asynchronous functions. Each function is executed, and its promise is handled using .then and .catch.  The results are stored in a results array. A completedCount variable tracks the number of completed promises. If all promises resolve, the results array is resolved. If any promise rejects, the error is immediately rejected using reject, preventing further execution.  Error handling ensures that only the first rejection is propagated."
+"class EventEmitter {
+  constructor() {
+    this.events = new Map();
+  }
+
+  subscribe(event, cb) {
+    if (!this.events.has(event)) {
+      this.events.set(event, []);
+    }
+
+    const listeners = this.events.get(event);
+    listeners.push(cb);
+
+    return {
+      unsubscribe: () => {
+        const index = listeners.indexOf(cb);
+        if (index !== -1) {
+          listeners.splice(index, 1);
+        }
+      }
+    };
+  }
+
+  emit(event, args = []) {
+    if (!this.events.has(event)) {
+      return [];
+    }
+
+    const listeners = this.events.get(event);
+    const results = [];
+
+    for (const listener of listeners) {
+      results.push(listener(...args));
+    }
+
+    return results;
+  }
+}",Medium,"class EventEmitter {
+    constructor() {
+        this.events = {};
+    }
+
+    /**
+     * @param {string} eventName
+     * @param {Function} callback
+     * @return {Object}
+     */
+    subscribe(eventName, callback) {
+        if (!this.events[eventName]) {
+            this.events[eventName] = [];
+        }
+        this.events[eventName].push(callback);
+        const unsubscribe = () => {
+            this.events[eventName] = this.events[eventName].filter((cb) => cb !== callback);
+        };
+        return { unsubscribe };
+    }
+
+    /**
+     * @param {string} eventName
+     * @param {Array} args
+     * @return {Array}
+     */
+    emit(eventName, args = []) {
+        if (!this.events[eventName]) {
+            return [];
+        }
+        return this.events[eventName].map((callback) => callback(...args));
+    }
+}","The EventEmitter class uses an object to store event listeners.  The subscribe method adds a callback to the event's listener array and returns an unsubscribe function. The emit method iterates through the listeners and executes them with the provided arguments, returning an array of results. Error handling is implicit; if an event doesn't exist, an empty array is returned.  The code uses modern JS syntax (ES6+) and follows best practices for readability and organization."
+"class Calculator {
+  constructor(value) {
+    this.result = value;
+  }
+  add(value) {
+    this.result += value;
+    return this;
+  }
+
+  subtract(value) {
+    this.result -= value;
+    return this;
+  }
+
+  multiply(value) {
+    this.result *= value;
+    return this;
+  }
+
+  divide(value) {
+    if (value === 0) {
+      throw new Error('Division by zero is not allowed');
+    }
+    this.result /= value;
+    return this;
+  }
+
+  power(value) {
+    this.result = Math.pow(this.result, value);
+    return this;
+  }
+
+  getResult() {
+    return this.result;
+  }
+}",Medium,"class Calculator {
+    /** 
+     * @param {number} value
+     */
+    constructor(value) {
+        this.result = value;
+    }
+    
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    add(value) {
+        this.result += value;
+        return this;
+    }
+    
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    subtract(value) {
+        this.result -= value;
+        return this;
+    }
+    
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */  
+    multiply(value) {
+        this.result *= value;
+        return this;
+    }
+    
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    divide(value) {
+        if (value === 0) {
+            throw new Error(""Division by zero is not allowed"");
+        }
+        this.result /= value;
+        return this;
+    }
+    
+    /** 
+     * @param {number} value
+     * @return {Calculator}
+     */
+    power(value) {
+        this.result = Math.pow(this.result, value);
+        return this;
+    }
+    
+    /** 
+     * @return {number}
+     */
+    getResult() {
+        return this.result;
+    }
+}",The code implements the Calculator class with methods for basic arithmetic operations and exponentiation.  Method chaining is supported by returning 'this' in each method. Error handling is included for division by zero. The constructor initializes the result. The getResult method returns the final result.
+"/**
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+
+class ListNode {
+  constructor(val, next) {
+    this.val = (val === undefined ? 0 : val);
+    this.next = (next === undefined ? null : next);
+  }
+}
+
+function arrayToList(array) {
+    if (array.length === 0) return null;
+
+    let head = new ListNode(array[0]);
+    let current = head;
+
+    for (let i = 1; i < array.length; i++) {
+        current.next = new ListNode(array[i]);
+        current = current.next;
+    }
+
+    return head;
+}
+
+var mergeKLists = function (lists) {
+    let nums = []
+
+    for (let i = 0; i < lists.length; i++) {
+        let current = lists[i]
+        while (current !== null) {
+            nums.push(current.val)
+            current = current.next
+        }
+    }
+
+    return arrayToList(nums.sort((a, b) => a - b))
+};",Medium,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+var mergeKLists = function(lists) {
+  if (!lists || lists.length === 0) return null;
+
+  while (lists.length > 1) {
+    let mergedLists = [];
+    for (let i = 0; i < lists.length; i += 2) {
+      let l1 = lists[i];
+      let l2 = i + 1 < lists.length ? lists[i + 1] : null;
+      mergedLists.push(mergeTwoLists(l1, l2));
+    }
+    lists = mergedLists;
+  }
+  return lists[0];
+};
+
+var mergeTwoLists = function(l1, l2) {
+  let dummy = new ListNode();
+  let tail = dummy;
+
+  while (l1 && l2) {
+    if (l1.val < l2.val) {
+      tail.next = l1;
+      l1 = l1.next;
+    } else {
+      tail.next = l2;
+      l2 = l2.next;
+    }
+    tail = tail.next;
+  }
+
+  tail.next = l1 || l2;
+  return dummy.next;
+};","The solution uses a divide and conquer approach.  It repeatedly merges pairs of linked lists until only one remains. The `mergeTwoLists` helper function efficiently merges two sorted linked lists. The main function handles edge cases (empty input) and iteratively merges lists until a single sorted list is obtained. This approach has a time complexity of O(N log k), where N is the total number of nodes and k is the number of linked lists. The space complexity is O(1) excluding the output list."
+"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {string}
+ */
+var mergeAlternately = function(word1, word2) {
+ let result = '';
+  for (let i = 0; i < Math.max(word1.length, word2.length); i++) {
+    if (i < word1.length) result += word1[i];
+    if (i < word2.length) result += word2[i];
+  }
+  return result;
+};",Easy,"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {string}
+ */
+var mergeAlternately = function(word1, word2) {
+  let merged = '';
+  let i = 0, j = 0;
+
+  while (i < word1.length || j < word2.length) {
+    if (i < word1.length) {
+      merged += word1[i];
+      i++;
+    }
+    if (j < word2.length) {
+      merged += word2[j];
+      j++;
+    }
+  }
+
+  return merged;
+};",The function `mergeAlternately` efficiently merges two strings by iterating through them using pointers `i` and `j`. It appends characters from `word1` and `word2` alternately to the `merged` string until one string is exhausted. The remaining characters from the longer string are then appended to complete the merged string.  This approach avoids unnecessary array manipulations and ensures optimal performance.
+"var gcdOfStrings = function (str1, str2) {
+    // handle the base case
+    if (str1 + str2 !== str2 + str1) return '';
+    let a = str1.length
+    let b = str2.length
+
+    // loop (divide) until you find the 
+    // highest common factor (length of string) 
+    // like we did in maths
+    while (b) {
+        let temp = b
+        b = a % b
+        a = temp
+    }
+    return str1.substring(0, a)
+};",Easy,"/**
+ * @param {string} str1
+ * @param {string} str2
+ * @return {string}
+ */
+var gcdOfStrings = function(str1, str2) {
+  //Error Handling for invalid inputs
+  if (typeof str1 !== 'string' || typeof str2 !== 'string') {
+    throw new Error('Inputs must be strings.');
+  }
+  if (str1.length === 0 || str2.length === 0) {
+    return '';
+  }
+
+  //Find the greatest common divisor of lengths
+  function gcd(a, b) {
+    if (b === 0) {
+      return a;
+    }
+    return gcd(b, a % b);
+  }
+  const commonLength = gcd(str1.length, str2.length);
+
+  //Extract the potential gcd string
+  const potentialGCD = str1.substring(0, commonLength);
+
+  //Check if it divides both strings
+  if (str1.length % commonLength === 0 && str2.length % commonLength === 0) {
+    let str1Check = '';
+    for (let i = 0; i < str1.length / commonLength; i++) {
+      str1Check += potentialGCD;
+    }
+    let str2Check = '';
+    for (let i = 0; i < str2.length / commonLength; i++) {
+      str2Check += potentialGCD;
+    }
+    if (str1Check === str1 && str2Check === str2) {
+      return potentialGCD;
+    }
+  }
+  return '';
+};","The function first handles error cases where inputs are not strings or are empty.  Then, it uses the Euclidean algorithm (gcd function) to find the greatest common divisor of the lengths of the input strings. This length represents the potential length of the greatest common divisor string. A substring of this length is extracted from str1. The function then checks if this substring, when repeated, forms both str1 and str2. If it does, the substring is returned; otherwise, an empty string is returned, indicating no common divisor string."
+"var reverseWords = function(s) {
+    let words = s.split(' ');
+    let res = [];
+
+    for (let i = words.length - 1; i >= 0; i--) {
+        if (words[i]) {
+            res.push(words[i]);
+        }
+    }
+
+    return res.join(' ');
+};",Medium,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var reverseWords = function(s) {
+  // Remove leading and trailing spaces
+  s = s.trim();
+
+  // Handle empty string
+  if (s === """") {
+    return """";
+  }
+
+  // Split the string into words
+  const words = s.split(/\s+/);
+
+  // Reverse the order of words
+  const reversedWords = words.reverse();
+
+  // Join the words with a single space
+  return reversedWords.join("" "");
+};","The function first trims leading and trailing spaces from the input string. It then handles the case of an empty string. The string is split into words using a regular expression to handle multiple spaces. The words are reversed using the reverse() method, and finally, they are joined with a single space using the join() method.  Error handling is included for empty strings. The code is concise and readable, using modern JavaScript features."
+"var productExceptSelf = function(nums) {
+    const output = Array(nums.length).fill(1);
+
+    let left = 1;
+    for (let i = 0; i < nums.length; i++) {
+        output[i] *= left;
+        left *= nums[i];
+    }
+
+    let right = 1;
+    for (let i = nums.length - 1; i >= 0; i--) {
+        output[i] *= right;
+        right *= nums[i];
+    }
+
+    return output;    
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var productExceptSelf = function(nums) {
+  if (!nums || nums.length === 0) {
+    return [];
+  }
+
+  const n = nums.length;
+  const result = new Array(n).fill(1);
+
+  // Calculate prefix products
+  let prefixProduct = 1;
+  for (let i = 0; i < n; i++) {
+    result[i] = prefixProduct;
+    prefixProduct *= nums[i];
+  }
+
+  // Calculate suffix products and multiply with prefix products
+  let suffixProduct = 1;
+  for (let i = n - 1; i >= 0; i--) {
+    result[i] *= suffixProduct;
+    suffixProduct *= nums[i];
+  }
+
+  return result;
+};","The solution utilizes two passes through the input array `nums`. The first pass calculates the prefix product, storing it in the `result` array. The second pass calculates the suffix product and multiplies it with the corresponding prefix product in the `result` array. This approach avoids division and achieves O(n) time complexity.  Error handling is included to manage empty or null input."
+"/**
+ * @param {character[]} chars
+ * @return {number}
+ */
+var compress = function(chars) {
+    let write = 0;
+    let read = 0;
+
+    while (read < chars.length) {
+        let char = chars[read];
+        let count = 0;
+
+        // Count the number of consecutive characters
+        while (read < chars.length && chars[read] === char) {
+            count++;
+            read++;
+        }
+        chars[write] = char;
+        write++;
+        if (count > 1) {
+            for (let digit of String(count)) {
+                chars[write] = digit;
+                write++;
+            }
+        }
+    }
+
+    return write;
+};",Medium,"/**
+ * @param {character[]} chars
+ * @return {number}
+ */
+var compress = function(chars) {
+  if (!chars || chars.length === 0) {
+    return 0; // Handle empty input
+  }
+
+  let index = 0;
+  let count = 1;
+  for (let i = 0; i < chars.length; i++) {
+    if (i + 1 < chars.length && chars[i] === chars[i + 1]) {
+      count++;
+    } else {
+      chars[index++] = chars[i];
+      if (count > 1) {
+        const countStr = String(count);
+        for (let j = 0; j < countStr.length; j++) {
+          chars[index++] = countStr[j];
+        }
+      }
+      count = 1;
+    }
+  }
+  return index;
+};","The code iterates through the input array `chars`. It keeps track of consecutive repeating characters using `count`. If a character is different from the next one or it's the last character, it writes the character to the `chars` array at the `index` position. If the `count` is greater than 1, it converts the count to a string and writes each digit to the array. The function returns the new length of the compressed array."
+"/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var longestOnes = function(nums, k) {
+    let left = 0
+    let max_length = 0
+    let zero_count = 0
+    for (let right = 0; right < nums.length; right++) {
+        if(nums[right] == 0){
+            zero_count += 1
+        }
+        while(zero_count > k) {
+            if(nums[left] == 0) {
+                zero_count -= 1
+            }
+            left++
+        }
+        // Calculate the length of the current valid window 
+        // and update max_length
+        max_length = Math.max(max_length, right- left + 1)
+    }
+    return max_length
+};",Medium,"/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var longestOnes = function(nums, k) {
+  if (!nums || nums.length === 0 || k < 0) {
+    return 0; // Handle invalid inputs
+  }
+
+  let left = 0;
+  let right = 0;
+  let zeroCount = 0;
+  let maxLength = 0;
+
+  while (right < nums.length) {
+    if (nums[right] === 0) {
+      zeroCount++;
+    }
+
+    while (zeroCount > k) {
+      if (nums[left] === 0) {
+        zeroCount--;
+      }
+      left++;
+    }
+
+    maxLength = Math.max(maxLength, right - left + 1);
+    right++;
+  }
+
+  return maxLength;
+};","The function uses a sliding window approach. It iterates through the array using two pointers, `left` and `right`. The `zeroCount` variable keeps track of the number of zeros within the window. If the number of zeros exceeds `k`, the left pointer moves to shrink the window until the condition is met. The `maxLength` variable stores the maximum length of the window with at most k zeros."
+"/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[][]}
+ */
+var findDifference = function(nums1, nums2) {
+    let set1 = new Set(nums1);
+    let set2 = new Set(nums2);
+    let uniqueToNums1 = Array.from(set1).filter(x => !set2.has(x));
+    let uniqueToNums2 = Array.from(set2).filter(x => !set1.has(x));
+
+    return [uniqueToNums1, uniqueToNums2];
+};",Medium,"/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[][]}
+ */
+var findDifference = function(nums1, nums2) {
+  const set1 = new Set(nums1);
+  const set2 = new Set(nums2);
+  const result = [[], []];
+
+  for (const num of nums1) {
+    if (!set2.has(num)) {
+      result[0].push(num);
+    }
+  }
+
+  for (const num of nums2) {
+    if (!set1.has(num)) {
+      result[1].push(num);
+    }
+  }
+
+  return result;
+};","The function `findDifference` efficiently finds the distinct integers in `nums1` not present in `nums2` and vice-versa using Sets. Sets provide constant time complexity for checking membership (`has()`), making the overall algorithm efficient. The result is stored in a 2D array, adhering to the problem's output format."
+"/**
+ * @param {string} s
+ * @return {string}
+ */
+var removeStars = function(s) {
+let i = 0;
+    let stk = [];
+     while(i<s.length){
+         if(s.charAt(i)===""*""){
+            if(stk.length>0){
+                stk.pop();
+            }
+         }
+         else {
+             stk.push(s.charAt(i))
+         }
+         i++;
+     }
+    return stk.join("""");
+};",Medium,"/**
+ * @param {string} s
+ * @return {string} 
+ */
+var removeStars = function(s) {
+  const stack = [];
+  for (let char of s) {
+    if (char === '*') {
+      stack.pop();
+    } else {
+      stack.push(char);
+    }
+  }
+  return stack.join('');
+};","The solution uses a stack to efficiently process the string.  It iterates through the string character by character. If it encounters a star, it pops the last element from the stack (the closest non-star character to its left). Otherwise, it pushes the character onto the stack. Finally, it joins the elements in the stack to form the resulting string. This approach avoids unnecessary string manipulations and has a time complexity of O(n), where n is the length of the string."
+"var predictPartyVictory = function(senate) {
+    senate = senate.split('');
+    while(senate.length) {
+        var first = senate.shift();
+        var len = senate.length;
+
+        for(var i=0; i<len; i++) {
+            if(first != senate[i]) {
+                senate.splice(i, 1);
+                senate.push(first);
+                break;
+            }
+        }
+        if(i == len) {
+            return first == 'D' ? 'Dire' : 'Radiant';
+        }
+    }
+};",Medium,"/**
+ * @param {string} senate
+ * @return {string}
+ */
+var predictPartyVictory = function(senate) {
+  let senators = senate.split('');
+  let banned = new Array(senators.length).fill(false);
+  let radiantCount = senators.filter(s => s === 'R').length;
+  let direCount = senators.length - radiantCount;
+
+  for (let i = 0; i < senators.length; i++) {
+    if (banned[i]) continue;
+
+    let currentParty = senators[i];
+    let otherParty = currentParty === 'R' ? 'D' : 'R';
+    let remainingSenators = senators.filter((s, index) => !banned[index]);
+    let remainingRadiant = remainingSenators.filter(s => s === 'R').length;
+    let remainingDire = remainingSenators.length - remainingRadiant;
+
+    if (remainingRadiant === 0 || remainingDire === 0) {
+      return currentParty === 'R' ? 'Radiant' : 'Dire';
+    }
+
+    let targetIndex = -1;
+    if (currentParty === 'R') {
+      targetIndex = remainingSenators.findIndex(s => s === 'D');
+    } else {
+      targetIndex = remainingSenators.findIndex(s => s === 'R');
+    }
+
+    if (targetIndex !== -1) {
+      banned[senators.indexOf(remainingSenators[targetIndex], i)] = true;
+    }
+  }
+
+  // Should not reach here if the input is valid
+  return '';
+};","The function iterates through the senators. If a senator can announce victory, it returns the party. Otherwise, it bans a senator from the opposite party.  The loop continues until a victory is declared. Error handling is implicit; if the input is invalid, an empty string is returned. The solution uses a `banned` array to track disabled senators and efficiently determines the remaining senators of each party in each round."
+"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteMiddle = function(head) {
+    if(head === null)return null;
+    prev = new ListNode(0);
+    prev.next = head;
+    slow = prev;
+    fast = head;
+    while(fast != null && fast.next != null){
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    slow.next = slow.next.next;
+    return prev.next;
+};",Medium,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteMiddle = function(head) {
+    if (head === null || head.next === null) {
+        return null;
+    }
+
+    let slow = head;
+    let fast = head;
+    let prev = null;
+
+    while (fast !== null && fast.next !== null) {
+        prev = slow;
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+
+    if (prev === null) {
+        return slow.next;
+    } else {
+        prev.next = slow.next;
+        return head;
+    }
+};","The function `deleteMiddle` efficiently removes the middle node of a linked list. It uses two pointers, `slow` and `fast`, to traverse the list. The `fast` pointer moves twice as fast as the `slow` pointer. When `fast` reaches the end, `slow` will be at the middle node. The `prev` pointer keeps track of the node before `slow`, allowing for the removal of the middle node by updating the `next` pointer of `prev`.  The edge cases of an empty list or a list with only one node are handled appropriately."
+"function lowestCommonAncestor(root, p, q) {
+  if (!root || root === p || root === q) return root;
+  var resL = lowestCommonAncestor(root.left, p, q);
+  var resR = lowestCommonAncestor(root.right, p, q);
+  return (resL && resR) ? root : (resL || resR);
+}",Medium,"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {TreeNode}
+ */
+var lowestCommonAncestor = function(root, p, q) {
+    if (!root || root === p || root === q) return root;
+
+    const left = lowestCommonAncestor(root.left, p, q);
+    const right = lowestCommonAncestor(root.right, p, q);
+
+    if (left && right) return root;
+    return left || right;
+};","The solution uses a recursive approach.  The base case is when the root is null, or when the root is either p or q. In this case, the root is returned. Otherwise, the function recursively calls itself on the left and right subtrees. If both left and right calls return a node (meaning p and q are on different sides), then the current root is the LCA. Otherwise, the LCA is either in the left or right subtree, so we return whichever is not null."
+"var findCircleNum = function (isConnected) {
+
+    let provinces = 0;
+    let visited = new Array(isConnected.length).fill(false);
+
+    for (let i = 0; i < isConnected.length; i++) {
+        if (!visited[i]) {
+            provinces++;
+            dfs(isConnected, visited, i);
+        }
+    }
+    return provinces;
+};
+
+function dfs(isConnected, visited, i) {
+
+    visited[i] = true;
+    
+    for (let j = 0; j < isConnected.length; j++) {
+        if (isConnected[i][j] === 1 && !visited[j]) {
+            dfs(isConnected, visited, j);
+        }
+    }
+}",Medium,"/**
+ * @param {number[][]} isConnected
+ * @return {number}
+ */
+var findCircleNum = function(isConnected) {
+  const n = isConnected.length;
+  if (n === 0) return 0;
+
+  const visited = new Array(n).fill(false);
+  let count = 0;
+
+  const dfs = (node) => {
+    visited[node] = true;
+    for (let i = 0; i < n; i++) {
+      if (isConnected[node][i] === 1 && !visited[i]) {
+        dfs(i);
+      }
+    }
+  };
+
+  for (let i = 0; i < n; i++) {
+    if (!visited[i]) {
+      dfs(i);
+      count++;
+    }
+  }
+
+  return count;
+};","The solution uses Depth First Search (DFS) to traverse the graph represented by the adjacency matrix isConnected.  The visited array keeps track of visited nodes. The dfs function recursively explores all connected nodes. The outer loop iterates through all nodes, and if a node hasn't been visited, it starts a new DFS traversal, incrementing the province count. This efficiently counts the number of connected components (provinces) in the graph."
+"var findPeakElement = function(nums) {
+    var start = 0, end = nums.length - 1;
+    while (start < end) {
+        var mid = Math.floor((start + end) / 2);
+        if (mid === 0) {
+            return nums[0] >= nums[1] ? 0 : 1;
+        }
+        if (mid === end) {
+            return nums[end - 1] >= nums[end - 2] ? end - 1 : end - 2;
+        }
+
+        if (nums[mid] > nums[mid + 1] && nums[mid] > nums[mid - 1]) {
+            return mid;
+        }
+        if (nums[mid] < nums[mid - 1]) {
+            end = mid - 1;
+        } else {
+            start = mid + 1;
+        }
+    }
+    return start;
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var findPeakElement = function(nums) {
+  let left = 0;
+  let right = nums.length - 1;
+
+  while (left < right) {
+    let mid = Math.floor((left + right) / 2);
+
+    if (nums[mid] < nums[mid + 1]) {
+      left = mid + 1; // Peak is in the right half
+    } else {
+      right = mid; // Peak is in the left half or at mid
+    }
+  }
+
+  return left; // left and right converge at the peak index
+};","The solution employs binary search for efficiency. It compares the middle element with its right neighbor. If the middle element is smaller, the peak must be in the right half; otherwise, it's in the left half or at the middle.  The search space is halved in each iteration, resulting in O(log n) time complexity. The loop continues until the left and right pointers converge at the index of a peak element."
+"var twoSum = function(nums, target) {
+    
+    let numToIndexMap = {};
+
+    
+    for (let i = 0; i < nums.length; i++) {
+        
+        let diff = target - nums[i];
+
+        
+        if (numToIndexMap.hasOwnProperty(diff)) {
+            
+            return [i, numToIndexMap[diff]];
+        }
+
+        
+        numToIndexMap[nums[i]] = i;
+    }
+
+    
+    return null;
+};",Easy,"/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+  const numMap = {}; // Create a map to store numbers and their indices
+
+  for (let i = 0; i < nums.length; i++) {
+    const complement = target - nums[i];
+    if (complement in numMap) {
+      // Found the complement, return the indices
+      return [numMap[complement], i];
+    }
+    numMap[nums[i]] = i; // Store the number and its index
+  }
+
+  // No solution found
+  throw new Error('No two numbers add up to the target.');
+};","The code uses a hash map (numMap) to store each number and its index. It iterates through the input array. For each number, it calculates the complement needed to reach the target. If the complement exists in the map, it means we've found the pair, and their indices are returned. If the loop completes without finding a pair, an error is thrown."
+"var isAnagram = function(s, t) {
+    if (s.length !== t.length) {
+        return false;
+    }
+    
+    var freq = new Array(26).fill(0);
+    for (var i = 0; i < s.length; i++) {
+        freq[s.charCodeAt(i) - 'a'.charCodeAt(0)]++;
+        freq[t.charCodeAt(i) - 'a'.charCodeAt(0)]--;
+    }
+    
+    for (var i = 0; i < freq.length; i++) {
+        if (freq[i] !== 0) {
+            return false;
+        }
+    }
+    
+    return true;
+};",Easy,"/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isAnagram = function(s, t) {
+  //Error Handling for invalid inputs
+  if(typeof s !== 'string' || typeof t !== 'string'){
+    throw new Error('Invalid input: Inputs must be strings');
+  }
+  if(s.length !== t.length){
+    return false; //Anagrams must have the same length
+  }
+
+  const sCharCount = {};
+  const tCharCount = {};
+
+  for(let i = 0; i < s.length; i++){
+    sCharCount[s[i]] = (sCharCount[s[i]] || 0) + 1;
+    tCharCount[t[i]] = (tCharCount[t[i]] || 0) + 1;
+  }
+
+  for(let char in sCharCount){
+    if(sCharCount[char] !== tCharCount[char]){
+      return false;
+    }
+  }
+  return true;
+};","The function first handles invalid input types. It then checks if the lengths of the input strings are different; if they are, it returns `false` because anagrams must have the same length. Two objects `sCharCount` and `tCharCount` are used to store the character counts of strings `s` and `t` respectively. The function iterates through the strings and updates the counts in the respective objects. Finally, it iterates through the keys of `sCharCount` and compares the counts in both objects. If any character counts are different, it returns `false`; otherwise, it returns `true`."
+"var romanToInt = function(s) {
+    let res = 0;
+    const roman = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    };
+
+    for (let i = 0; i < s.length - 1; i++) {
+        if (roman[s[i]] < roman[s[i + 1]]) {
+            res -= roman[s[i]];
+        } else {
+            res += roman[s[i]];
+        }
+    }
+
+    return res + roman[s[s.length - 1]];    
+};",Easy,"/**
+ * @param {string} s
+ * @return {number}
+ */
+var romanToInt = function(s) {
+  const romanMap = {
+    'I': 1,
+    'V': 5,
+    'X': 10,
+    'L': 50,
+    'C': 100,
+    'D': 500,
+    'M': 1000
+  };
+
+  let result = 0;
+  for (let i = 0; i < s.length; i++) {
+    const currentVal = romanMap[s[i]];
+    const nextVal = romanMap[s[i + 1]];
+
+    if (nextVal && currentVal < nextVal) {
+      result -= currentVal;
+    } else {
+      result += currentVal;
+    }
+  }
+
+  return result;
+};","The function `romanToInt` converts a Roman numeral string to an integer. It uses a `romanMap` to store the integer values of Roman numerals. The function iterates through the input string, comparing the value of each numeral with the next one. If the current numeral is smaller than the next, it subtracts the current value; otherwise, it adds the current value to the result.  Error handling is implicitly done through the use of the `romanMap`. If an invalid Roman numeral is provided, it will either return 0 or throw an error depending on how the map handles undefined keys.  The code is concise and readable, using modern JavaScript syntax."
+"var isPalindrome = function(x) {
+    if (x < 0) {
+        return false;
+    }
+
+    let reverse = 0;
+    let xcopy = x;
+
+    while (x > 0) {
+        reverse = (reverse * 10) + (x % 10);
+        x = Math.floor(x / 10);
+    }
+
+    return reverse === xcopy;    
+};",Easy,"/**
+ * @param {number} x
+ * @return {boolean}
+ */
+var isPalindrome = function(x) {
+  // Handle negative numbers and numbers ending in 0
+  if (x < 0 || (x !== 0 && x % 10 === 0)) {
+    return false;
+  }
+
+  let revertedNumber = 0;
+  let originalNumber = x;
+
+  while (originalNumber > 0) {
+    revertedNumber = revertedNumber * 10 + originalNumber % 10;
+    originalNumber = Math.floor(originalNumber / 10);
+  }
+
+  return revertedNumber === x;
+};","The function first handles trivial cases: negative numbers and numbers ending in 0 (except 0 itself) are not palindromes.  Then, it reverses the input number using a while loop. Finally, it compares the reversed number with the original number to determine if it's a palindrome. This approach avoids converting the number to a string, which is generally less efficient."
+"/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var fizzBuzz = function(n) {
+    var ans = [];
+
+    for (var i = 1; i <= n; i++) {
+        if (i % 3 === 0 && i % 5 === 0) {
+            ans.push(""FizzBuzz"");
+        } else if (i % 3 === 0) {
+            ans.push(""Fizz"");
+        } else if (i % 5 === 0) {
+            ans.push(""Buzz"");
+        } else {
+            ans.push(i.toString());
+        }
+    }
+
+    return ans;
+};",Easy,"/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var fizzBuzz = function(n) {
+  if (typeof n !== 'number' || n <= 0 || !Number.isInteger(n)) {
+    throw new Error('Invalid input: n must be a positive integer.');
+  }
+  const result = [];
+  for (let i = 1; i <= n; i++) {
+    if (i % 15 === 0) {
+      result.push(""FizzBuzz"");
+    } else if (i % 3 === 0) {
+      result.push(""Fizz"");
+    } else if (i % 5 === 0) {
+      result.push(""Buzz"");
+    } else {
+      result.push(String(i));
+    }
+  }
+  return result;
+};","The function first validates the input to ensure it's a positive integer.  Then, it iterates from 1 to n. For each number, it checks divisibility by 15 (FizzBuzz), 3 (Fizz), and 5 (Buzz) in that order. If none of these conditions are met, the number itself (converted to a string) is added to the result array. The function returns the result array containing the FizzBuzz strings."
+"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    const hash = {};
+    let res = 0;
+    let majority = 0;
+
+    for (let n of nums) {
+        hash[n] = 1 + (hash[n] || 0);
+        if (hash[n] > majority) {
+            res = n;
+            majority = hash[n];
+        }
+    }
+
+    return res;    
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+  if (!nums || nums.length === 0) {
+    throw new Error('Input array cannot be null or empty.');
+  }
+
+  const numCount = {};
+  for (const num of nums) {
+    numCount[num] = (numCount[num] || 0) + 1;
+  }
+
+  let majorityElement = null;
+  let maxCount = 0;
+  for (const num in numCount) {
+    if (numCount[num] > maxCount) {
+      maxCount = numCount[num];
+      majorityElement = parseInt(num);
+    }
+  }
+
+  return majorityElement;
+};","The function first checks for invalid input. Then it uses a hash map to count the occurrences of each number. Finally, it iterates through the hash map to find the number with the maximum count, which is the majority element.  The parseInt is used to convert the keys (which are strings) back to numbers. Error handling is included to manage null or empty input arrays."
+"
+var firstUniqChar = function(s) {
+    let mp = {};
+
+    for (let a of s) {
+        mp[a] = (mp[a] || 0) + 1;
+    }
+
+    for (let i = 0; i < s.length; i++) {
+        if (mp[s[i]] === 1) {
+            return i;
+        }
+    }
+
+    return -1;
+};",Easy,"/**
+ * @param {string} s
+ * @return {number}
+ */
+var firstUniqChar = function(s) {
+  const charCount = {};
+  for (let char of s) {
+    charCount[char] = (charCount[char] || 0) + 1;
+  }
+
+  for (let i = 0; i < s.length; i++) {
+    if (charCount[s[i]] === 1) {
+      return i;
+    }
+  }
+
+  return -1;
+};","The function first counts the occurrences of each character in the string using a character count object. Then, it iterates through the string again. For each character, it checks its count in the character count object. If the count is 1, it means that the character is non-repeating, and its index is returned. If no non-repeating character is found after iterating through the entire string, -1 is returned."
+"function binarySearch(nums, target) {
+  let left = 0;
+  let right = nums.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    
+    if (nums[mid] === target) {
+      return mid;
+    } else if (nums[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  
+  return -1;
+}",Easy,"/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var search = function(nums, target) {
+  let left = 0;
+  let right = nums.length - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (nums[mid] === target) {
+      return mid;
+    } else if (nums[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  return -1;
+};","The function implements a binary search algorithm. It initializes two pointers, `left` and `right`, to the start and end of the array, respectively.  The algorithm iteratively narrows down the search space by comparing the middle element with the target. If the target is found, its index is returned. If the target is greater than the middle element, the search continues in the right half; otherwise, it continues in the left half. If the target is not found after the loop completes, -1 is returned. This approach guarantees O(log n) time complexity because the search space is halved in each iteration."
+"var moveZeroes = function(nums) {
+    let left = 0;
+
+    for (let right = 0; right < nums.length; right++) {
+        if (nums[right] !== 0) {
+            [nums[right], nums[left]] = [nums[left], nums[right]];
+            left++;
+        }
+    }
+
+    return nums;    
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var moveZeroes = function(nums) {
+  //Error Handling: Check if the input is a valid array
+  if (!Array.isArray(nums)) {
+    throw new Error('Invalid input: nums must be an array.');
+  }
+
+  let nonZeroIndex = 0; //Index to track the position for the next non-zero element
+
+  //Iterate through the array
+  for (let i = 0; i < nums.length; i++) {
+    if (nums[i] !== 0) {
+      //If the element is non-zero, move it to the nonZeroIndex position
+      nums[nonZeroIndex] = nums[i];
+      nonZeroIndex++;
+    }
+  }
+
+  //Fill the remaining elements with zeros
+  for (let i = nonZeroIndex; i < nums.length; i++) {
+    nums[i] = 0;
+  }
+};","The function first checks if the input is a valid array. Then, it iterates through the array, moving all non-zero elements to the beginning of the array while keeping their relative order. Finally, it fills the remaining positions with zeros.  This approach is efficient because it only iterates through the array twice and modifies the array in-place, avoiding the need for creating a new array."
+"/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(input) {
+    var start = 0
+    var end = input.length - 1
+    while (start < end) {
+        var s = input.charCodeAt(start)
+        var e = input.charCodeAt(end)
+    
+        if (!isLetter(s)) {
+            start++
+            continue
+        }
+        if (!isLetter(e)) {
+            end--
+            continue
+        }
+    
+        if (toLowerCase(s) !== toLowerCase(e)) {
+            return false 
+        } 
+        start++
+        end--
+  }
+  return true
+};
+
+var isLetter = function(code) {
+    if (((code >= 48) && (code <= 57))  // numbers
+    || ((code >= 65) && (code <= 90))  // uppercase
+    || ((code >= 97) && (code <= 122))) {  // lowercase
+        return true
+    }
+    else {
+        return false
+    }
+}
+
+var toLowerCase = function(code) {
+    if (code >= 65 && code <= 90) {
+        return code + 32    
+    }
+    else {
+        return code
+    }
+}",Easy,"/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+  // Convert the string to lowercase and remove non-alphanumeric characters
+  s = s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  // Check if the string is a palindrome
+  let left = 0;
+  let right = s.length - 1;
+  while (left < right) {
+    if (s[left] !== s[right]) {
+      return false;
+    }
+    left++;
+    right--;
+  }
+
+  return true;
+};","The function first preprocesses the input string by converting it to lowercase and removing non-alphanumeric characters using a regular expression. Then, it uses two pointers, one at the beginning and one at the end of the string, to compare characters from both ends. If any pair of characters doesn't match, it's not a palindrome, and the function returns `false`. If the loop completes without finding any mismatches, it means the string is a palindrome, and the function returns `true`."
+"var isPowerOfThree = function(n) {
+    if (n === 0) return false;
+    if (n === 1) return true;
+    
+    if (!(n%3)) return isPowerOfThree(n/3);
+    
+    return false;
+};",Easy,"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isPowerOfThree = function(n) {
+  if (n <= 0) return false;
+  while (n % 3 === 0) {
+    n /= 3;
+  }
+  return n === 1;
+};","The function `isPowerOfThree` efficiently determines if a given integer `n` is a power of three. It first handles the base cases: if `n` is less than or equal to 0, it cannot be a power of three, so it returns `false`. Otherwise, it repeatedly divides `n` by 3 using a `while` loop as long as `n` is divisible by 3. If, after this process, `n` is equal to 1, it means that the original number was a power of three, and the function returns `true`. Otherwise, it returns `false`. This approach avoids the use of logarithms or recursion, making it efficient and easy to understand."
+"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var findDisappearedNumbers = function(nums) {
+    let obj={}
+    for(let n of nums){
+        obj[n]=1
+    }
+    let arr=[]
+    for(let i=1;i<=nums.length;i++){
+        if(!obj[i]) arr.push(i)
+    }
+    return arr
+};",Easy,"/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var findDisappearedNumbers = function(nums) {
+  //Error Handling: Check if input is valid
+  if (!Array.isArray(nums) || nums.length === 0) {
+    return []; //Return empty array for invalid input
+  }
+
+  const n = nums.length;
+  const numSet = new Set(nums);
+  const result = [];
+
+  for (let i = 1; i <= n; i++) {
+    if (!numSet.has(i)) {
+      result.push(i);
+    }
+  }
+
+  return result;
+};","The function first checks for invalid input. It then uses a Set to efficiently track the numbers present in the input array.  The code iterates through the range [1, n] and adds any number not found in the Set to the result array. This approach has a time complexity of O(n) due to the single loop and Set operations, making it efficient for large input arrays."
+"/**
+ * @param {number[]} cost
+ * @return {number}
+ */
+var minCostClimbingStairs = function(cost) {
+    cost.push(0);
+
+    for (let i = cost.length - 4; i >= 0; i--) {
+        cost[i] += Math.min(cost[i + 1], cost[i + 2]);
+    }
+
+    return Math.min(cost[0], cost[1]);    
+};",Easy,"/**
+ * @param {number[]} cost
+ * @return {number}
+ */
+var minCostClimbingStairs = function(cost) {
+  if (!cost || cost.length === 0) {
+    return 0; // Handle empty input
+  }
+
+  const n = cost.length;
+  // Create a DP array to store minimum costs to reach each step
+  const dp = new Array(n + 1).fill(Infinity);
+  dp[0] = 0; // Cost to reach step 0 is 0
+  dp[1] = 0; // Cost to reach step 1 is 0 (assuming we start from step 0 or 1)
+
+  for (let i = 2; i <= n; i++) {
+    // Minimum cost to reach current step is the minimum of:
+    // 1. Cost to reach current step from the previous step
+    // 2. Cost to reach current step from the step before the previous step
+    dp[i] = Math.min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2]);
+  }
+
+  return dp[n]; // Minimum cost to reach the top
+};","The solution uses dynamic programming.  A DP array `dp` stores the minimum cost to reach each step. `dp[i]` is the minimum cost to reach step `i`.  The base cases are `dp[0] = 0` and `dp[1] = 0` (we can start from either step 0 or 1). The recurrence relation is `dp[i] = min(dp[i-1] + cost[i-1], dp[i-2] + cost[i-2])`. The final answer is `dp[n]`, where n is the number of steps. Error handling is included to check for empty input."
+"/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    let res = """";
+    let x=0, y=0, rem=0;
+    while(a!="""" || b!="""") {
+        if(a!="""") {
+            x = parseInt(a.slice(-1));
+            a = a.slice(0,-1);
+        }
+        if(b!="""") {
+            y = parseInt(b.slice(-1));
+            b = b.slice(0,-1);
+        }
+        if(x+y+rem == 2) {
+            rem=1;
+            res = ""0"" + res;
+        }
+        else if(x+y+rem == 3) {
+            rem=1;
+            res = ""1"" + res;
+        }
+        else {
+            res = (x+y+rem).toString() + res;
+            rem=0;
+        }
+        x=0;
+        y=0;
+    }
+    if(rem==1) res = ""1"" + res;
+    return res;
+
+};",Easy,"/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+  let i = a.length - 1;
+  let j = b.length - 1;
+  let carry = 0;
+  let result = '';
+
+  while (i >= 0 || j >= 0 || carry) {
+    const sum = (i >= 0 ? parseInt(a[i]) : 0) + (j >= 0 ? parseInt(b[j]) : 0) + carry;
+    result = (sum % 2) + result;
+    carry = Math.floor(sum / 2);
+    i--;
+    j--;
+  }
+
+  return result;
+};","The function iterates through the input strings from right to left, adding digits and handling carry.  parseInt converts string digits to numbers. The modulo operator (%) gets the remainder (0 or 1), and Math.floor() gets the integer part of the division (carry). The result is built up from right to left."
+"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+    const seen = new Set();
+    
+    while (n !== 1 && !seen.has(n)) {
+        seen.add(n);
+        let sum = 0;
+        
+        let numStr = n.toString();
+        for (let i = 0; i < numStr.length; i++) {
+            let digit = Number(numStr[i]);
+            sum += digit * digit;
+        }
+        
+        n = sum;  
+    }
+    return n === 1;
+};",Easy,"/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+  if (n <= 0) {
+    throw new Error(""Input must be a positive integer."");
+  }
+
+  const seen = new Set();
+  while (!seen.has(n)) {
+    seen.add(n);
+    n = sumOfSquaresOfDigits(n);
+    if (n === 1) {
+      return true;
+    }
+  }
+  return false;
+};
+
+function sumOfSquaresOfDigits(n) {
+  let sum = 0;
+  while (n > 0) {
+    const digit = n % 10;
+    sum += digit * digit;
+    n = Math.floor(n / 10);
+  }
+  return sum;
+}",The algorithm uses a Set to track numbers encountered during the process. It iteratively calculates the sum of squares of digits until either 1 is reached (happy number) or a cycle is detected (unhappy number). Error handling is included to ensure that the input is a positive integer. The sumOfSquaresOfDigits function is a helper function to calculate the sum of squares of digits efficiently.
+"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function (root) {
+    if (!root) return 0
+    let leftSubHeight = maxDepth(root.left)
+    let rightSubHeight = maxDepth(root.right) 
+    return Math.max(leftSubHeight, rightSubHeight) + 1
+};",Easy,"/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function(root) {
+    if(root === null) return 0;
+    let leftDepth = maxDepth(root.left);
+    let rightDepth = maxDepth(root.right);
+    return Math.max(leftDepth, rightDepth) + 1; 
+};","The solution uses a recursive depth-first search approach.  The base case is an empty tree (root is null), returning a depth of 0. Otherwise, it recursively calculates the maximum depth of the left and right subtrees and returns the maximum of these depths plus 1 (to account for the current node). This efficiently finds the longest path from root to leaf."
+"/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function (headA, headB) {
+  
+    let nodeA = headA;
+    let nodeB = headB;
+    
+    
+    while (nodeA !== nodeB) {
+        
+        nodeA = !nodeA ? headB : nodeA.next;
+        
+        nodeB = !nodeB ? headA : nodeB.next;
+    }
+    
+    
+    return nodeA;
+};",Easy,"/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function(headA, headB) {
+  if (!headA || !headB) return null;
+
+  let a = headA;
+  let b = headB;
+
+  while (a !== b) {
+    a = a === null ? headB : a.next;
+    b = b === null ? headA : b.next;
+  }
+
+  return a;
+};","The code uses two pointers, `a` and `b`, to traverse the linked lists.  Pointer `a` starts at `headA` and pointer `b` starts at `headB`. In each iteration, if a pointer reaches the end of its list, it's moved to the beginning of the other list. This continues until both pointers point to the same node (the intersection) or both reach null (no intersection). The time complexity is O(m+n), where m and n are the lengths of the lists, and space complexity is O(1). This approach efficiently handles the case where lists intersect or don't intersect."
+"var minDistance = function(word1, word2) {
+    const cache = {}
+    function dp(i, j) {
+        if (cache[`${i}->${j}`] !== undefined) {
+            return cache[`${i}->${j}`]
+        }
+        if (i >= word1.length) {
+            return word2.length - j;
+        } 
+        if (j >= word2.length) {
+            return word1.length - i;
+        }
+        if (word1[i] === word2[j]) {
+            return dp(i+1, j+1);
+        }
+        let insert = 1 + dp(i, j+1);
+        let del = 1 + dp(i+1, j);
+        let repl = 1 + dp(i+1, j+1);
+        const res = Math.min(insert, del, repl);
+        cache[`${i}->${j}`] = res;
+        return res;
+    }
+    return dp(0, 0)
+};",Medium,"/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {number}
+ */
+var minDistance = function(word1, word2) {
+  const m = word1.length;
+  const n = word2.length;
+
+  // Create a DP table to store results of subproblems
+  const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+  // Initialize the first row and column of the DP table
+  for (let i = 0; i <= m; i++) {
+    dp[i][0] = i;
+  }
+  for (let j = 0; j <= n; j++) {
+    dp[0][j] = j;
+  }
+
+  // Fill in the rest of the DP table
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (word1[i - 1] === word2[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1]; // No operation needed if characters are the same
+      } else {
+        dp[i][j] = Math.min(
+          dp[i - 1][j] + 1, // Deletion
+          dp[i][j - 1] + 1, // Insertion
+          dp[i - 1][j - 1] + 1 // Replacement
+        );
+      }
+    }
+  }
+
+  return dp[m][n]; // The minimum edit distance is in the bottom-right corner
+};","The solution uses dynamic programming. A DP table `dp` is created where `dp[i][j]` represents the minimum edit distance between the first `i` characters of `word1` and the first `j` characters of `word2`. The table is filled iteratively, using the recurrence relation: `dp[i][j] = min(dp[i-1][j] + 1, dp[i][j-1] + 1, dp[i-1][j-1] + (word1[i-1] != word2[j-1]))`. The final result is `dp[m][n]`, where `m` and `n` are the lengths of `word1` and `word2` respectively.  The base cases are initialized to handle empty strings."
+"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var longestConsecutive = function(nums) {
+    if(!nums.length) return 0;
+    
+    let count = 1;
+    let largestSequence = 0;
+    
+    nums = new Set(nums);
+    nums = Array.from(nums);
+    nums.sort((a,b)=> a-b);
+   
+
+    for(let i=0 ; i<nums.length ; i++){
+        let diff = nums[i+1] - nums[i]; 
+        if(diff == 1){
+             count++;
+        }else{
+            if(count > largestSequence){
+                largestSequence = count;
+            }
+            count = 1;
+        }
+
+    }
+    return largestSequence;;
+};",Medium,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var longestConsecutive = function(nums) {
+  if (!nums || nums.length === 0) return 0;
+
+  const numSet = new Set(nums);
+  let longestStreak = 0;
+
+  for (const num of numSet) {
+    if (!numSet.has(num - 1)) {
+      let currentNum = num;
+      let currentStreak = 1;
+
+      while (numSet.has(currentNum + 1)) {
+        currentNum += 1;
+        currentStreak += 1;
+      }
+
+      longestStreak = Math.max(longestStreak, currentStreak);
+    }
+  }
+
+  return longestStreak;
+};","The function first handles edge cases where the input array is null or empty. It then uses a Set to store the unique numbers in the input array for efficient lookup. The algorithm iterates through each number in the Set. If a number is not preceded by a consecutive number (meaning it's the start of a potential sequence), it starts counting the consecutive numbers until it encounters a gap. The longest streak is updated accordingly. The time complexity is O(n) because of the single iteration through the Set, and the space complexity is O(n) due to the Set."
+"var shortestPalindrome = function(s) {
+    let count = kmp(s.split('').reverse().join(''), s);
+    return s.slice(count).split('').reverse().join('') + s;
+};
+
+var kmp = function(txt, patt) {
+    let newString = patt + '#' + txt;
+    let pi = new Array(newString.length).fill(0);
+    let i = 1, k = 0;
+    while (i < newString.length) {
+        if (newString[i] === newString[k]) {
+            k++;
+            pi[i] = k;
+            i++;
+        } else {
+            if (k > 0) {
+                k = pi[k - 1];
+            } else {
+                pi[i] = 0;
+                i++;
+            }
+        }
+    }
+    return pi[newString.length - 1];
+};",Hard,"/**
+ * @param {string} s
+ * @return {string}
+ */
+var shortestPalindrome = function(s) {
+  if (!s || s.length === 0) return """";
+
+  const reversed = s.split("""").reverse().join("""");
+  let i = 0;
+  while (i < s.length && s.substring(0, s.length - i) !== reversed.substring(i)) {
+    i++;
+  }
+
+  return reversed.substring(0, i) + s;
+};","The function `shortestPalindrome` takes a string `s` as input and returns the shortest palindrome that can be formed by adding characters to the beginning of `s`. It first reverses the input string. Then, it iterates through the string to find the longest prefix that is also a suffix of the reversed string. Finally, it adds the remaining part of the reversed string to the beginning of the original string to form the shortest palindrome."
+"var findLadders = function(beginWord, endWord, wordList) {
+    if (!wordList.includes(endWord)) return [];
+    
+    const result = [], map = new Map(), steps = new Map();
+	
+    for (const word of wordList) {
+        for (let i = 0; i < word.length; i++) {
+            const hash = word.substring(0, i) + '*' + word.substring(i + 1);
+			
+            if (!map.has(hash)) map.set(hash, []);
+			
+            map.get(hash).push(word);
+            steps.set(hash, wordList.length);
+        }
+    }
+    
+    const queue = [[beginWord]];
+	
+    while (queue.length > 0) {
+        const current = queue.shift();
+        const set = new Set(current);
+        const lastWord = current[current.length - 1];
+        if (lastWord === endWord) {
+            if (result.length === 0 || current.length === result[0].length)
+                result.push(current);
+            else break;
+        } else {
+            for (let i = 0; i < lastWord.length; i++) {
+                const hash = lastWord.substring(0, i) + '*' + lastWord.substring(i + 1);
+                if (!map.has(hash) || current.length > steps.get(hash))
+					continue;
+					
+                for (const nextWord of map.get(hash))
+                    if (!set.has(nextWord))
+						queue.push([...current, nextWord]);
+						
+                steps.set(hash, current.length);
+            }
+        }
+    }
+    return result;
+};",Hard,"/**
+ * @param {string} beginWord
+ * @param {string} endWord
+ * @param {string[]} wordList
+ * @return {string[][]}
+ */
+var findLadders = function(beginWord, endWord, wordList) {
+  if (!wordList.includes(endWord)) return [];
+  const wordSet = new Set(wordList);
+  const queue = [[beginWord]];
+  const result = [];
+  const visited = new Set();
+  visited.add(beginWord);
+
+  while (queue.length > 0) {
+    const currentLevel = queue.shift();
+    const lastWord = currentLevel[currentLevel.length - 1];
+    if (lastWord === endWord) {
+      result.push(currentLevel);
+      continue; // Found a path, move to the next
+    }
+
+    for (let i = 0; i < lastWord.length; i++) {
+      for (let j = 0; j < 26; j++) {
+        const charCode = 'a'.charCodeAt(0) + j;
+        const newWord = lastWord.substring(0, i) + String.fromCharCode(charCode) + lastWord.substring(i + 1);
+        if (wordSet.has(newWord) && !visited.has(newWord)) {
+          visited.add(newWord);
+          queue.push([...currentLevel, newWord]);
+        }
+      }
+    }
+  }
+  return result;
+};","The function uses Breadth-First Search (BFS) to find all shortest transformation sequences. It starts with the beginWord and explores its neighbors (words differing by one letter).  It uses a queue to manage the search and a visited set to avoid cycles.  The algorithm continues until it finds the endWord or exhausts all possible paths. The result is an array of arrays, where each inner array represents a shortest transformation sequence."
+"const isMatch = function (string, pattern) {
+  let s = 0, p = 0;
+  let starIdx = -1, pointer = -1;
+
+  while (s < string.length) {
+    if ((p < pattern.length && string[s] === pattern[p]) || pattern[p] === ""?"") {
+      s++;
+      p++;
+    } 
+	else if (p < pattern.length && pattern[p] === ""*"") {
+      starIdx = p;
+      pointer = s;
+      p++;
+    } 
+	else if (starIdx === -1) return false;
+    else {
+      p = starIdx + 1;
+      s = pointer + 1;
+      pointer = s;
+    }
+  }
+  for (let idx = p; idx < pattern.length; idx++) {
+    if (pattern[idx] !== ""*"") return false;
+  }
+  return true;
+};",Hard,"/**
+ * @param {string} s
+ * @param {string} p
+ * @return {boolean}
+ */
+var isMatch = function(s, p) {
+  if (typeof s !== 'string' || typeof p !== 'string') {
+    throw new Error('Inputs must be strings.');
+  }
+
+  const m = s.length;
+  const n = p.length;
+
+  const dp = Array(m + 1).fill(false).map(() => Array(n + 1).fill(false));
+  dp[0][0] = true;
+
+  for (let j = 1; j <= n; j++) {
+    if (p[j - 1] === '*') {
+      dp[0][j] = dp[0][j - 1];
+    }
+  }
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (p[j - 1] === '*') {
+        dp[i][j] = dp[i][j - 1] || dp[i - 1][j];
+      } else if (p[j - 1] === '?' || s[i - 1] === p[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      }
+    }
+  }
+
+  return dp[m][n];
+};","The solution uses dynamic programming. A 2D array `dp` is created where `dp[i][j]` represents whether the first `i` characters of `s` match the first `j` characters of `p`. The base cases are handled, and the algorithm iterates through the strings, updating `dp` based on the characters and wildcard characters ('?', '*'). The final result is stored in `dp[m][n]`, where `m` and `n` are the lengths of `s` and `p`, respectively. Error handling is included to ensure that inputs are strings."
+"var isMatch = function(s, p) {
+    const m = s.length, n = p.length;
+    const dp = new Array(m+1).fill().map(() => new Array(n+1).fill(false));
+    dp[0][0] = true; // empty pattern matches empty string
+
+    // initialize first row (empty string)
+    for (let j = 1; j <= n; j++) {
+        if (p[j-1] === '*')
+        dp[0][j] = dp[0][j-2];
+    }
+
+    // fill in remaining cells
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+        if (s[i-1] === p[j-1] || p[j-1] === '.') {
+            dp[i][j] = dp[i-1][j-1];
+        } else if (p[j-1] === '*') {
+            dp[i][j] = dp[i][j-2]; // zero occurrences
+            if (s[i-1] === p[j-2] || p[j-2] === '.') {
+            dp[i][j] = dp[i][j] || dp[i-1][j]; // one or more occurrences
+            }
+        }
+        }
+    }
+    return dp[m][n];
+}",Hard,"/**
+ * @param {string} s
+ * @param {string} p
+ * @return {boolean}
+ */
+var isMatch = function(s, p) {
+  const m = s.length;
+  const n = p.length;
+
+  // Create a DP table to store results of subproblems
+  const dp = Array(m + 1).fill(false).map(() => Array(n + 1).fill(false));
+
+  // Empty string matches empty pattern
+  dp[0][0] = true;
+
+  // Handle patterns with leading '*'
+  for (let j = 1; j <= n; j++) {
+    if (p[j - 1] === '*') {
+      dp[0][j] = dp[0][j - 2];
+    }
+  }
+
+  // Fill the DP table
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (p[j - 1] === '.') {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else if (p[j - 1] === '*') {
+        dp[i][j] = dp[i][j - 2]; // Match zero occurrences
+        if (p[j - 2] === '.' || p[j - 2] === s[i - 1]) {
+          dp[i][j] = dp[i][j] || dp[i - 1][j]; // Match one or more occurrences
+        }
+      } else if (p[j - 1] === s[i - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      }
+    }
+  }
+
+  return dp[m][n];
+};","The solution uses dynamic programming.  A DP table `dp[i][j]` stores whether the first `i` characters of string `s` match the first `j` characters of pattern `p`. The table is filled iteratively, considering cases for '.' and '*'. Base cases handle empty strings and patterns starting with '*'. The final result is stored in `dp[m][n]`."
+"/**
+ * @param {number[]} balloons - The input array representing the balloon values.
+ * @return {number} - The maximum coins that can be collected.
+ */
+var maxCoins = function(balloons) {
+    const n = balloons.length;
+
+    // Pad the `balloons` array with 1 on both sides to simplify boundary cases
+    balloons.push(1);
+    balloons.unshift(1);
+
+    // Create a DP table initialized with 0, with size (n+2) x (n+2)
+    const dp = Array.from({ length: n + 2 }, () => Array(n + 2).fill(0));
+
+    // Iterate backwards over all possible subarray starting points
+    for (let left = n; left >= 1; left--) {
+        // Iterate over all possible subarray ending points
+        for (let right = left; right <= n; right++) {
+            let maxCoins = -Infinity; // Store the maximum coins for subarray [left, right]
+
+            // Try bursting each balloon `idx` in the range as the last balloon
+            for (let lastBurst = left; lastBurst <= right; lastBurst++) {
+                // Calculate the coins for bursting balloon `lastBurst` last
+                const coins = balloons[left - 1] * balloons[lastBurst] * balloons[right + 1] +
+                              dp[left][lastBurst - 1] + dp[lastBurst + 1][right];
+
+                // Update the maximum coins for this subarray
+                maxCoins = Math.max(maxCoins, coins);
+            }
+
+            // Store the maximum coins obtained for subarray [left, right] in the DP table
+            dp[left][right] = maxCoins;
+        }
+    }
+
+    // Return the maximum coins for bursting all balloons between 1 and n
+    return dp[1][n];
+};
+
+/**
+ * Time Complexity: O(n^3)
+ * - We have three nested loops: one for `left`, one for `right`, and one for choosing the last balloon to burst in the range.
+ * 
+ * Space Complexity: O(n^2)
+ * - We use a DP table of size (n+2) x (n+2) to store the results of subproblems.
+ */",Hard,"/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxCoins = function(nums) {
+  // Handle edge cases
+  if (!nums || nums.length === 0) {
+    return 0;
+  }
+
+  // Add 1s to the beginning and end of the array to handle boundary conditions
+  nums = [1, ...nums, 1];
+
+  const n = nums.length;
+  // dp[i][j] represents the maximum coins that can be obtained by bursting balloons from index i to j
+  const dp = Array(n).fill(0).map(() => Array(n).fill(0));
+
+  // Iterate through all possible subarrays
+  for (let len = 2; len < n; len++) {
+    for (let i = 0; i < n - len; i++) {
+      const j = i + len;
+      for (let k = i + 1; k < j; k++) {
+        dp[i][j] = Math.max(dp[i][j], dp[i][k] + dp[k][j] + nums[i] * nums[k] * nums[j]);
+      }
+    }
+  }
+
+  return dp[0][n - 1];
+};","The solution uses dynamic programming to solve the problem.  It adds 1s to the beginning and end of the input array to simplify boundary condition handling. The dp array stores the maximum coins obtainable for subarrays. The code iterates through subarrays of increasing length, calculating the maximum coins for each subarray by considering all possible bursting orders. The final result is the maximum coins obtainable for the entire array."
+"var solveSudoku = function(board) {
+    const solve = () => {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (board[row][col] === '.') {
+                    for (let num = '1'; num <= '9'; num++) {
+                        if (isValid(board, row, col, num)) {
+                            board[row][col] = num;
+                            if (solve()) return true;
+                            board[row][col] = '.';
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    
+    const isValid = (board, row, col, num) => {
+        for (let i = 0; i < 9; i++) {
+            if (board[row][i] === num || board[i][col] === num) return false;
+        }
+        let startRow = Math.floor(row / 3) * 3;
+        let startCol = Math.floor(col / 3) * 3;
+        for (let i = startRow; i < startRow + 3; i++) {
+            for (let j = startCol; j < startCol + 3; j++) {
+                if (board[i][j] === num) return false;
+            }
+        }
+        return true;
+    };
+    
+    solve();
+};",Hard,"/**
+ * @param {character[][]} board
+ * @return {void} Do not return anything, modify board in-place instead.
+ */
+var solveSudoku = function(board) {
+    const solve = () => {
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+                if (board[i][j] === '.') {
+                    for (let k = 1; k <= 9; k++) {
+                        if (isValid(i, j, k)) {
+                            board[i][j] = k.toString();
+                            if (solve()) return true;
+                            board[i][j] = '.';
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    const isValid = (row, col, num) => {
+        for (let i = 0; i < 9; i++) {
+            if (board[row][i] === num.toString() || board[i][col] === num.toString()) return false;
+        }
+        const subgridRow = Math.floor(row / 3) * 3;
+        const subgridCol = Math.floor(col / 3) * 3;
+        for (let i = subgridRow; i < subgridRow + 3; i++) {
+            for (let j = subgridCol; j < subgridCol + 3; j++) {
+                if (board[i][j] === num.toString()) return false;
+            }
+        }
+        return true;
+    };
+
+    solve();
+};","The solution uses a backtracking algorithm. The `solve` function iterates through each cell. If a cell is empty, it tries numbers 1-9. The `isValid` function checks if placing a number in a cell is valid according to Sudoku rules. If a valid number is found, it recursively calls `solve`. If no valid number is found, it backtracks and tries a different number. If `solve` returns true, it means a solution is found. Otherwise, it means no solution exists."
