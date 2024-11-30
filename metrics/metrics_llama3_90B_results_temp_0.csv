@@ -1,0 +1,7 @@
+File,Average Accuracy (Refactored),Average Accuracy (Optimized),Accuracy Change Percentage,Average Runtime Improvement (Refactored %),Average Runtime Improvement (Optimized %),Average Runtime Comparison (Refactored vs. Optimized %),Average ESLint Change Percentage,Average Closure Change Percentage
+llama3_90B_results_temp_0/PROMPT_CODEGEN_V1_llama3-groq-70b-8192-tool-use-preview.csv,0.7626,0.9071,-15.9352,33.8357,11.3129,20.2337,-16.3197,-42.6330
+llama3_90B_results_temp_0/PROMPT_REFACTOR_V4_llama3-groq-70b-8192-tool-use-preview.csv,0.8666,0.9256,-6.3684,32.5932,18.2120,12.1655,-50.2327,-45.3231
+llama3_90B_results_temp_0/PROMPT_REFACTOR_V5_llama3-groq-70b-8192-tool-use-preview.csv,0.8267,0.9256,-10.6802,52.0235,16.9266,30.0161,-16.1303,-28.3819
+llama3_90B_results_temp_0/PROMPT_REFACTOR_V1_llama3-groq-70b-8192-tool-use-preview.csv,0.8101,0.9256,-12.4768,19.1242,16.7730,2.0134,-17.2488,-27.9569
+llama3_90B_results_temp_0/PROMPT_REFACTOR_V2_llama3-groq-70b-8192-tool-use-preview.csv,0.8055,0.9056,-11.0473,40.1507,14.8535,22.0256,-18.6928,-29.9736
+llama3_90B_results_temp_0/PROMPT_REFACTOR_V3_llama3-groq-70b-8192-tool-use-preview.csv,0.8323,0.9256,-10.0815,16.6330,18.0448,-1.1960,-11.6058,-25.6900

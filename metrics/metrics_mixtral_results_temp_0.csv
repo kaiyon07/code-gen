@@ -1,0 +1,7 @@
+File,Average Accuracy (Refactored),Average Accuracy (Optimized),Accuracy Change Percentage,Average Runtime Improvement (Refactored %),Average Runtime Improvement (Optimized %),Average Runtime Comparison (Refactored vs. Optimized %),Average ESLint Change Percentage,Average Closure Change Percentage
+mixtral_results_temp_0/PROMPT_REFACTOR_V2_mixtral-8x7b-32768.csv,0.7193,0.9071,-20.7048,32.9310,16.6492,13.9579,2.9738,24.8766
+mixtral_results_temp_0/PROMPT_REFACTOR_V5_mixtral-8x7b-32768.csv,0.6688,0.9071,-26.2760,37.3973,14.7284,19.7587,-8.1416,25.3993
+mixtral_results_temp_0/PROMPT_REFACTOR_V1_mixtral-8x7b-32768.csv,0.6474,0.8871,-27.0225,41.5985,14.9248,23.2097,-6.0958,15.0334
+mixtral_results_temp_0/PROMPT_REFACTOR_V4_mixtral-8x7b-32768.csv,0.7337,0.8871,-17.2957,16.8618,13.1191,3.3086,-15.6892,-3.1727
+mixtral_results_temp_0/PROMPT_REFACTOR_V3_mixtral-8x7b-32768.csv,0.6491,0.9071,-28.4478,30.0590,13.9783,14.1085,-0.9920,4.7036
+mixtral_results_temp_0/PROMPT_CODEGEN_V1_mixtral-8x7b-32768.csv,0.7315,0.8871,-17.5357,100.4513,13.4397,76.7029,-10.6341,4.6752
