@@ -1,13 +1,13 @@
-File,Average Accuracy (Refactored),Average Accuracy (Optimized),Average Runtime Improvement (Refactored),Average Runtime Improvement (Optimized),Average ESLint Change Percentage,Average Closure Change Percentage
-result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V3_results.csv,0.8610933510933512,0.8871014867485455,1.1369437042770605,1.199068829353006,-8.56154058345952,7.11973581973582
-result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V5_results.csv,0.8994771894771896,0.9071014867485455,1.0156032983543135,1.1629007814815497,-16.211886157586605,8.228069153069155
-result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V2_results.csv,0.8944771894771896,0.8871014867485455,1.0911407423704256,1.2049733259327664,-4.264409338688348,6.144735819735821
-result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V4_results.csv,0.8598408258408259,0.8871014867485455,1.1475749993305555,1.2037303122706906,-29.605080551919514,-10.18986013986014
-result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V4_results.csv,0.9130486180486181,0.9071014867485455,1.135294348641968,1.2341641173717388,-25.29244124879014,-10.395221445221448
-result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_results.csv,0.8610933510933512,0.8871014867485455,1.1084594180627017,1.188260749768277,-9.668395587435693,10.186402486402487
-result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V3_results.csv,0.8752708402708403,0.8871014867485455,1.0739589913616943,1.1797006675304569,-3.256996422999476,9.911402486402489
-result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V2_results.csv,0.8736186036186037,0.8871014867485455,1.1745785727348894,1.2019417556603897,-16.50501368856992,9.51973581973582
-result_gemini/results_gemini_0/gemini-1.5-pro_CODEGEN_results.csv,0.8898408258408259,0.9071014867485455,1.0253655090275162,1.1280598117205243,-8.983822698358658,8.194735819735822
-result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V5_results.csv,0.8596647796647797,0.8871014867485455,1.1374241858545397,1.209982127958329,-11.345654629509047,6.5197358197358195
-result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_results.csv,0.9062254412254412,0.9071014867485455,1.0698474013914678,1.1756522027654568,-7.386642593822119,7.91140248640249
-result_gemini/results_gemini_0/gemini-1.5-flash_CODEGEN_results.csv,0.8564930624930625,0.8871014867485455,1.072264850309108,1.1910754230499958,-0.7472931127458815,10.569735819735822
+File,Average Accuracy (Refactored),Average Accuracy (Optimized),Accuracy Change Percentage,Average Runtime Improvement (Refactored %),Average Runtime Improvement (Optimized %),Average Runtime Comparison (Refactored vs. Optimized %),Average ESLint Change Percentage,Average Closure Change Percentage
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V3_results.csv,0.86,0.89,-2.93,17.46,13.22,3.75,-8.56,7.12
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V5_results.csv,0.90,0.91,-0.84,49.54,14.82,30.23,-16.21,8.23
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V2_results.csv,0.89,0.89,0.83,27.57,13.40,12.49,-4.26,6.14
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V4_results.csv,0.86,0.89,-3.07,13.28,15.30,-1.76,-29.61,-10.19
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V4_results.csv,0.91,0.91,0.66,22.80,18.03,4.05,-25.29,-10.40
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_results.csv,0.86,0.89,-2.93,18.68,12.58,5.42,-9.67,10.19
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V3_results.csv,0.88,0.89,-1.33,26.96,24.83,1.70,-3.26,9.91
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V2_results.csv,0.87,0.89,-1.52,9.25,15.09,-5.07,-16.51,9.52
+result_gemini/results_gemini_0/gemini-1.5-pro_CODEGEN_results.csv,0.89,0.91,-1.90,38.40,19.75,15.58,-8.98,8.19
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V5_results.csv,0.86,0.89,-3.09,20.33,14.92,4.71,-11.35,6.52
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_results.csv,0.91,0.91,-0.10,25.60,14.77,9.44,-7.39,7.91
+result_gemini/results_gemini_0/gemini-1.5-flash_CODEGEN_results.csv,0.86,0.89,-3.45,33.41,14.98,16.03,-0.75,10.57

@@ -1,9 +1,9 @@
-File,Average Accuracy (Refactored),Average Accuracy (Optimized),Average Runtime Improvement (Refactored),Average Runtime Improvement (Optimized),Average ESLint Change Percentage,Average Closure Change Percentage
-openai_results_temp_0/PROMPT_REFACTOR_V2_gpt-4-turbo.csv,0.8659418359418359,0.8871014867485455,1.1342790126835067,1.1928641709197745,-18.81067369459488,5.319735819735821
-openai_results_temp_0/CODE_GEN_V1_gpt-4-turbo.csv,0.8496709956709957,0.8871014867485455,0.973753593700494,1.1830885268716185,-13.535696113660615,4.553069153069154
-openai_results_temp_0/PROMPT_REFACTOR_V3_gpt-4-turbo.csv,0.8794771894771896,0.8871014867485455,1.0993636390024033,1.1765795014412481,-14.416607800146771,7.053069153069156
-openai_results_temp_0/CODE_GEN_V1_gpt-3.5-turbo.csv,0.8209577089577089,0.8871014867485455,1.3564117842999823,1.175613523735371,-36.67926499171794,-46.76478243978243
-openai_results_temp_0/CODE_REFACTOR_V1_gpt-3.5-turbo.csv,0.8901914751914751,0.8871014867485455,1.1076935069074623,1.177860461781584,-11.240298212279635,-23.968006993006995
-openai_results_temp_0/PROMPT_REFACTOR_V1_gpt-4-turbo.csv,0.8794771894771896,0.8871014867485455,1.1136286295084223,1.1873223264602708,-15.810225352739653,8.353069153069157
-openai_results_temp_0/CODE_REFACTOR_V2_gpt-3.5-turbo.csv,0.8564122544122544,0.8871014867485455,1.1628044756589109,1.2210940379168331,-13.64835036006242,-19.584673659673662
-openai_results_temp_0/CODE_REFACTOR_V3_gpt-3.5-turbo.csv,0.8952867132867133,0.8871014867485455,1.1627342628254342,1.1989101819645074,-8.414742862916238,-21.330827505827507
+File,Average Accuracy (Refactored),Average Accuracy (Optimized),Accuracy Change Percentage,Average Runtime Improvement (Refactored %),Average Runtime Improvement (Optimized %),Average Runtime Comparison (Refactored vs. Optimized %),Average ESLint Change Percentage,Average Closure Change Percentage
+openai_results_temp_0/PROMPT_REFACTOR_V2_gpt-4-turbo.csv,0.87,0.89,-2.39,11.48,15.42,-3.41,-18.81,5.32
+openai_results_temp_0/CODE_GEN_V1_gpt-4-turbo.csv,0.85,0.89,-4.22,41.61,15.60,22.50,-13.54,4.55
+openai_results_temp_0/PROMPT_REFACTOR_V3_gpt-4-turbo.csv,0.88,0.89,-0.86,23.98,16.61,6.32,-14.42,7.05
+openai_results_temp_0/CODE_GEN_V1_gpt-3.5-turbo.csv,0.82,0.89,-7.46,16.63,16.97,-0.30,-36.68,-46.76
+openai_results_temp_0/CODE_REFACTOR_V1_gpt-3.5-turbo.csv,0.89,0.89,0.35,15.03,16.17,-0.98,-11.24,-23.97
+openai_results_temp_0/PROMPT_REFACTOR_V1_gpt-4-turbo.csv,0.88,0.89,-0.86,24.33,15.41,7.72,-15.81,8.35
+openai_results_temp_0/CODE_REFACTOR_V2_gpt-3.5-turbo.csv,0.86,0.89,-3.46,10.15,10.59,-0.40,-13.65,-19.58
+openai_results_temp_0/CODE_REFACTOR_V3_gpt-3.5-turbo.csv,0.90,0.89,0.92,12.67,14.12,-1.27,-8.41,-21.33
