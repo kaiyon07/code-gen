@@ -1,0 +1,6 @@
+File,Average Accuracy (Refactored),Average Accuracy (Optimized),Accuracy Change Percentage,Average Runtime Improvement (Refactored %),Average Runtime Improvement (Optimized %),Average Runtime Comparison (Refactored vs. Optimized %),Average ESLint Change Percentage,Average Closure Change Percentage
+openai_results_temp_0/gpt-4-turbo/PROMPT_CODEGEN_V1_gpt-4-turbo.csv,0.8497,0.8871,-4.2194,41.6120,15.5975,22.5044,-13.5357,4.5531
+openai_results_temp_0/gpt-4-turbo/PROMPT_REFACTOR_V2_gpt-4-turbo.csv,0.8659,0.8871,-2.3853,11.4769,15.4153,-3.4124,-18.8107,5.3197
+openai_results_temp_0/gpt-4-turbo/PROMPT_REFACTOR_V4_gpt-4-turbo.csv,0.8462,0.8871,-4.6078,23.0853,16.5801,5.5800,-38.4871,-18.2755
+openai_results_temp_0/gpt-4-turbo/PROMPT_REFACTOR_V3_gpt-4-turbo.csv,0.8795,0.8871,-0.8595,23.9818,16.6083,6.3233,-14.4166,7.0531
+openai_results_temp_0/gpt-4-turbo/PROMPT_REFACTOR_V1_gpt-4-turbo.csv,0.8795,0.8871,-0.8595,24.3259,15.4125,7.7231,-15.8102,8.3531
