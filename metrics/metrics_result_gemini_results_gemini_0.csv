@@ -1,0 +1,13 @@
+File,Average Accuracy (Refactored),Average Accuracy (Optimized),Accuracy Change Percentage,Average Runtime Improvement (Refactored %),Average Runtime Improvement (Optimized %),Average Runtime Comparison (Refactored vs. Optimized %),Average ESLint Change Percentage,Average Closure Change Percentage
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V3_results.csv,0.8611,0.8871,-2.9318,17.4638,13.2154,3.7524,-8.5615,7.1197
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V5_results.csv,0.8995,0.9071,-0.8405,49.5369,14.8233,30.2322,-16.2119,8.2281
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V2_results.csv,0.8945,0.8871,0.8314,27.5686,13.4029,12.4915,-4.2644,6.1447
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V4_results.csv,0.8598,0.8871,-3.0730,13.2769,15.3038,-1.7579,-29.6051,-10.1899
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V4_results.csv,0.9130,0.9071,0.6556,22.8048,18.0293,4.0460,-25.2924,-10.3952
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_results.csv,0.8611,0.8871,-2.9318,18.6823,12.5798,5.4206,-9.6684,10.1864
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_V3_results.csv,0.8753,0.8871,-1.3336,26.9580,24.8308,1.7040,-3.2570,9.9114
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V2_results.csv,0.8736,0.8871,-1.5199,9.2501,15.0862,-5.0711,-16.5050,9.5197
+result_gemini/results_gemini_0/gemini-1.5-pro_CODEGEN_results.csv,0.8898,0.9071,-1.9028,38.4039,19.7457,15.5816,-8.9838,8.1947
+result_gemini/results_gemini_0/gemini-1.5-flash_REFACTOR_V5_results.csv,0.8597,0.8871,-3.0928,20.3338,14.9221,4.7090,-11.3457,6.5197
+result_gemini/results_gemini_0/gemini-1.5-pro_REFACTOR_results.csv,0.9062,0.9071,-0.0966,25.5993,14.7691,9.4365,-7.3866,7.9114
+result_gemini/results_gemini_0/gemini-1.5-flash_CODEGEN_results.csv,0.8565,0.8871,-3.4504,33.4111,14.9785,16.0313,-0.7473,10.5697
