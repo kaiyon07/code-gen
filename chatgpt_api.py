@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-api_key = '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'
+api_key = ''
 
 client = OpenAI(api_key=api_key)
 
