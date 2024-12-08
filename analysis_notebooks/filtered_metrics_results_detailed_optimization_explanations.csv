@@ -1,0 +1,9 @@
+File,Average Accuracy (Refactored),Average Accuracy (Optimized),Accuracy Change Percentage,Average Runtime Improvement (Refactored %),Average Runtime Improvement (Optimized %),Average Runtime Comparison (Refactored vs. Optimized %),Average ESLint Change Percentage,Average Closure Change Percentage
+mixtral_results_temp_0/PROMPT_REFACTOR_V5_mixtral-8x7b-32768.csv,0.6688,0.9071,-26.276,37.3973,14.7284,19.7587,-8.1416,25.3993
+mixtral_results_temp_0/PROMPT_REFACTOR_V3_mixtral-8x7b-32768.csv,0.6491,0.9071,-28.4478,30.059,13.9783,14.1085,-0.992,4.7036
+llama3_90B_results_temp_0/PROMPT_REFACTOR_V5_llama3-groq-70b-8192-tool-use-preview.csv,0.8267,0.9256,-10.6802,52.0235,16.9266,30.0161,-16.1303,-28.3819
+llama3_90B_results_temp_0/PROMPT_REFACTOR_V3_llama3-groq-70b-8192-tool-use-preview.csv,0.8323,0.9256,-10.0815,16.633,18.0448,-1.196,-11.6058,-25.69
+gemini_results_temp_0/gemini-1.5-pro/PROMPT_REFACTOR_V5_gemini-1.5-pro.csv,0.8995,0.9071,-0.8405,49.5369,14.8233,30.2322,-16.2119,8.2281
+gemini_results_temp_0/gemini-1.5-pro/PROMPT_REFACTOR_V3_gemini-1.5-pro.csv,0.8753,0.8871,-1.3336,26.958,24.8308,1.704,-3.257,9.9114
+gemini_results_temp_0/gemini-1.5-flash/PROMPT_REFACTOR_V5_gemini-1.5-flash.csv,0.8597,0.8871,-3.0928,20.3338,14.9221,4.709,-11.3457,6.5197
+gemini_results_temp_0/gemini-1.5-flash/PROMPT_REFACTOR_V3_gemini-1.5-flash.csv,0.8611,0.8871,-2.9318,17.4638,13.2154,3.7524,-8.5615,7.1197

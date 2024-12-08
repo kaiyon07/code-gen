@@ -1,0 +1,7 @@
+File,Average Accuracy (Refactored),Average Accuracy (Optimized),Accuracy Change Percentage,Average Runtime Improvement (Refactored %),Average Runtime Improvement (Optimized %),Average Runtime Comparison (Refactored vs. Optimized %),Average ESLint Change Percentage,Average Closure Change Percentage
+gemini_results_temp_0/gemini-1.5-flash/PROMPT_REFACTOR_V1_gemini-1.5-flash.csv,0.8611,0.8871,-2.9318,18.6823,12.5798,5.4206,-9.6684,10.1864
+gemini_results_temp_0/gemini-1.5-flash/PROMPT_REFACTOR_V2_gemini-1.5-flash.csv,0.8736,0.8871,-1.5199,9.2501,15.0862,-5.0711,-16.5050,9.5197
+gemini_results_temp_0/gemini-1.5-flash/PROMPT_REFACTOR_V4_gemini-1.5-flash.csv,0.8598,0.8871,-3.0730,13.2769,15.3038,-1.7579,-29.6051,-10.1899
+gemini_results_temp_0/gemini-1.5-flash/PROMPT_REFACTOR_V5_gemini-1.5-flash.csv,0.8597,0.8871,-3.0928,20.3338,14.9221,4.7090,-11.3457,6.5197
+gemini_results_temp_0/gemini-1.5-flash/PROMPT_REFACTOR_V3_gemini-1.5-flash.csv,0.8611,0.8871,-2.9318,17.4638,13.2154,3.7524,-8.5615,7.1197
+gemini_results_temp_0/gemini-1.5-flash/PROMPT_CODEGEN_V1_gemini-1.5-flash.csv,0.8565,0.8871,-3.4504,33.4111,14.9785,16.0313,-0.7473,10.5697
