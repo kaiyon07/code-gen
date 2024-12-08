@@ -77,5 +77,5 @@ static analysis and runtime metrics of the code.
 
 ### Step 3: Data Analysis and Aggregation
 
-Aggregated statistics for each model are located in `./metrics`. Notebooks in `./analysis_notebooks` are used to produce 
-such statistics as well as any graphs (figures) in the report.
+Aggregated statistics for each model are located in `./analysis_notebooks/metrics`. Notebooks in `./analysis_notebooks` 
+are used to produce such statistics as well as any graphs (figures) in the report.
